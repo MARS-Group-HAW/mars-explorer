@@ -1,26 +1,39 @@
 {
-    "compilerOptions": {
-        "target": "es5",
-        "rootDir": "src",
-        "module": "commonjs",
-        "baseUrl": "./example",
-        "moduleResolution": "node",
-        "sourceMap": true,
-        "declarationMap": true,
-        "inlineSources": false,
-        "declaration": true,
-        "stripInternal": true,
-        "lib": [
-            "es2016",
-            "dom"
-        ],
-        "outDir": "lib",
-        "strict": true,
-        "strictNullChecks": false,
-        "noImplicitReturns": true,
-        "noUnusedLocals": true
-    },
-    "include": [
-        "src"
-    ]
+  "compilerOptions": {
+    "target": "es6",
+    "rootDir": "src",
+    "module": "commonjs",
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "sourceMap": true,
+    "declarationMap": true,
+    "inlineSources": false,
+    "declaration": true,
+    "stripInternal": true,
+    "lib": [
+      "es2016",
+      "dom"
+    ],
+    "strict": true,
+    "strictNullChecks": false,
+    "noImplicitReturns": true,
+    "noUnusedLocals": true,
+    "allowSyntheticDefaultImports": true,
+    "jsx": "react",
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "noImplicitAny": true,
+    "outDir": "dist",
+    "resolveJsonModule": true,
+    "paths": {
+      "*": [
+        "node_modules/*",
+        "src/shared/types/*"
+      ]
+    }
+  },
+  "include": [
+    "src"
+  ],
 }

@@ -2,27 +2,28 @@
  * Copyright (c) 2018 TypeFox GmbH (http://www.typefox.io). All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-import * as fs from 'fs';
-import * as rpc from "vscode-ws-jsonrpc";
-import * as server from "vscode-ws-jsonrpc/lib/server";
+// import * as fs from 'fs';
+import * as rpc from '@codingame/monaco-jsonrpc';
+import * as server from '@codingame/monaco-jsonrpc/lib/server';
+
+
 import {
     InitializeRequest, InitializeParams,
     DidOpenTextDocumentNotification, DidOpenTextDocumentParams
 } from 'vscode-languageserver';
-import config from "./config";
-
-const serverName = 'omnisharp';
+import config, {SERVER_NAMES} from "./config";
 
 export function launch(socket: rpc.IWebSocket) {
     const reader = new rpc.WebSocketMessageReader(socket);
     const writer = new rpc.WebSocketMessageWriter(socket);
+    console.log('connecting')
 
     // start the language server as an external process
+    // @ts-ignore
     const socketConnection = server.createConnection(reader, writer, () => socket.dispose());
-    // const serverConnection = server.createServerProcess('LSP', '/Users/jvoss/Projects/temp/csharp-language-server-protocol/sample/SampleServer/bin/Debug/netcoreapp3.1/osx-x64/SampleServer', []);
-    const connectTo = config[serverName];
+    const connectTo = config[SERVER_NAMES.LOCAL_JNV];
     const serverConnection = server.createServerProcess(
-        serverName,
+        SERVER_NAMES.LOCAL_JNV,
         connectTo.command,
         connectTo.args,
     );
@@ -39,13 +40,14 @@ export function launch(socket: rpc.IWebSocket) {
                     const didOpenParams = message.params as DidOpenTextDocumentParams;
                     const uri = didOpenParams.textDocument.uri;
                     const text = didOpenParams.textDocument.text;
-                    if (uri) fs.writeFileSync(uri.replace('file://', ''), text)
+                    console.log('Opening', uri, text);
+                    // if (uri) fs.writeFileSync(uri.replace('file://', ''), text)
                     break;
                 }
             }
         }
 
-        console.info(`GOT MESSAGE: `, message.jsonrpc, message)
+        // console.info(`GOT MESSAGE: `, message.jsonrpc, message)
 
         return message;
     });

@@ -1,0 +1,25 @@
+{
+  "dotnet": {
+    "enabled": true,
+    "enablePackageRestore": true
+  },
+  "MSBuild": {
+    "MSBuildSDKsPath": "/Users/jvoss/Projects/master-thesis/temp/omnisharp/dotnet-sdk/sdk/3.1.410/Sdks",
+    "UseLegacySdkResolver": true
+  },
+  "RoslynExtensionsOptions": {
+    "enableAnalyzersSupport": true
+  },
+  "script": {
+    "enabled": false
+  },
+  "cake": {
+    "enabled": false
+  },
+  "fileOptions": {
+    "excludeSearchPatterns": [
+      "**/var/**/*",
+      "**/obj/**/*"
+    ]
+  }
+}
