@@ -2,41 +2,19 @@
  * Copyright (c) 2018 TypeFox GmbH (http://www.typefox.io). All rights reserved.
  * Licensed under the MIT License. See License.txt in the project root for license information.
  * ------------------------------------------------------------------------------------------ */
-import { listen } from '@codingame/monaco-jsonrpc';
-import * as monaco from 'monaco-editor-core'
+import {listen} from '@codingame/monaco-jsonrpc';
 import {
-    MonacoLanguageClient, MessageConnection, CloseAction, ErrorAction,
-    MonacoServices, createConnection
+    CloseAction,
+    createConnection,
+    ErrorAction,
+    MessageConnection,
+    MonacoLanguageClient
 } from 'monaco-languageclient';
-import normalizeUrl = require('normalize-url');
-const ReconnectingWebSocket = require('reconnecting-websocket');
-
-// create Monaco editor
-const code = `using System;
-
-namespace TestDotNetCoreApp
-{
-    class Program
-    {
-        static void Main(string[] args)
-        {
-            Console.WriteLine("Hello World!");
-        }
-    }
-}`;
-
-monaco.editor.create(document.getElementById("container")!, {
-    model: monaco.editor.createModel(code, 'csharp', monaco.Uri.parse('file:///workspace/TestDotNetCoreApp/Program.cs')),
-    glyphMargin: true,
-    theme: 'vs-dark',
-    fontSize: 16,
-});
-
-// install Monaco language client services
-MonacoServices.install(monaco, {rootUri: "file:///workspace"});
+// import ReconnectingWebsocket from "reconnecting-websocket";
 
 // create the web socket
 const url = createUrl('/socket')
+console.log('Client URL', url);
 const webSocket = createWebSocket(url);
 // listen when the web socket is opened
 listen({
@@ -63,7 +41,7 @@ function createLanguageClient(connection: MessageConnection): MonacoLanguageClie
         },
         // create a language client connection from the JSON RPC connection on demand
         connectionProvider: {
-            get: (errorHandler:any, closeHandler:any) => {
+            get: (errorHandler: any, closeHandler: any) => {
                 return Promise.resolve(createConnection(connection, errorHandler, closeHandler))
             }
         }
@@ -72,10 +50,12 @@ function createLanguageClient(connection: MessageConnection): MonacoLanguageClie
 
 function createUrl(path: string): string {
     const protocol = location.protocol === 'https:' ? 'wss' : 'ws';
-    return normalizeUrl(`${protocol}://${location.host}${location.pathname}${path}`);
+    // TODO: use port send by main
+    return `${protocol}://localhost:5555${path}`;
 }
 
 function createWebSocket(url: string): WebSocket {
+    /*
     const socketOptions = {
         maxReconnectionDelay: 10000,
         minReconnectionDelay: 1000,
@@ -84,5 +64,9 @@ function createWebSocket(url: string): WebSocket {
         maxRetries: Infinity,
         debug: false
     };
-    return new ReconnectingWebSocket(url, [], socketOptions);
+       return new ReconnectingWebSocket(url, [], socketOptions);
+
+     */
+
+    return new WebSocket(url, []);
 }

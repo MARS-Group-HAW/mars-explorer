@@ -1,6 +1,10 @@
 import {DocumentSelector} from "monaco-languageclient";
 import * as path from "path";
 
+export enum SERVER_NAMES {
+    LOCAL_JNV = "LOCAL_JNV"
+}
+
 type Server = {
     command: string;
     workingDirectory: string;
@@ -9,15 +13,21 @@ type Server = {
     documentSelector: DocumentSelector
 }
 
-export type ServerMap = { [name: string]: Server };
+export type ServerMap = { [key in keyof typeof SERVER_NAMES]: Server };
 
 
 // Sample Server: '/Users/jvoss/Projects/temp/csharp-language-server-protocol/sample/SampleServer/bin/Debug/netcoreapp3.1/osx-x64/SampleServer',
 const Servers: ServerMap = {
-    omnisharp: {
-        command: '/opt/omnisharp/run',
-        workingDirectory: path.resolve(__dirname, '..', 'csharp-workspace'),
-        args: ['-lsp', '-debug'],
+    [SERVER_NAMES.LOCAL_JNV]: {
+        command: 'bash',
+        workingDirectory: path.resolve(__dirname, '..', '.webpack', 'renderer', 'workspace'),
+        args: [
+            '/Users/jvoss/Projects/master-thesis/temp/omnisharp/omnisharp-osx/run',
+            '-lsp',
+            '-debug', // TODO: maybe delete -debug?
+            'script:enabled=false',
+            'cake:enabled=false'
+        ],
         language: 'csharp',
         documentSelector: [{
             pattern: "**/*.cs"
