@@ -1,7 +1,6 @@
 import { DocumentSelector } from "monaco-languageclient";
 import * as path from "path";
 import { SpawnOptions } from "child_process";
-import { app } from "electron";
 import { is } from "electron-util";
 
 export enum SERVER_NAMES {

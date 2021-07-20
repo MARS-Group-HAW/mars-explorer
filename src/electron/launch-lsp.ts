@@ -14,7 +14,7 @@ import {
   InitializeParams,
   InitializeRequest,
 } from "vscode-languageserver";
-import { Servers, SERVER_NAMES } from "./config";
+import { SERVER_NAMES, Servers } from "./config";
 import { logger } from "./logger";
 
 export function launch(socket: rpc.IWebSocket) {

@@ -12,7 +12,7 @@ rules.push({
 })
 
 plugins.push(new MonacoWebpackPlugin({
-    languages: ['csharp', 'json'],
+    languages: ['csharp'],
     publicPath: ".webpack/renderer"
 }))
 
