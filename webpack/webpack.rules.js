@@ -8,9 +8,10 @@ module.exports = [
     test: /\.(m?js|node)$/,
     parser: { amd: false },
     use: {
-      loader: '@marshallofsound/webpack-asset-relocator-loader',
+      // replaced because of https://github.com/electron-userland/electron-forge/issues/2154
+      loader: "@timfish/webpack-asset-relocator-loader",
       options: {
-        outputAssetBase: 'native_modules',
+        outputAssetBase: "native_modules",
       },
     },
   },

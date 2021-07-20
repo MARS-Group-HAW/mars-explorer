@@ -1,5 +1,5 @@
 import {startServer} from "./server";
-import {enforceMacOSAppLocation, isFirstAppLaunch} from "electron-util";
+import {enforceMacOSAppLocation, is, isFirstAppLaunch} from "electron-util";
 import * as path from "path";
 import {ipcMain} from "electron";
 import {Channel} from "../shared/types/Channel";
@@ -7,9 +7,11 @@ import {Channel} from "../shared/types/Channel";
 const {app, BrowserWindow} = require('electron')
 const squirrel = require('electron-squirrel-startup');
 const fs = require('fs-extra')
+const log4js = require("log4js");
 
-const PATHS = {
-    workspace: path.join(app.getPath('userData'), 'workspace')
+export const PATHS = {
+    workspace: path.join(app.getPath('documents'), 'mars-explorer'),
+    resources: is.development ? path.join(__dirname, '..', 'resources') : process.resourcesPath
 }
 
 
@@ -43,7 +45,7 @@ function createWindow() {
         height: 800,
         webPreferences: {
             nodeIntegration: true,
-            contextIsolation: true,
+            contextIsolation: false,
             enableRemoteModule: false,
             preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY
         }
@@ -75,6 +77,8 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on('window-all-closed', function () {
+    log4js.shutdown();
+
     if (process.platform !== 'darwin') app.quit()
 })
 

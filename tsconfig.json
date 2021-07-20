@@ -17,7 +17,7 @@
     "strict": true,
     "strictNullChecks": false,
     "noImplicitReturns": true,
-    "noUnusedLocals": true,
+    "noUnusedLocals": false, // for development
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
     "allowJs": true,

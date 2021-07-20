@@ -4,6 +4,9 @@ import * as monaco from "monaco-editor-core";
 import {MonacoServices} from "monaco-languageclient";
 import './client';
 import {Channel} from "../shared/types/Channel";
+import {ipcRenderer} from "electron";
+
+const fs = window.require('fs');
 
 (self as any).MonacoEnvironment = {
     getWorkerUrl: function (moduleId: string, label: string) {
@@ -25,40 +28,31 @@ export class Modeler extends Component {
             aliases: ['C#', 'csharp'],
         });
 
-        window.api.invoke(Channel.GET_WORKSPACE_PATH).then(console.log)
-
-        // console.log('Workspace: ', remote.getGlobal('workspace'));
-
-        const folderPath = '/Users/jvoss/Projects/master-thesis/mars-life/Explorer/.webpack/renderer/workspace';
-
-        // const csFile = await fetch('/workspace/Solution.cs');
-        // const csFile = await fetch(folderPath + '/Solution.cs');
-        // const csFileText = await csFile.text();
-
-        // const uri = 'file:///workspace';
-
-        monaco.editor.create(document.getElementById(Modeler.MONACO_CONTAINER_ID)!, {
-            model: monaco.editor.createModel(
-                `using System;
-
-class Solution {
-    static void Main(String[] args) {
-
+        ipcRenderer.invoke(Channel.GET_WORKSPACE_PATH).then(workspacePath => this.setupMonaco(workspacePath));
     }
-}
-`,
-                'csharp',
-                // monaco.Uri.parse(`${uri}/Solution.cs`)
-                monaco.Uri.parse(`${folderPath}/Solution.cs`)
-            ),
-            glyphMargin: true,
-            theme: 'vs-dark',
-            fontSize: 16,
-            language: 'csharp',
-        });
+
+    private async setupMonaco(folderPath: string) {
+
+        const startFile = `${folderPath}/MyTestApp/Program.cs`;
+        const fileContents = await fs.readFileSync(startFile, 'utf-8');
+
+        monaco.editor.create(
+            document.getElementById(Modeler.MONACO_CONTAINER_ID),
+            {
+                model: monaco.editor.createModel(
+                    fileContents,
+                    'csharp',
+                    monaco.Uri.parse(startFile)
+                ),
+                glyphMargin: true,
+                theme: 'vs-dark',
+                fontSize: 16,
+                language: 'csharp',
+            }
+        );
 
         // install Monaco language client services
-        MonacoServices.install(monaco, {rootUri: monaco.Uri.parse(`${folderPath}`).path});
+        MonacoServices.install(monaco, {rootUri: monaco.Uri.parse(`${folderPath}/MyTestApp/`).path});
     }
 
     render() {
