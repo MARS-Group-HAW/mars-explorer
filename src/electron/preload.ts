@@ -1,3 +1,4 @@
+/*
 import {Channel} from "../shared/types/Channel";
 import {IpcRendererEvent} from "electron";
 
@@ -28,6 +29,8 @@ function callIpcRenderer(method: Methods, channel: Channel, ...args: any[]) {
         };
     }
 }
+
+
 contextBridge.exposeInMainWorld(
     'api', {
         invoke: (channel: Channel, ...args: any[]) => callIpcRenderer('invoke', channel, ...args),
@@ -35,3 +38,4 @@ contextBridge.exposeInMainWorld(
         on: (channel: Channel, ...args: any[]) => callIpcRenderer('on', channel, ...args),
     },
 );
+*/

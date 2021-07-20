@@ -5,27 +5,32 @@
 // import * as fs from 'fs';
 import * as rpc from '@codingame/monaco-jsonrpc';
 import * as server from '@codingame/monaco-jsonrpc/lib/server';
+import * as fs from 'fs-extra';
+import uri2path from 'file-uri-to-path';
 
 
 import {
-    InitializeRequest, InitializeParams,
-    DidOpenTextDocumentNotification, DidOpenTextDocumentParams
+    DidOpenTextDocumentNotification,
+    DidOpenTextDocumentParams,
+    InitializeParams,
+    InitializeRequest
 } from 'vscode-languageserver';
-import config, {SERVER_NAMES} from "./config";
+import {Servers, SERVER_NAMES} from "./config";
+import {logger} from "./logger";
 
 export function launch(socket: rpc.IWebSocket) {
     const reader = new rpc.WebSocketMessageReader(socket);
     const writer = new rpc.WebSocketMessageWriter(socket);
-    console.log('connecting')
 
     // start the language server as an external process
     // @ts-ignore
     const socketConnection = server.createConnection(reader, writer, () => socket.dispose());
-    const connectTo = config[SERVER_NAMES.LOCAL_JNV];
+    const connectTo = Servers[SERVER_NAMES.OMNISHARP_TEMP_13712];
     const serverConnection = server.createServerProcess(
-        SERVER_NAMES.LOCAL_JNV,
+        SERVER_NAMES.OMNISHARP_TEMP_13712,
         connectTo.command,
         connectTo.args,
+        connectTo.options,
     );
     server.forward(socketConnection, serverConnection, message => {
         if (rpc.isRequestMessage(message)) {
@@ -40,14 +45,18 @@ export function launch(socket: rpc.IWebSocket) {
                     const didOpenParams = message.params as DidOpenTextDocumentParams;
                     const uri = didOpenParams.textDocument.uri;
                     const text = didOpenParams.textDocument.text;
-                    console.log('Opening', uri, text);
-                    // if (uri) fs.writeFileSync(uri.replace('file://', ''), text)
+                    const uriAsPath = uri2path(uri);
+
+                    if (uri) fs.writeFileSync(uriAsPath, text)
                     break;
                 }
             }
         }
 
-        // console.info(`GOT MESSAGE: `, message.jsonrpc, message)
+        const maybeMessage = (message as any)?.params?.message;
+        if (maybeMessage) {
+            logger.debug(maybeMessage)
+        }
 
         return message;
     });
