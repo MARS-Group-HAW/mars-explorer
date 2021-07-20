@@ -10,10 +10,7 @@
     "inlineSources": false,
     "declaration": true,
     "stripInternal": true,
-    "lib": [
-      "es2016",
-      "dom"
-    ],
+    "lib": ["es2016", "dom"],
     "strict": true,
     "strictNullChecks": false,
     "noImplicitReturns": true,
@@ -27,13 +24,8 @@
     "outDir": "dist",
     "resolveJsonModule": true,
     "paths": {
-      "*": [
-        "node_modules/*",
-        "src/shared/types/*"
-      ]
+      "*": ["node_modules/*", "src/shared/types/*"]
     }
   },
-  "include": [
-    "src"
-  ],
+  "include": ["src"]
 }

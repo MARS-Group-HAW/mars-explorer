@@ -1,10 +1,10 @@
 // eslint-disable-next-line import/no-unresolved
-import {SafeIpcRenderer} from "SafeIpcRenderer";
+import { SafeIpcRenderer } from "SafeIpcRenderer";
 
-export {}
+export {};
 
 declare global {
-    interface Window {
-        api: SafeIpcRenderer,
-    }
+  interface Window {
+    api: SafeIpcRenderer;
+  }
 }

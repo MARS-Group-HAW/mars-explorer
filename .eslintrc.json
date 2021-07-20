@@ -10,7 +10,8 @@
     "plugin:@typescript-eslint/recommended",
     "plugin:import/errors",
     "plugin:import/warnings",
-    "plugin:import/typescript"
+    "plugin:import/typescript",
+    "prettier"
   ],
   "rules": {
     "@typescript-eslint/no-namespace": "off",
@@ -20,11 +21,7 @@
   "settings": {
     "import/resolver": {
       "node": {
-        "extensions": [
-          ".jsx",
-          ".ts",
-          ".tsx"
-        ]
+        "extensions": [".jsx", ".ts", ".tsx"]
       }
     }
   }
