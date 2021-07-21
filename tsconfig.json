@@ -3,7 +3,7 @@
     "target": "es6",
     "rootDir": "src",
     "module": "commonjs",
-    "baseUrl": ".",
+    "baseUrl": "src",
     "moduleResolution": "node",
     "sourceMap": true,
     "declarationMap": true,
@@ -21,10 +21,10 @@
     "skipLibCheck": true,
     "esModuleInterop": true,
     "noImplicitAny": true,
-    "outDir": "dist",
     "resolveJsonModule": true,
     "paths": {
-      "*": ["node_modules/*", "src/shared/types/*"]
+      "@shared/*": ["shared/*"],
+      "*": ["node_modules/*"]
     }
   },
   "include": ["src"]
