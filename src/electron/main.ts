@@ -1,13 +1,13 @@
 import { startServer } from "./server";
 import { enforceMacOSAppLocation, is, isFirstAppLaunch } from "electron-util";
 import * as path from "path";
-import { ipcMain, IpcMainInvokeEvent } from "electron";
+import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import { Channel } from "@shared/types/Channel";
 
-const { app, BrowserWindow } = require("electron");
-const squirrel = require("electron-squirrel-startup");
-const fs = require("fs-extra");
-const log4js = require("log4js");
+// @ts-ignore - no types available
+import squirrel = require("electron-squirrel-startup");
+import fs = require("fs-extra");
+import log4js = require("log4js");
 
 export const PATHS = {
   workspace: path.join(app.getPath("documents"), "mars-explorer"),
