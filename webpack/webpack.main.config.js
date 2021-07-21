@@ -1,4 +1,5 @@
 const rules = require('./webpack.rules');
+const resolves = require('./webpack.resolves');
 
 rules.push({
   test: /\.(m?js|node)$/,
@@ -29,9 +30,7 @@ module.exports = {
   module: {
     rules: rules,
   },
-  resolve: {
-    extensions: ['.js', '.ts', '.jsx', '.tsx', '.css', '.json']
-  },
+  resolve: resolves,
   // see https://github.com/websockets/ws/issues/1126
   externals: {
     bufferutil: "bufferutil",

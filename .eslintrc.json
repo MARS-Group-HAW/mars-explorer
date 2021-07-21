@@ -8,6 +8,7 @@
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
+    "plugin:@typescript-eslint/recommended-requiring-type-checking",
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
@@ -18,11 +19,13 @@
     "@typescript-eslint/no-var-requires": "off"
   },
   "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "project": "./tsconfig.json",
+    "tsconfigRootDir": "./"
+  },
   "settings": {
     "import/resolver": {
-      "node": {
-        "extensions": [".jsx", ".ts", ".tsx"]
-      }
+      "typescript": {}
     }
   }
 }

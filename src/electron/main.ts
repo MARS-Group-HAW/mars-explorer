@@ -2,7 +2,7 @@ import { startServer } from "./server";
 import { enforceMacOSAppLocation, is, isFirstAppLaunch } from "electron-util";
 import * as path from "path";
 import { ipcMain, IpcMainInvokeEvent } from "electron";
-import { Channel } from "../shared/types/Channel";
+import { Channel } from "@shared/types/Channel";
 
 const { app, BrowserWindow } = require("electron");
 const squirrel = require("electron-squirrel-startup");

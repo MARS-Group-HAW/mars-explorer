@@ -3,8 +3,9 @@ import { Component } from "react";
 import * as monaco from "monaco-editor-core";
 import { MonacoServices } from "monaco-languageclient";
 import "./client";
-import { Channel } from "../shared/types/Channel";
+import { Channel } from "@shared/types/Channel";
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 (self as any).MonacoEnvironment = {
   getWorkerUrl: function (moduleId: string, label: string) {
     if (label === "json") {
@@ -17,7 +18,7 @@ import { Channel } from "../shared/types/Channel";
 export class Modeler extends Component {
   private static readonly MONACO_CONTAINER_ID = "monaco-container";
 
-  async componentDidMount(): Promise<void> {
+  componentDidMount(): void {
     monaco.languages.register({
       id: "csharp",
       extensions: [".cs"],
@@ -26,7 +27,13 @@ export class Modeler extends Component {
 
     window.api
       .invoke<string>(Channel.GET_WORKSPACE_PATH)
-      .then((workspacePath) => this.setupMonaco(workspacePath));
+      .then((workspacePath) => this.setupMonaco(workspacePath))
+      .catch((e) =>
+        console.error(
+          "Something went wrong while getting the workspace path: ",
+          e
+        )
+      );
   }
 
   private async setupMonaco(folderPath: string) {
