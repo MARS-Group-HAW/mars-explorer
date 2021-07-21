@@ -4,9 +4,6 @@ import * as monaco from "monaco-editor-core";
 import { MonacoServices } from "monaco-languageclient";
 import "./client";
 import { Channel } from "../shared/types/Channel";
-import { ipcRenderer } from "electron";
-
-const fs = window.require("fs");
 
 (self as any).MonacoEnvironment = {
   getWorkerUrl: function (moduleId: string, label: string) {
@@ -27,14 +24,26 @@ export class Modeler extends Component {
       aliases: ["C#", "csharp"],
     });
 
-    ipcRenderer
+    window.api
       .invoke(Channel.GET_WORKSPACE_PATH)
-      .then((workspacePath) => this.setupMonaco(workspacePath));
+      .then((workspacePath) => this.setupMonaco(workspacePath as string));
   }
 
   private async setupMonaco(folderPath: string) {
     const startFile = `${folderPath}/MyTestApp/Program.cs`;
-    const fileContents = await fs.readFileSync(startFile, "utf-8");
+    const fileContents =
+      "using System;\n" +
+      "\n" +
+      "namespace MyTestApp\n" +
+      "{\n" +
+      "    class Program\n" +
+      "    {\n" +
+      "        static void Main(string[] args)\n" +
+      "        {\n" +
+      '            Console.WriteLine("Hello World!");\n' +
+      "        }\n" +
+      "    }\n" +
+      "}"; // await fs.readFileSync(startFile, "utf-8");
 
     monaco.editor.create(document.getElementById(Modeler.MONACO_CONTAINER_ID), {
       model: monaco.editor.createModel(
