@@ -12,7 +12,7 @@ const log4js = require("log4js");
 export const PATHS = {
   workspace: path.join(app.getPath("documents"), "mars-explorer"),
   resources: is.development
-    ? path.join(__dirname, "..", "resources")
+    ? path.join(__dirname, "..", "..", "resources")
     : process.resourcesPath,
 };
 
@@ -44,8 +44,8 @@ function createWindow() {
     width: 1000,
     height: 800,
     webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
+      nodeIntegration: false,
+      contextIsolation: true,
       enableRemoteModule: false,
       preload: MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY,
     },

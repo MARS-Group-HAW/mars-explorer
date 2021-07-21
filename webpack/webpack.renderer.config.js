@@ -17,7 +17,6 @@ plugins.push(new MonacoWebpackPlugin({
 }))
 
 module.exports = {
-    target: 'electron-renderer',
     module: {
         rules,
     },
