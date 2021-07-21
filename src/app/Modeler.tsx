@@ -25,25 +25,16 @@ export class Modeler extends Component {
     });
 
     window.api
-      .invoke(Channel.GET_WORKSPACE_PATH)
-      .then((workspacePath) => this.setupMonaco(workspacePath as string));
+      .invoke<string>(Channel.GET_WORKSPACE_PATH)
+      .then((workspacePath) => this.setupMonaco(workspacePath));
   }
 
   private async setupMonaco(folderPath: string) {
     const startFile = `${folderPath}/MyTestApp/Program.cs`;
-    const fileContents =
-      "using System;\n" +
-      "\n" +
-      "namespace MyTestApp\n" +
-      "{\n" +
-      "    class Program\n" +
-      "    {\n" +
-      "        static void Main(string[] args)\n" +
-      "        {\n" +
-      '            Console.WriteLine("Hello World!");\n' +
-      "        }\n" +
-      "    }\n" +
-      "}"; // await fs.readFileSync(startFile, "utf-8");
+    const fileContents = await window.api.invoke<string>(
+      Channel.READ_FILE,
+      startFile
+    );
 
     monaco.editor.create(document.getElementById(Modeler.MONACO_CONTAINER_ID), {
       model: monaco.editor.createModel(

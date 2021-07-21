@@ -1,7 +1,7 @@
 import { startServer } from "./server";
 import { enforceMacOSAppLocation, is, isFirstAppLaunch } from "electron-util";
 import * as path from "path";
-import { ipcMain } from "electron";
+import { ipcMain, IpcMainInvokeEvent } from "electron";
 import { Channel } from "../shared/types/Channel";
 
 const { app, BrowserWindow } = require("electron");
@@ -41,7 +41,7 @@ function createWindow() {
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1000,
+    width: 1100,
     height: 800,
     webPreferences: {
       nodeIntegration: false,
@@ -83,3 +83,10 @@ app.on("window-all-closed", function () {
 });
 
 ipcMain.handle(Channel.GET_WORKSPACE_PATH, () => PATHS.workspace);
+
+ipcMain.handle(
+  Channel.READ_FILE,
+  (ev: IpcMainInvokeEvent, path: string): string => {
+    return fs.readFileSync(path, "utf-8");
+  }
+);
