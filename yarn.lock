@@ -5930,22 +5930,22 @@ mkdirp@^1.0.3:
   resolved "https://registry.npmjs.org/mkdirp/-/mkdirp-1.0.4.tgz#3eb5ed62622756d79a5f0e2a221dfebad75c2f7e"
   integrity sha512-vVqVZQyf3WLx2Shd0qJ9xuvqgAyKPLAiqITEtqW0oIUjzo3PePDd6fW9iFz30ef7Ysp/oiWqbhszeGWW2T6Gzw==
 
-monaco-editor-core@^0.22.3:
-  version "0.22.3"
-  resolved "https://registry.npmjs.org/monaco-editor-core/-/monaco-editor-core-0.22.3.tgz#decb2d53d4c87f1d838c4a78e27570f9aca2ecbd"
-  integrity sha512-QUA8fbVz769QBR5Xp8vKJngJM35PRvMuqDjVSsM5IJfWwwVEsQAKu/8SUD3jcEHfnE4YgQfeLktapBwJvWntgw==
+monaco-editor-core@^0.26.0:
+  version "0.26.0"
+  resolved "https://registry.npmjs.org/monaco-editor-core/-/monaco-editor-core-0.26.0.tgz#60f2b7673710a383c877b43a587fd25b7a6e440a"
+  integrity sha512-qtZQdVUk2HeE2IMBTfBV+UNT1vNWEJ2nenfsi9pQSN/HWrUNAcpsVtaPjklUwjxw/QfuziG+h/QkL1L91S8tfg==
 
-monaco-editor-webpack-plugin@^3.1.0:
-  version "3.1.0"
-  resolved "https://registry.npmjs.org/monaco-editor-webpack-plugin/-/monaco-editor-webpack-plugin-3.1.0.tgz#972efc47a91b3bf3bd977885684a3180eb8f341b"
-  integrity sha512-TP5NkCAV0OeFTry5k/d60KR7CkhTXL4kgJKtE3BzjgbDb5TGEPEhoKmHBrSa6r7Oc0sNbPLZhKD/TP2ig7A+/A==
+monaco-editor-webpack-plugin@^4.1.1:
+  version "4.1.1"
+  resolved "https://registry.npmjs.org/monaco-editor-webpack-plugin/-/monaco-editor-webpack-plugin-4.1.1.tgz#b44127910c8f4a29bde72859a1c4107c2960a939"
+  integrity sha512-daa+k3rytb7Jf8bcSSsbrnMsCPR7+kiHUGt08Bvqxdws3tGMPMzsiiRgCyckpKY4XChIXWoasDav3idHhrooEQ==
   dependencies:
     loader-utils "^2.0.0"
 
-monaco-editor@^0.24.0:
-  version "0.24.0"
-  resolved "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.24.0.tgz#990b55096bcc95d08d8d28e55264c6eb17707269"
-  integrity sha512-o1f0Lz6ABFNTtnEqqqvlY9qzNx24rQZx1RgYNQ8SkWkE+Ka63keHH/RqxQ4QhN4fs/UYOnvAtEUZsPrzccH++A==
+monaco-editor@^0.26.1:
+  version "0.26.1"
+  resolved "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.26.1.tgz#62bb5f658bc95379f8abb64b147632bd1c019d73"
+  integrity sha512-mm45nUrBDk0DgZKgbD7+bhDOtcAFNGPJJRAdS6Su1kTGl6XEgC7U3xOmDUW/0RrLf+jlvCGaqLvD4p2VjwuwwQ==
 
 monaco-languageclient@next:
   version "0.13.1-next.9"
