@@ -1,32 +1,20 @@
-import { DocumentSelector } from "monaco-languageclient";
 import * as path from "path";
-import { SpawnOptions } from "child_process";
 import { is } from "electron-util";
-
-export enum SERVER_NAMES {
-  OMNISHARP_TEMP_1349 = "OMNISHARP_TEMP_1349",
-  OMNISHARP_TEMP_13712 = "OMNISHARP_TEMP_13712",
-}
+import { OmnisharpConfiguration } from "./types/OmnisharpConfiguration";
+import {
+  Server,
+  SERVER_NAMES,
+  ServerMap,
+} from "./types/OmnisharpServerConfiguration";
 
 const resources = is.development
   ? path.join(__dirname, "..", "..", "resources")
   : process.resourcesPath;
 
-type Server = {
-  args: string[];
-  command: string;
-  options: SpawnOptions;
-  // workingDirectory: string;
-  language: string;
-  documentSelector: DocumentSelector;
-};
-
-export type ServerMap = { [key in keyof typeof SERVER_NAMES]: Server };
-
 const PATH_TO_OMNISHARP_DIR =
   "/Users/jvoss/Projects/master-thesis/temp/omnisharp";
 
-const OMNISHARP_CONFIG = {
+const OMNISHARP_CONFIG: OmnisharpConfiguration = {
   dotnet: {
     enabled: true,
     enablePackageRestore: true,
@@ -52,13 +40,14 @@ const OMNISHARP_CONFIG = {
 
 function configToArg(): string[] {
   const args: string[] = [];
-  Object.keys(OMNISHARP_CONFIG).forEach((key: any) => {
-    // @ts-ignore
-    Object.keys(OMNISHARP_CONFIG[key]).forEach((keyInKey) =>
-      // @ts-ignore
-      args.push(`${key}:${keyInKey}=${OMNISHARP_CONFIG[key][keyInKey]}`)
-    );
-  });
+
+  for (const [k, v] of Object.entries(OMNISHARP_CONFIG)) {
+    for (const [k2, v2] of Object.entries(v)) {
+      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
+      args.push(`${k}:${k2}=${v2}`);
+    }
+  }
+
   return args;
 }
 

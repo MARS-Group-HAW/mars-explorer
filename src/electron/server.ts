@@ -6,6 +6,7 @@ import * as ws from "ws";
 import * as http from "http";
 import * as url from "url";
 import * as net from "net";
+import { AddressInfo } from "net";
 import express from "express";
 import * as rpc from "@codingame/monaco-jsonrpc";
 import { launch } from "./launch-lsp";
@@ -72,7 +73,14 @@ export function startServer(): number {
   });
 
   server.on("upgrade", onWsUpgrade);
-  const port = (server.address() as any).port;
+
+  const serverAddress = server.address();
+
+  if (typeof serverAddress === "string") {
+    throw new Error(`Server Address has no port. Instead ${serverAddress}.`);
+  }
+
+  const port = (server.address() as AddressInfo).port;
 
   console.info("Server running on port: ", port);
 

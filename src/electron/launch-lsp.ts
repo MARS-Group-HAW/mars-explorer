@@ -5,7 +5,6 @@
 // import * as fs from 'fs';
 import * as rpc from "@codingame/monaco-jsonrpc";
 import * as server from "@codingame/monaco-jsonrpc/lib/server";
-import * as fs from "fs-extra";
 import uri2path from "file-uri-to-path";
 
 import {
@@ -14,8 +13,10 @@ import {
   InitializeParams,
   InitializeRequest,
 } from "vscode-languageserver";
-import { SERVER_NAMES, Servers } from "./config";
+import { Servers } from "./config";
 import { logger } from "./logger";
+import fs = require("fs-extra");
+import { SERVER_NAMES } from "./types/OmnisharpServerConfiguration";
 
 export function launch(socket: rpc.IWebSocket) {
   const reader = new rpc.WebSocketMessageReader(socket);
@@ -54,9 +55,8 @@ export function launch(socket: rpc.IWebSocket) {
       }
     }
 
-    const maybeMessage = (message as any)?.params?.message;
-    if (maybeMessage) {
-      logger.debug(maybeMessage);
+    if ("params" in message && "message" in message["params"]) {
+      logger.debug(message["params"]["message"]);
     }
 
     return message;
