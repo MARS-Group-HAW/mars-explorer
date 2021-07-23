@@ -1,6 +1,11 @@
 import * as React from "react";
 import { Component } from "react";
-import * as monaco from "monaco-editor-core";
+/* FIXME
+    should be: monaco-editor/esm/vs/editor/editor.api";
+    but leads to error on Service installation.
+    https://github.com/TypeFox/monaco-languageclient/issues/274
+ */
+import * as monaco from "monaco-editor";
 import { MonacoServices } from "monaco-languageclient";
 import "./client";
 import { Channel } from "@shared/types/Channel";
@@ -8,9 +13,6 @@ import { Channel } from "@shared/types/Channel";
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 (self as any).MonacoEnvironment = {
   getWorkerUrl: function (moduleId: string, label: string) {
-    if (label === "json") {
-      return "json.worker.js";
-    }
     return "editor.worker.js";
   },
 };
@@ -56,7 +58,7 @@ export class Modeler extends Component {
     });
 
     // install Monaco language client services
-    MonacoServices.install(monaco, {
+    MonacoServices.install(monaco as any, {
       rootUri: monaco.Uri.parse(`${folderPath}/MyTestApp/`).path,
     });
   }
