@@ -41,8 +41,8 @@ function createWindow() {
 
   // Create the browser window.
   const mainWindow = new BrowserWindow({
-    width: 1100,
-    height: 800,
+    width: 1300,
+    height: 900,
     webPreferences: {
       nodeIntegration: false,
       contextIsolation: true,
