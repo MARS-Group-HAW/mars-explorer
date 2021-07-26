@@ -10,6 +10,9 @@ import { Project } from "@shared/types/Project";
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
 import log4js = require("log4js");
+import log = require("electron-log");
+
+log.catchErrors();
 
 const USER_DOCUMENTS_PATH = app.getPath("documents");
 const RESOURCES_PATH = is.development
@@ -31,13 +34,16 @@ declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
 // Handle creating/removing shortcuts on Windows when installing/uninstalling.
 if (squirrel) {
+  log.info("Quitting because of squirrel");
   // eslint-disable-line global-require
   app.quit();
 }
 
 function setupApp() {
   // FIXME: dont do on every startup
+  log.info("Ensuring workspace dirs");
   fs.ensureDirSync(PATHS.workspaceExamples);
+  log.info(`Copying Examples to ${PATHS.workspaceExamples}`);
   fs.copySync(path.join(PATHS.resources, "examples"), PATHS.workspaceExamples);
 }
 
@@ -64,13 +70,16 @@ function createWindow() {
   mainWindow.webContents.openDevTools();
 }
 
-setupApp();
-
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Einige APIs können nur nach dem Auftreten dieses Events genutzt werden.
 app.whenReady().then(() => {
+  log.info("Configuration: ", PATHS);
+  log.info("Enforcing Location");
   enforceMacOSAppLocation();
+  log.info("Starting setup");
+  setupApp();
+  log.info("Creating window");
   createWindow();
 
   app.on("activate", function () {
@@ -84,6 +93,8 @@ app.whenReady().then(() => {
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", function () {
+  log.info("Quitting app");
+
   log4js.shutdown();
 
   if (process.platform !== "darwin") app.quit();
