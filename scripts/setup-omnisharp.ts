@@ -58,7 +58,7 @@ console.info("> No omnisharp found.");
 console.info("Ensuring that omnisharp dir exits ...");
 fs.ensureDirSync(pathToOmnisharpOSPath);
 
-console.info(`Download Omnisharp for your OS: ${currentOS}`);
+console.info(`Downloading Omnisharp for your OS: ${currentOS}${currentArch}`);
 
 (async () => {
   // TODO: linux and windows x64 and x86
