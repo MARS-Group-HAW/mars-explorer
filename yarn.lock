@@ -2999,6 +2999,11 @@ electron-is-dev@^1.1.0:
   resolved "https://registry.npmjs.org/electron-is-dev/-/electron-is-dev-1.2.0.tgz#2e5cea0a1b3ccf1c86f577cee77363ef55deb05e"
   integrity sha512-R1oD5gMBPS7PVU8gJwH6CtT0e6VSoD0+SzSnYpNm+dBkcijgA+K7VAMHDfnRq/lkKPZArpzplTW6jfiMYosdzw==
 
+electron-log@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.npmjs.org/electron-log/-/electron-log-4.4.0.tgz#0f350004565bb246e58e7b4af0b320c9f7aef3e8"
+  integrity sha512-LOp3elm5mOAAoQmvK8ZOaD75m6DvybWNMkwd8ZtZm23bymbxI///bZ42r/XvqKgmFCnv32/L+fz0mkDE4DMA/g==
+
 electron-notarize@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/electron-notarize/-/electron-notarize-1.0.0.tgz#bc925b1ccc3f79e58e029e8c4706572b01a9fd8f"
