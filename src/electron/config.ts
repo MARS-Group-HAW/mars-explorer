@@ -1,18 +1,25 @@
 import * as path from "path";
-import { is } from "electron-util";
 import { OmnisharpConfiguration } from "./types/OmnisharpConfiguration";
-import {
-  Server,
-  SERVER_NAMES,
-  ServerMap,
-} from "./types/OmnisharpServerConfiguration";
+import { Server } from "./types/OmnisharpServerConfiguration";
+import { PATHS } from "./main";
 
-const resources = is.development
-  ? path.join(__dirname, "..", "..", "resources")
-  : process.resourcesPath;
+import os = require("os");
 
-const PATH_TO_OMNISHARP_DIR =
-  "/Users/jvoss/Projects/master-thesis/temp/omnisharp";
+let currentOS: "linux" | "osx" | "win";
+
+switch (os.type()) {
+  case "Linux":
+    currentOS = "linux";
+    break;
+  case "Darwin":
+    currentOS = "osx";
+    break;
+  case "Windows_NT":
+    currentOS = "win";
+    break;
+  default:
+    throw new Error(`Unknown OS: ${os.type()}`);
+}
 
 const OMNISHARP_CONFIG: OmnisharpConfiguration = {
   dotnet: {
@@ -51,8 +58,7 @@ function configToArg(): string[] {
   return args;
 }
 
-const OMNISHARP_BASE: Omit<Server, "options"> = {
-  command: "sh run",
+const OMNISHARP_BASE: Omit<Server, "command" | "options"> = {
   args: [
     "-lsp",
     "-v", // TODO: maybe delete -debug?
@@ -66,27 +72,17 @@ const OMNISHARP_BASE: Omit<Server, "options"> = {
   ],
 };
 
-export const Servers: ServerMap = {
-  [SERVER_NAMES.OMNISHARP_TEMP_1349]: {
+export function getServer(): Server {
+  return {
+    command: "sh run",
     ...OMNISHARP_BASE,
     args: [
       ...OMNISHARP_BASE.args,
-      "-s /Users/jvoss/Documents/mars-explorer/MyTestApp/Program.cs",
+      `-s ${path.join(PATHS.workspaceExamples, "MyTestApp", "MyTestApp.sln")}`,
     ],
     options: {
-      cwd: path.join(PATH_TO_OMNISHARP_DIR, "1.34.9"),
+      cwd: path.join(PATHS.resources, "omnisharp", currentOS),
       shell: true,
     },
-  },
-  [SERVER_NAMES.OMNISHARP_TEMP_13712]: {
-    ...OMNISHARP_BASE,
-    args: [
-      ...OMNISHARP_BASE.args,
-      "-s /Users/jvoss/Documents/mars-explorer/MyTestApp/MyTestApp.sln",
-    ],
-    options: {
-      cwd: path.join(resources, "omnisharp", "osx"),
-      shell: true,
-    },
-  },
-};
+  };
+}

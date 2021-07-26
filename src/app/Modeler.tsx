@@ -9,6 +9,8 @@ import * as monaco from "monaco-editor";
 import { MonacoServices } from "monaco-languageclient";
 import "./client";
 import { Channel } from "@shared/types/Channel";
+import { Project } from "@shared/types/Project";
+import { ExampleProject } from "@shared/types/ExampleProject";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 (self as any).MonacoEnvironment = {
@@ -28,7 +30,7 @@ export class Modeler extends Component {
     });
 
     window.api
-      .invoke<string>(Channel.GET_WORKSPACE_PATH)
+      .invoke<ExampleProject, Project>(Channel.GET_EXAMPLE_PROJECT, "MyTestApp")
       .then((workspacePath) => this.setupMonaco(workspacePath))
       .catch((e) =>
         console.error(
@@ -38,18 +40,18 @@ export class Modeler extends Component {
       );
   }
 
-  private async setupMonaco(folderPath: string) {
-    const startFile = `${folderPath}/MyTestApp/Program.cs`;
-    const fileContents = await window.api.invoke<string>(
+  private async setupMonaco(project: Project) {
+    // FIXME: get example path from main
+    const fileContents = await window.api.invoke<string, string>(
       Channel.READ_FILE,
-      startFile
+      project.entryFilePath
     );
 
     monaco.editor.create(document.getElementById(Modeler.MONACO_CONTAINER_ID), {
       model: monaco.editor.createModel(
         fileContents,
         "csharp",
-        monaco.Uri.parse(startFile)
+        monaco.Uri.parse(project.entryFilePath)
       ),
       glyphMargin: true,
       theme: "vs-dark",
@@ -59,7 +61,7 @@ export class Modeler extends Component {
 
     // install Monaco language client services
     MonacoServices.install(monaco as any, {
-      rootUri: monaco.Uri.parse(`${folderPath}/MyTestApp/`).path,
+      rootUri: monaco.Uri.parse(project.rootPath).path,
     });
   }
 

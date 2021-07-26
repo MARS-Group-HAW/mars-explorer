@@ -1,4 +1,4 @@
-const path = require('path');
+const path = require("path");
 const rules = require("./webpack.rules");
 const plugins = require("./webpack.plugins");
 const resolves = require("./webpack.resolves");
@@ -35,8 +35,12 @@ plugins.push(new RemovePlugin({
       }
     ],
     exclude: [
-      path.join(folderPath, 'node_modules_monaco-editor_esm_vs_basic-languages_csharp_csharp_js')
+      path.join(folderPath, "node_modules_monaco-editor_esm_vs_basic-languages_csharp_csharp_js")
     ],
+    log: false,
+    logWarning: true,
+    logError: true,
+    logDebug: false
   }
 }));
 
