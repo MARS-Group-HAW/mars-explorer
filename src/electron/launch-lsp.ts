@@ -13,10 +13,10 @@ import {
   InitializeParams,
   InitializeRequest,
 } from "vscode-languageserver";
-import { Servers } from "./config";
 import { logger } from "./logger";
 import fs = require("fs-extra");
 import { SERVER_NAMES } from "./types/OmnisharpServerConfiguration";
+import { getServer } from "./config";
 
 export function launch(socket: rpc.IWebSocket) {
   const reader = new rpc.WebSocketMessageReader(socket);
@@ -27,7 +27,7 @@ export function launch(socket: rpc.IWebSocket) {
   const socketConnection = server.createConnection(reader, writer, () =>
     socket.dispose()
   );
-  const connectTo = Servers[SERVER_NAMES.OMNISHARP_TEMP_13712];
+  const connectTo = getServer();
   const serverConnection = server.createServerProcess(
     SERVER_NAMES.OMNISHARP_TEMP_13712,
     connectTo.command,

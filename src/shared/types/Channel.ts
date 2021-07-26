@@ -1,4 +1,6 @@
 export enum Channel {
-  GET_WORKSPACE_PATH = "get-workspace-path",
-  READ_FILE = "read-file",
+  GET_WORKSPACE_PATH = "GET_WORKSPACE_PATH",
+  READ_FILE = "READ_FILE",
+  GET_EXAMPLES_PATH = "GET_EXAMPLES_PATH",
+  GET_EXAMPLE_PROJECT = "GET_EXAMPLE_PROJECT",
 }
