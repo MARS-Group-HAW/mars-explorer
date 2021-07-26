@@ -21,8 +21,30 @@ switch (os.type()) {
   case "Windows_NT":
     currentOS = "win";
     break;
+  default:
+    console.info(`Unknown OS: ${os.type()}`);
+    process.exit(1);
 }
 console.info(`> Found ${currentOS}`);
+
+let currentArch: "-x64" | "-x86" | "" = "";
+
+if (currentOS !== "osx") {
+  console.info("Determining your architecture ...");
+
+  switch (os.arch()) {
+    case "x32":
+      currentArch = "-x86";
+      break;
+    case "x64":
+      currentArch = "-x64";
+      break;
+    default:
+      console.info(`Unknown Architecture: ${os.arch()}`);
+      process.exit(1);
+  }
+  console.info(`> Found ${currentArch}`);
+}
 
 const pathToOmnisharpOSPath = path.join(pathToOmnisharp, currentOS);
 
@@ -42,7 +64,7 @@ console.info(`Download Omnisharp for your OS: ${currentOS}`);
   // TODO: linux and windows x64 and x86
   try {
     await download(
-      `https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v${OMNISHARP_VERSION}/omnisharp-${currentOS}.zip`,
+      `https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v${OMNISHARP_VERSION}/omnisharp-${currentOS}${currentArch}.zip`,
       pathToOmnisharpOSPath,
       {
         extract: true,
@@ -56,7 +78,7 @@ console.info(`Download Omnisharp for your OS: ${currentOS}`);
       }
     );
   } catch (e) {
-    console.info("An error occurred while download and unzipping omnisharp:");
+    console.info("An error occurred while downloading/unzipping omnisharp:");
     console.log(e);
     process.exit(1);
   }
