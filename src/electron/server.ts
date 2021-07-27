@@ -10,27 +10,21 @@ import { AddressInfo } from "net";
 import express from "express";
 import * as rpc from "@codingame/monaco-jsonrpc";
 import { launch } from "./launch-lsp";
+import { Logger } from "./logger";
+
+const logger = new Logger("server");
 
 let expressServer: express.Express;
 let wss: ws.Server;
-
-/*
-process.on('uncaughtException', function (err: any) {
-    console.error('Uncaught Exception: ', err.toString());
-    if (err.stack) {
-        console.error(err.stack);
-    }
-});
- */
 
 function onWsUpgrade(
   request: http.IncomingMessage,
   socket: net.Socket,
   head: Buffer
 ) {
-  console.log(request.url);
   const pathname = request.url ? url.parse(request.url).pathname : undefined;
-  console.log("upgraded", pathname);
+  logger.info("Websocket upgraded with ", pathname);
+
   if (pathname === "/socket") {
     wss.handleUpgrade(request, socket, head, (webSocket) => {
       const socket: rpc.IWebSocket = {
@@ -65,6 +59,8 @@ export function startServer(): number {
   // server the static content, i.e. index.html
   // app.use(express.static(__dirname));
   // start the server
+
+  logger.info("Starting to listen to port: ", 5555);
   const server = expressServer.listen(5555);
   // create the web socket
   wss = new ws.Server({
@@ -80,9 +76,5 @@ export function startServer(): number {
     throw new Error(`Server Address has no port. Instead ${serverAddress}.`);
   }
 
-  const port = (server.address() as AddressInfo).port;
-
-  console.info("Server running on port: ", port);
-
-  return port;
+  return (server.address() as AddressInfo).port;
 }

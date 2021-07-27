@@ -1,5 +1,6 @@
 import { Channel } from "@shared/types/Channel";
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
+import { Logger } from "./logger";
 
 type Methods = "invoke" | "send" | "on";
 
@@ -43,4 +44,5 @@ contextBridge.exposeInMainWorld("api", {
     callIpcRenderer("send", channel, ...args),
   on: (channel: Channel, ...args: unknown[]) =>
     callIpcRenderer("on", channel, ...args),
+  logger: new Logger("app"),
 });
