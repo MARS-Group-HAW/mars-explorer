@@ -5,14 +5,12 @@ import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import { Channel } from "@shared/types/Channel";
 import { ExampleProject } from "@shared/types/ExampleProject";
 import { Project } from "@shared/types/Project";
-
+import { Logger } from "./logger";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
-import log4js = require("log4js");
-import log = require("electron-log");
 
-log.catchErrors();
+const log = new Logger("main");
 
 const USER_DOCUMENTS_PATH = app.getPath("documents");
 const RESOURCES_PATH = is.development
@@ -48,9 +46,6 @@ function setupApp() {
 }
 
 function createWindow() {
-  // send port to renderer
-  startServer();
-
   // Create the browser window.
   const mainWindow = new BrowserWindow({
     width: 1300,
@@ -64,7 +59,9 @@ function createWindow() {
   });
 
   // and load the index.html of the app.
-  mainWindow.loadURL(MAIN_WINDOW_WEBPACK_ENTRY);
+  mainWindow
+    .loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
+    .catch((e: Error) => log.error("main window could not be loaded: ", e));
 
   // Open the DevTools.
   mainWindow.webContents.openDevTools();
@@ -73,30 +70,33 @@ function createWindow() {
 // This method will be called when Electron has finished
 // initialization and is ready to create browser windows.
 // Einige APIs können nur nach dem Auftreten dieses Events genutzt werden.
-app.whenReady().then(() => {
-  log.info("Configuration: ", PATHS);
-  log.info("Enforcing Location");
-  enforceMacOSAppLocation();
-  log.info("Starting setup");
-  setupApp();
-  log.info("Creating window");
-  createWindow();
+app
+  .whenReady()
+  .then(() => {
+    log.info("Configuration: ", PATHS);
+    log.info("Enforcing Location");
+    enforceMacOSAppLocation();
+    log.info("Starting setup");
+    setupApp();
+    log.info("Starting server");
+    startServer();
+    log.info("Creating window");
+    createWindow();
 
-  app.on("activate", function () {
-    // On macOS it's common to re-create a window in the app when the
-    // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0) createWindow();
-  });
-});
+    app.on("activate", function () {
+      // On macOS it's common to re-create a window in the app when the
+      // dock icon is clicked and there are no other windows open.
+      if (BrowserWindow.getAllWindows().length === 0) createWindow();
+    });
+  })
+  .catch((e: Error) => log.error("App could not be initialized: ", e));
+
+app.on("before-quit", () => log.info("Quitting app"));
 
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
 app.on("window-all-closed", function () {
-  log.info("Quitting app");
-
-  log4js.shutdown();
-
   if (process.platform !== "darwin") app.quit();
 });
 

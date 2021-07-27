@@ -13,12 +13,16 @@ import {
   InitializeParams,
   InitializeRequest,
 } from "vscode-languageserver";
-import { logger } from "./logger";
-import fs = require("fs-extra");
 import { SERVER_NAMES } from "./types/OmnisharpServerConfiguration";
 import { getServer } from "./config";
+import { Logger } from "./logger";
+import fs = require("fs-extra");
+
+const launcherLogger = new Logger("launcher");
+const lspLogger = new Logger("lsp", { newFile: true, printToConsole: false });
 
 export function launch(socket: rpc.IWebSocket) {
+  launcherLogger.info("Launching the LSP");
   const reader = new rpc.WebSocketMessageReader(socket);
   const writer = new rpc.WebSocketMessageWriter(socket);
 
@@ -28,6 +32,7 @@ export function launch(socket: rpc.IWebSocket) {
     socket.dispose()
   );
   const connectTo = getServer();
+  launcherLogger.info("Server Configuration: ", connectTo);
   const serverConnection = server.createServerProcess(
     SERVER_NAMES.OMNISHARP_TEMP_13712,
     connectTo.command,
@@ -56,7 +61,16 @@ export function launch(socket: rpc.IWebSocket) {
     }
 
     if ("params" in message && "message" in message["params"]) {
-      logger.debug(message["params"]["message"]);
+      const extractedMessage: string[] = (
+        message["params"]["message"] as string
+      ).split(":");
+
+      if (extractedMessage.length < 2) {
+        lspLogger.info(extractedMessage[0]);
+      } else {
+        lspLogger.scope = extractedMessage.shift();
+        lspLogger.info(extractedMessage.join(";").trimStart());
+      }
     }
 
     return message;
