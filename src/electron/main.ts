@@ -18,6 +18,8 @@ const RESOURCES_PATH = is.development
   : process.resourcesPath;
 const WORKSPACE_PATH = path.join(USER_DOCUMENTS_PATH, "mars-explorer");
 
+let webSocketPort: number;
+
 export const PATHS = {
   workspace: WORKSPACE_PATH,
   workspaceExamples: path.join(WORKSPACE_PATH, "examples"),
@@ -79,7 +81,7 @@ app
     log.info("Starting setup");
     setupApp();
     log.info("Starting server");
-    startServer();
+    webSocketPort = startServer();
     log.info("Creating window");
     createWindow();
 
@@ -122,3 +124,5 @@ ipcMain.handle(
     return fs.readFileSync(path, "utf-8");
   }
 );
+
+ipcMain.handle(Channel.GET_WEBSOCKET_PORT, () => webSocketPort);

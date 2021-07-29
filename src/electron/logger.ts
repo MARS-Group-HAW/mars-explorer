@@ -31,6 +31,7 @@ export class Logger implements ILogger {
     }
 
     this.electronLog.catchErrors();
+    this.electronLog.log("### NEW SESSION ###");
   }
 
   public set scope(scope: string) {
@@ -40,5 +41,6 @@ export class Logger implements ILogger {
   debug = (...params: any[]): void => this.electronLog.debug(params);
   error = (...params: any[]): void => this.electronLog.error(params);
   info = (...params: any[]): void => this.electronLog.info(params);
+  log = (...params: any[]): void => this.electronLog.info(params);
   warn = (...params: any[]): void => this.electronLog.warn(params);
 }

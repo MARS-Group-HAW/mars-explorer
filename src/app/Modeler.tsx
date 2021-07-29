@@ -7,27 +7,37 @@ import { Component } from "react";
  */
 import * as monaco from "monaco-editor";
 import { MonacoServices } from "monaco-languageclient";
-import "./client";
 import { Channel } from "@shared/types/Channel";
 import { Project } from "@shared/types/Project";
 import { ExampleProject } from "@shared/types/ExampleProject";
+import { Client } from "./client";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 (self as any).MonacoEnvironment = {
   getWorkerUrl: function (moduleId: string, label: string) {
+    window.api.logger.info(
+      `Getting worker URL (moduleId: ${moduleId}, label: ${label})`
+    );
     return "editor.worker.js";
   },
 };
 
 export class Modeler extends Component {
+  private client: Client;
   private static readonly MONACO_CONTAINER_ID = "monaco-container";
 
-  componentDidMount(): void {
+  async componentDidMount() {
     monaco.languages.register({
       id: "csharp",
       extensions: [".cs"],
       aliases: ["C#", "csharp"],
     });
+
+    const port = await window.api.invoke<void, number>(
+      Channel.GET_WEBSOCKET_PORT
+    );
+
+    this.client = new Client(port);
 
     window.api
       .invoke<ExampleProject, Project>(Channel.GET_EXAMPLE_PROJECT, "MyTestApp")
@@ -63,6 +73,10 @@ export class Modeler extends Component {
     MonacoServices.install(monaco as any, {
       rootUri: monaco.Uri.parse(project.rootPath).path,
     });
+  }
+
+  componentWillUnmount() {
+    this.client.close();
   }
 
   render() {
