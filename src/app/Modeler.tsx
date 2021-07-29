@@ -33,21 +33,18 @@ export class Modeler extends Component {
       aliases: ["C#", "csharp"],
     });
 
+    const exampleProject = await window.api.invoke<ExampleProject, Project>(
+      Channel.GET_EXAMPLE_PROJECT,
+      "MyTestApp"
+    );
+
+    await this.setupMonaco(exampleProject);
+
     const port = await window.api.invoke<void, number>(
       Channel.GET_WEBSOCKET_PORT
     );
 
     this.client = new Client(port);
-
-    window.api
-      .invoke<ExampleProject, Project>(Channel.GET_EXAMPLE_PROJECT, "MyTestApp")
-      .then((workspacePath) => this.setupMonaco(workspacePath))
-      .catch((e) =>
-        console.error(
-          "Something went wrong while getting the workspace path: ",
-          e
-        )
-      );
   }
 
   private async setupMonaco(project: Project) {
