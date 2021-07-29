@@ -8,6 +8,9 @@ type LoggerOptions = {
   printToConsole: boolean;
 };
 
+const IS_DEV =
+  process.env.ELECTRON_ENV && process.env.ELECTRON_ENV === "development";
+
 export class Logger implements ILogger {
   private readonly electronLog: ElectronLog;
 
@@ -21,17 +24,35 @@ export class Logger implements ILogger {
     this.electronLog = log.create(scope);
     Object.assign(this.electronLog, this.electronLog.scope(scope));
 
-    if (options.newFile) {
-      this.electronLog.transports.file.resolvePath = ({ libraryDefaultDir }) =>
-        path.join(libraryDefaultDir, `${scope}.log`);
-    }
+    this.setFileName(options.newFile, scope);
 
     if (!options.printToConsole) {
       this.electronLog.transports.console.level = false;
     }
 
     this.electronLog.catchErrors();
-    this.electronLog.log("### NEW SESSION ###");
+    this.electronLog.log(`### NEW SESSION (${scope}) ###`);
+  }
+
+  private setFileName(newFile: boolean, scope: string) {
+    let fileName = newFile
+      ? `${scope}.log`
+      : this.electronLog.transports.file.fileName;
+
+    fileName = IS_DEV ? Logger.appendDevExtension(fileName) : fileName;
+
+    if (newFile) {
+      this.electronLog.transports.file.resolvePath = ({ libraryDefaultDir }) =>
+        path.join(libraryDefaultDir, fileName);
+    } else {
+      this.electronLog.transports.file.fileName = fileName;
+    }
+  }
+
+  private static appendDevExtension(filePath: string): string {
+    const splitFilePath = filePath.split(".");
+    splitFilePath.splice(splitFilePath.length - 1, 0, "dev");
+    return splitFilePath.join(".");
   }
 
   public set scope(scope: string) {
