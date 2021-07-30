@@ -10,7 +10,7 @@ import { MonacoServices } from "monaco-languageclient";
 import { Channel } from "@shared/types/Channel";
 import { Project } from "@shared/types/Project";
 import { ExampleProject } from "@shared/types/ExampleProject";
-import { Client } from "./client";
+import { startLanguageClient } from "./client";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 (self as any).MonacoEnvironment = {
@@ -23,7 +23,6 @@ import { Client } from "./client";
 };
 
 export class Modeler extends Component {
-  private client: Client;
   private static readonly MONACO_CONTAINER_ID = "monaco-container";
 
   async componentDidMount() {
@@ -39,12 +38,6 @@ export class Modeler extends Component {
     );
 
     await this.setupMonaco(exampleProject);
-
-    const port = await window.api.invoke<void, number>(
-      Channel.GET_WEBSOCKET_PORT
-    );
-
-    this.client = new Client(port);
   }
 
   private async setupMonaco(project: Project) {
@@ -66,14 +59,13 @@ export class Modeler extends Component {
       language: "csharp",
     });
 
+    const rootUri = monaco.Uri.parse(project.rootPath).path;
     // install Monaco language client services
     MonacoServices.install(monaco as any, {
-      rootUri: monaco.Uri.parse(project.rootPath).path,
+      rootUri,
     });
-  }
 
-  componentWillUnmount() {
-    this.client.close();
+    await startLanguageClient();
   }
 
   render() {

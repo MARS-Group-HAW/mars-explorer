@@ -1,4 +1,3 @@
-import { listen } from "@codingame/monaco-jsonrpc";
 import {
   CloseAction,
   createConnection,
@@ -7,72 +6,110 @@ import {
   MessageConnection,
   MonacoLanguageClient,
 } from "monaco-languageclient";
+import {
+  createMessageConnection,
+  DataCallback,
+  Message,
+  MessageReader,
+  MessageWriter,
+  Trace,
+} from "vscode-jsonrpc";
+import { Channel } from "@shared/types/Channel";
 
-export class Client {
-  private readonly path = "/socket";
-  private readonly url: string;
-  private readonly webSocket: WebSocket;
+export async function startLanguageClient(): Promise<MonacoLanguageClient> {
+  // launch language server
+  const ipcChannel = await window.api.invoke<void, string>(
+    Channel.START_LANGUAGE_SERVER
+  );
 
-  constructor(port: number) {
-    this.url = Client.createUrl(this.path, port);
-    window.api.logger.info(`Creating WebSocket at ${this.url}`);
-    this.webSocket = new WebSocket(this.url, []);
+  // wire up the IPC connection
+  const reader = new RendererIpcMessageReader(ipcChannel);
+  const writer = new RendererIpcMessageWriter(ipcChannel);
+  const connection = createMessageConnection(reader, writer);
 
-    listen({
-      webSocket: this.webSocket,
-      logger: window.api.logger,
-      onConnection: (connection) => {
-        window.api.logger.info("WebSocket connected!");
-        // create and start the language client
-        window.api.logger.info("Creating Language Client");
-        const languageClient = this.createLanguageClient(connection);
-        window.api.logger.info("Starting Language Client");
-        const disposable: Disposable = languageClient.start();
+  // create and start the language client
+  const client = createBaseLanguageClient(connection);
+  client.start();
 
-        connection.onClose(() => {
-          window.api.logger.info("WebSocket closed!");
-          disposable.dispose();
-        });
+  return client;
+}
+
+function createBaseLanguageClient(connection: MessageConnection) {
+  const client = new MonacoLanguageClient({
+    clientOptions: {
+      documentSelector: ["csharp"],
+      errorHandler: {
+        closed: () => CloseAction.DoNotRestart,
+        error: () => ErrorAction.Continue,
       },
+    },
+    connectionProvider: {
+      // eslint-disable-next-line @typescript-eslint/require-await
+      get: async (errorHandler, closeHandler) =>
+        createConnection(connection, errorHandler, closeHandler),
+    },
+    name: "C# Language Server",
+  });
+
+  // for debugging
+  client.trace = Trace.Messages;
+
+  return client;
+}
+
+// custom implementations of the MessageReader and MessageWriter to plug into a MessageConnection
+class RendererIpcMessageReader implements MessageReader {
+  private subscribers: DataCallback[] = [];
+
+  constructor(private channel: string) {
+    // listen to incoming language server notifications and messages from the backend
+    window.api.on(this.channel, (msg) => {
+      this.notifySubscribers(msg);
     });
   }
 
-  public close = (): void => this.webSocket.close();
+  // events are not implemented for this example
+  public onError = () => dummyDisposable();
+  public onClose = () => dummyDisposable();
+  public onPartialMessage = () => dummyDisposable();
 
-  private static createUrl(path: string, port: number): string {
-    const protocol = location.protocol === "https:" ? "wss" : "ws";
-    return `${protocol}://localhost:${port}${path}`;
+  public listen(callback: DataCallback): Disposable {
+    this.subscribers.push(callback);
+    return dummyDisposable();
   }
 
-  private createLanguageClient(
-    connection: MessageConnection
-  ): MonacoLanguageClient {
-    return new MonacoLanguageClient({
-      name: "Sample Language Client",
-      clientOptions: {
-        // use a language id as a document selector
-        documentSelector: ["csharp"],
-        // disable the default error handler
-        errorHandler: {
-          error: (error, message, count) => {
-            window.api.logger.error(
-              `Error in Language Client: `,
-              message,
-              count
-            );
-            return ErrorAction.Shutdown;
-          },
-          closed: () => CloseAction.DoNotRestart,
-        },
-      },
-      // create a language client connection from the JSON RPC connection on demand
-      connectionProvider: {
-        get: (errorHandler: any, closeHandler: any) => {
-          return Promise.resolve(
-            createConnection(connection, errorHandler, closeHandler)
-          );
-        },
-      },
-    });
+  public dispose(): void {
+    return;
   }
+
+  private notifySubscribers = (msg: Message) => {
+    this.subscribers.forEach((s) => s(msg));
+  };
+}
+
+class RendererIpcMessageWriter implements MessageWriter {
+  constructor(private channel: string) {}
+
+  // events are not implemented for this example
+  public onError = () => dummyDisposable();
+  public onClose = () => dummyDisposable();
+
+  public write(msg: Message): Promise<void> {
+    // send all requests for the language server to the backend
+    return Promise.resolve(window.api.send(this.channel, msg));
+  }
+
+  public dispose(): void {
+    // nothing to dispose
+  }
+
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  end(): void {}
+}
+
+// dummy disposable to satisfy interfaces
+function dummyDisposable(): Disposable {
+  return {
+    dispose: () => void 0,
+  };
 }
