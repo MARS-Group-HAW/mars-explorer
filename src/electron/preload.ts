@@ -8,12 +8,20 @@ type Methods = "invoke" | "send" | "on";
 
 type UnknownListener = (...param: unknown[]) => unknown;
 
+const channelsAsArray = Object.keys(Channel);
+
 function callIpcRenderer(
   method: Methods,
-  channel: Channel,
+  channel: Channel | string,
   ...args: unknown[]
 ) {
-  if (typeof channel !== "string") {
+  if (
+    typeof channel !== "string" ||
+    (!channelsAsArray.includes(channel) && !channel.startsWith("LSP"))
+  ) {
+    PreloadLogger.warn(
+      `Channel "${channel}" not a string or not part of the defined channels.`
+    );
     throw "Error: IPC channel name not allowed";
   }
   PreloadLogger.info(
@@ -44,11 +52,11 @@ function callIpcRenderer(
 }
 
 contextBridge.exposeInMainWorld("api", {
-  invoke: (channel: Channel, ...args: unknown[]) =>
+  invoke: (channel: Channel | string, ...args: unknown[]) =>
     callIpcRenderer("invoke", channel, ...args),
-  send: (channel: Channel, ...args: unknown[]) =>
+  send: (channel: Channel | string, ...args: unknown[]) =>
     callIpcRenderer("send", channel, ...args),
-  on: (channel: Channel, ...args: unknown[]) =>
+  on: (channel: Channel | string, ...args: unknown[]) =>
     callIpcRenderer("on", channel, ...args),
   logger: new Logger("app"),
 });

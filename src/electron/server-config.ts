@@ -59,11 +59,7 @@ function configToArg(): string[] {
 }
 
 const OMNISHARP_BASE: Omit<Server, "command" | "options"> = {
-  args: [
-    "-lsp",
-    "-v", // TODO: maybe delete -debug?
-    ...configToArg(),
-  ],
+  args: ["-lsp", "-v", ...configToArg()],
   language: "csharp",
   documentSelector: [
     {

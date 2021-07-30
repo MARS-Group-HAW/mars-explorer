@@ -1,4 +1,3 @@
-import { startServer } from "./server";
 import { enforceMacOSAppLocation, is } from "electron-util";
 import * as path from "path";
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
@@ -9,6 +8,7 @@ import { Logger } from "./logger";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
+import { launchLanguageServer } from "./server-launcher";
 
 const log = new Logger("main");
 
@@ -47,9 +47,11 @@ function setupApp() {
   fs.copySync(path.join(PATHS.resources, "examples"), PATHS.workspaceExamples);
 }
 
+let mainWindow: BrowserWindow;
+
 function createWindow() {
   // Create the browser window.
-  const mainWindow = new BrowserWindow({
+  mainWindow = new BrowserWindow({
     width: 1300,
     height: 900,
     webPreferences: {
@@ -80,8 +82,8 @@ app
     enforceMacOSAppLocation();
     log.info("Starting setup");
     setupApp();
-    log.info("Starting server");
-    webSocketPort = startServer();
+    //log.info("Starting server");
+    //webSocketPort = startServer();
     log.info("Creating window");
     createWindow();
 
@@ -126,3 +128,6 @@ ipcMain.handle(
 );
 
 ipcMain.handle(Channel.GET_WEBSOCKET_PORT, () => webSocketPort);
+ipcMain.handle(Channel.START_LANGUAGE_SERVER, () =>
+  launchLanguageServer(mainWindow)
+);
