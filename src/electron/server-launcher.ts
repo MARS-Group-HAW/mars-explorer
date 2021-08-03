@@ -11,16 +11,63 @@ import * as rpc from "@codingame/monaco-jsonrpc";
 import {
   DidOpenTextDocumentNotification,
   DidOpenTextDocumentParams,
+  InitializedNotification,
   InitializeParams,
   InitializeRequest,
+  LogMessageNotification,
+  LogMessageParams,
+  MessageType,
+  ShowMessageNotification,
+  ShowMessageParams,
 } from "vscode-languageserver";
 import uri2path from "file-uri-to-path";
+import { LoggerLabel } from "@shared/types/Logger";
 import fs = require("fs-extra");
 
+type Test = {
+  msgType: string;
+  method: string;
+  classpath: string;
+};
+
+const Labels: (keyof Test)[] = ["msgType", "method", "classpath"];
+
 const launcherLogger = new Logger("launcher");
-const lspLogger = new Logger("lsp", { newFile: true, printToConsole: false });
+const lspLogger = new Logger("lsp", {
+  newFile: true,
+  printToConsole: false,
+  labels: Labels,
+});
 
 let lastMessage: Message;
+
+function setLabel(key: keyof Test, value: string) {
+  lspLogger.label = {
+    key,
+    value,
+  };
+}
+
+function setLabels(labels: Partial<Test>) {
+  const x: LoggerLabel[] = [];
+
+  x.push({
+    key: "msgType",
+    value: labels["msgType"] || "/",
+  });
+
+  x.push({
+    key: "method",
+    value: labels["method"] || "/",
+  });
+
+  x.push({
+    key: "classpath",
+    value: labels["classpath"] || "/",
+  });
+
+  lspLogger.labels = x;
+}
 
 export function launchLanguageServer(mainWindow: BrowserWindow): string {
   const connectTo = getServer();
@@ -42,16 +89,45 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
 
     // FIXME Prevent duplication
     if (JSON.stringify(lastMessage) === JSON.stringify(msg)) {
-      lspLogger.warn("DUPLICATION OF ABOVE");
+      setLabels({});
+      lspLogger.log("DUPLICATION OF ABOVE");
       return;
     } else {
       lastMessage = msg;
     }
 
-    if (rpc.isNotificationMessage(msg) && msg.method.includes("error")) {
-      lspLogger.error(msg);
+    if (rpc.isNotificationMessage(msg)) {
+      setLabels({
+        msgType: "notification",
+        method: msg.method,
+      });
+
+      switch (msg.method) {
+        case InitializedNotification.type.method: {
+          lspLogger.info(msg.params);
+          break;
+        }
+        // TODO: show in GUI by LSP Standard
+        case ShowMessageNotification.type.method: {
+          handleShowMessageNotification(msg.params as ShowMessageParams);
+          break;
+        }
+        case LogMessageNotification.type.method: {
+          handleLogMessageNotification(msg.params as LogMessageParams);
+          break;
+        }
+        case "o#/error":
+          lspLogger.error(msg);
+          break;
+        default:
+          lspLogger.log(msg.params);
+      }
     } else {
-      lspLogger.debug(msg);
+      setLabels({
+        msgType: "?",
+        method: "?",
+      });
+      lspLogger.log(msg);
     }
 
     mainWindow.webContents.send(ipcChannel, msg);
@@ -60,16 +136,22 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
   // listen to incoming messages and forward them to the language server process
   ipcMain.on(ipcChannel, (event: any, message: Message) => {
     lspLogger.scope = "Client => LSP";
-    lspLogger.debug(message);
 
     if (rpc.isRequestMessage(message)) {
+      setLabels({
+        msgType: "request",
+        method: message.method,
+      });
+
       if (message.method === InitializeRequest.type.method) {
         const initializeParams = message.params as InitializeParams;
         initializeParams.processId = process.pid;
       }
-    }
-
-    if (rpc.isNotificationMessage(message)) {
+    } else if (rpc.isNotificationMessage(message)) {
+      setLabels({
+        msgType: "notification",
+        method: message.method,
+      });
       switch (message.method) {
         case DidOpenTextDocumentNotification.type.method: {
           const didOpenParams = message.params as DidOpenTextDocumentParams;
@@ -81,6 +163,13 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
           break;
         }
       }
+    } else {
+      // FIXME LOG BY METHOD
+      setLabels({
+        msgType: "?",
+        method: "?",
+      });
+      lspLogger.log(message);
     }
 
     void writer.write(message);
@@ -88,4 +177,38 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
   });
 
   return ipcChannel;
+}
+
+function logMessageByType(params: { type: MessageType; message: string }) {
+  let msg = params.message;
+
+  const splitMessage = msg.split(":");
+
+  if (splitMessage[0]) {
+    setLabel("classpath", splitMessage.shift());
+    msg = splitMessage.join(":");
+  }
+
+  switch (params.type) {
+    case MessageType.Log:
+      lspLogger.log(msg);
+      break;
+    case MessageType.Info:
+      lspLogger.info(msg);
+      break;
+    case MessageType.Warning:
+      lspLogger.warn(msg);
+      break;
+    case MessageType.Error:
+      lspLogger.error(msg);
+      break;
+  }
+}
+
+function handleLogMessageNotification(params: LogMessageParams) {
+  logMessageByType(params);
+}
+
+function handleShowMessageNotification(params: ShowMessageParams) {
+  logMessageByType(params);
 }

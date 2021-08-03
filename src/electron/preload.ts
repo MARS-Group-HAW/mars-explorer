@@ -2,7 +2,10 @@ import { Channel } from "@shared/types/Channel";
 import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 import { Logger } from "./logger";
 
-const PreloadLogger = new Logger("ipc");
+const PreloadLogger = new Logger("ipc", {
+  printToConsole: false,
+  labels: ["method", "channel"],
+});
 
 type Methods = "invoke" | "send" | "on";
 
@@ -24,10 +27,18 @@ function callIpcRenderer(
     );
     throw "Error: IPC channel name not allowed";
   }
-  PreloadLogger.info(
-    // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-    `Method: ${method} | Channel: ${channel} | Params: ${args}`
-  );
+  PreloadLogger.labels = [
+    {
+      key: "method",
+      value: method,
+    },
+    {
+      key: "channel",
+      value: channel,
+    },
+  ];
+  PreloadLogger.info(args);
+
   if (method === "invoke" || method === "send") {
     return ipcRenderer[method](channel, ...args);
   }
