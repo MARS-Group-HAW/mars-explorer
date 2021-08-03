@@ -7,3 +7,8 @@ export interface ILogger {
   log: LogFunction;
   debug: LogFunction;
 }
+
+export type LoggerLabel = {
+  key: string;
+  value: string;
+};

@@ -1,11 +1,12 @@
 import { ElectronLog } from "electron-log";
-import { ILogger } from "@shared/types/Logger";
+import { ILogger, LoggerLabel } from "@shared/types/Logger";
 import log = require("electron-log");
 import path = require("path");
 
 type LoggerOptions = {
-  newFile: boolean;
-  printToConsole: boolean;
+  newFile?: boolean;
+  printToConsole?: boolean;
+  labels?: string[];
 };
 
 const IS_DEV =
@@ -28,6 +29,15 @@ export class Logger implements ILogger {
 
     if (!options.printToConsole) {
       this.electronLog.transports.console.level = false;
+    }
+
+    if (options.labels) {
+      const labelsInFormat = options.labels
+        .map((label) => `[{${label}}]`)
+        .join(" ");
+      const newFormat = `[{h}:{i}:{s}.{ms}] [{level}] [{scope}] ${labelsInFormat} {text}`;
+      this.electronLog.transports.console.format = newFormat;
+      this.electronLog.transports.file.format = newFormat;
     }
 
     this.electronLog.catchErrors();
@@ -59,9 +69,30 @@ export class Logger implements ILogger {
     Object.assign(this.electronLog, this.electronLog.scope(scope));
   }
 
-  debug = (...params: any[]): void => this.electronLog.debug(params);
-  error = (...params: any[]): void => this.electronLog.error(params);
-  info = (...params: any[]): void => this.electronLog.info(params);
-  log = (...params: any[]): void => this.electronLog.info(params);
-  warn = (...params: any[]): void => this.electronLog.warn(params);
+  public set label(label: LoggerLabel) {
+    this.electronLog.variables[label.key] = label.value;
+  }
+
+  public set labels(labels: LoggerLabel[]) {
+    labels.forEach((label) => (this.label = label));
+  }
+
+  private format = (...params: any[]): string =>
+    params
+      .flat()
+      .filter((param) => param !== null)
+      .map(this.formatParam)
+      .join("\n");
+
+  private formatParam = (param: any): string =>
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    typeof param === "object" ? JSON.stringify(param, null, 4) : param;
+
+  debug = (...params: any[]): void =>
+    this.electronLog.debug(this.format(params));
+  error = (...params: any[]): void =>
+    this.electronLog.error(this.format(params));
+  info = (...params: any[]): void => this.electronLog.info(this.format(params));
+  log = (...params: any[]): void => this.electronLog.info(this.format(params));
+  warn = (...params: any[]): void => this.electronLog.warn(this.format(params));
 }
