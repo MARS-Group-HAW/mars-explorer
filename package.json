@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": ".webpack/main",
   "scripts": {
-    "postinstall": "ts-node scripts/setup-omnisharp",
+    "postinstall": "ts-node scripts/setup-omnisharp && npx patch-package",
     "start": "cross-env ELECTRON_ENV=development electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
@@ -61,6 +61,7 @@
     "fork-ts-checker-webpack-plugin": "^6.0.1",
     "monaco-editor-webpack-plugin": "^4.1.1",
     "node-loader": "^2.0.0",
+    "patch-package": "^6.4.7",
     "prettier": "2.3.2",
     "remove-files-webpack-plugin": "^1.4.5",
     "style-loader": "^0.20.3",
