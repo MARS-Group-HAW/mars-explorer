@@ -64,10 +64,10 @@ export class Modeler extends Component {
     window.api.logger.debug({
       projectRootPath: project.rootPath,
       projectRootUri: monaco.Uri.parse(project.rootPath),
-    })
+    });
     window.api.logger.debug({
       entryFilePath: project.entryFilePath,
-      entryFileUri:         monaco.Uri.file(project.entryFilePath),
+      entryFileUri: monaco.Uri.file(project.entryFilePath),
     });
 
     // install Monaco language client services

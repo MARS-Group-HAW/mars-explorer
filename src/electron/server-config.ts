@@ -4,7 +4,7 @@ import { Server } from "./types/OmnisharpServerConfiguration";
 import { PATHS } from "./main";
 
 import os = require("os");
-import {is} from "electron-util";
+import { is } from "electron-util";
 
 let currentOS: "linux" | "osx" | "win";
 
