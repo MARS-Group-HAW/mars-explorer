@@ -3,6 +3,7 @@ import { contextBridge, ipcRenderer, IpcRendererEvent } from "electron";
 import { Logger } from "./logger";
 
 const PreloadLogger = new Logger("ipc", {
+  newFile: true,
   printToConsole: false,
   labels: ["method", "channel"],
 });
