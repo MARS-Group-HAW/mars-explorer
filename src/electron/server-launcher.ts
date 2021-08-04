@@ -21,11 +21,15 @@ import {
   ShowMessageParams,
 } from "vscode-languageserver";
 import { LoggerLabel } from "@shared/types/Logger";
-import {fileURLToPath} from "url";
+import { fileURLToPath } from "url";
 
 import fs = require("fs-extra");
-import {OmnisharpErrorMessage, OmnisharpErrorNotification, OmnisharpErrorNotificationParams} from "./Omnisharp";
-import {Channel} from "@shared/types/Channel";
+import {
+  OmnisharpErrorMessage,
+  OmnisharpErrorNotification,
+  OmnisharpErrorNotificationParams,
+} from "./Omnisharp";
+import { Channel } from "@shared/types/Channel";
 
 type Test = {
   msgType: string;
@@ -123,7 +127,9 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
           const errorParams = msg.params as OmnisharpErrorNotificationParams;
           lspLogger.error(errorParams.Text);
 
-          if(errorParams.Text.startsWith(OmnisharpErrorMessage.DOTNET_NOT_FOUND)) {
+          if (
+            errorParams.Text.startsWith(OmnisharpErrorMessage.DOTNET_NOT_FOUND)
+          ) {
             mainWindow.webContents.send(Channel.DOTNET_NOT_FOUND);
           }
 
