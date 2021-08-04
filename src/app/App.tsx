@@ -2,6 +2,7 @@ import * as React from "react";
 import { Component } from "react";
 import { Modeler } from "./Modeler";
 import { Channel } from "@shared/types/Channel";
+import "@fontsource/roboto"; // Defaults to weight 400.
 
 export class App extends Component<any, any> {
   componentDidMount() {
