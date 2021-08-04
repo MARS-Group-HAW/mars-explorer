@@ -4,6 +4,7 @@ import { Server } from "./types/OmnisharpServerConfiguration";
 import { PATHS } from "./main";
 
 import os = require("os");
+import {is} from "electron-util";
 
 let currentOS: "linux" | "osx" | "win";
 
@@ -70,7 +71,7 @@ const OMNISHARP_BASE: Omit<Server, "command" | "options"> = {
 
 export function getServer(): Server {
   return {
-    command: "sh run",
+    command: is.windows ? "Omnisharp.exe" : "sh run",
     ...OMNISHARP_BASE,
     args: [
       ...OMNISHARP_BASE.args,
