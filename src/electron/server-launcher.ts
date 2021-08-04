@@ -79,12 +79,15 @@ function setLabels(labels: Partial<Test>) {
 export function launchLanguageServer(mainWindow: BrowserWindow): string {
   const connectTo = getServer();
   launcherLogger.info("Spawning Server");
+  launcherLogger.info(connectTo);
 
   // FIXME:   handle WINDOWS    process.platform.startsWith("win") ? ".cmd" : ""
   const lsProcess = spawn(connectTo.command, connectTo.args, connectTo.options);
 
   // choose a unique channel name, e.g. by using the PID
   const ipcChannel = `LSP_${lsProcess.pid}`;
+
+  launcherLogger.info(`IPC_Channel: ${ipcChannel}`);
 
   // create reader/writer for I/O streams
   const reader = new StreamMessageReader(lsProcess.stdout);
@@ -191,6 +194,7 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
     return;
   });
 
+  launcherLogger.info("Server spawned successfully!");
   return ipcChannel;
 }
 
