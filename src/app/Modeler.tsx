@@ -51,7 +51,7 @@ export class Modeler extends Component {
       model: monaco.editor.createModel(
         fileContents,
         "csharp",
-        monaco.Uri.parse(project.entryFilePath)
+        monaco.Uri.file(project.entryFilePath)
       ),
       glyphMargin: true,
       theme: "vs-dark",
@@ -60,6 +60,16 @@ export class Modeler extends Component {
     });
 
     const rootUri = monaco.Uri.parse(project.rootPath).path;
+
+    window.api.logger.debug({
+      projectRootPath: project.rootPath,
+      projectRootUri: monaco.Uri.parse(project.rootPath),
+    })
+    window.api.logger.debug({
+      entryFilePath: project.entryFilePath,
+      entryFileUri:         monaco.Uri.file(project.entryFilePath),
+    });
+
     // install Monaco language client services
     MonacoServices.install(monaco as any, {
       rootUri,

@@ -20,8 +20,9 @@ import {
   ShowMessageNotification,
   ShowMessageParams,
 } from "vscode-languageserver";
-import uri2path from "file-uri-to-path";
 import { LoggerLabel } from "@shared/types/Logger";
+import {fileURLToPath} from "url";
+
 import fs = require("fs-extra");
 
 type Test = {
@@ -157,7 +158,7 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
           const didOpenParams = message.params as DidOpenTextDocumentParams;
           const uri = didOpenParams.textDocument.uri;
           const text = didOpenParams.textDocument.text;
-          const uriAsPath = uri2path(uri);
+          const uriAsPath = fileURLToPath(uri);
 
           if (uri) fs.writeFileSync(uriAsPath, text);
           break;
