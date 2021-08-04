@@ -1,4 +1,5 @@
 {
+  "author": "Jan-Niklas Voß",
   "name": "mars-explorer",
   "productName": "mars-explorer",
   "version": "0.0.1",
@@ -85,10 +86,7 @@
       },
       "makers": [
         {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": ""
-          }
+          "name": "@electron-forge/maker-squirrel"
         },
         {
           "name": "@electron-forge/maker-zip",
