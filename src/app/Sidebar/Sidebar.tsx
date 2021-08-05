@@ -2,6 +2,8 @@ import * as React from "react";
 import { ReactNode } from "react";
 import {
   AppBar,
+  Backdrop,
+  CircularProgress,
   Container,
   Divider,
   Drawer,
@@ -16,13 +18,15 @@ import {
 import BubbleChartIcon from "@material-ui/icons/BubbleChart";
 import TuneIcon from "@material-ui/icons/Tune";
 import BarChartIcon from "@material-ui/icons/BarChart";
-import { Page } from "../types/Page";
+import { Page } from "../types/Navigation";
 
 const drawerWidth = 180;
+const barHeight = 50;
 
 const useStyles = makeStyles((theme) => ({
   root: {
     display: "flex",
+    height: "100%",
   },
   headerContainer: {
     padding: theme.spacing(1),
@@ -36,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
     top: "auto",
     bottom: 0,
     zIndex: theme.zIndex.drawer + 1,
+    height: barHeight,
   },
   list: {
     height: "100%",
@@ -55,7 +60,16 @@ const useStyles = makeStyles((theme) => ({
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
-    padding: theme.spacing(3),
+    height: `calc(100% - ${barHeight}px)`,
+  },
+  backdrop: {
+    height: `calc(100% - ${barHeight}px)`,
+    width: `calc(100% - ${drawerWidth}px)`,
+    zIndex: theme.zIndex.drawer + 1,
+    color: "#fff",
+    right: 0,
+    top: 0,
+    left: "auto",
   },
 }));
 
@@ -83,11 +97,17 @@ const MENU_ITEMS: MenuItem = {
 
 type Props = {
   children: ReactNode;
+  isPageLoading: boolean;
   page: Page | null;
   onPageChange: (page: Page) => void;
 };
 
-export const Sidebar = ({ page, onPageChange, children }: Props) => {
+export const Sidebar = ({
+  isPageLoading,
+  page,
+  onPageChange,
+  children,
+}: Props) => {
   const classes = useStyles();
 
   return (
@@ -138,7 +158,12 @@ export const Sidebar = ({ page, onPageChange, children }: Props) => {
           </Toolbar>
         </AppBar>
       </Drawer>
-      <main className={classes.content}>{children}</main>
+      <main className={classes.content}>
+        <Backdrop className={classes.backdrop} open={isPageLoading}>
+          <CircularProgress color="secondary" />
+        </Backdrop>
+        {children}
+      </main>
     </div>
   );
 };

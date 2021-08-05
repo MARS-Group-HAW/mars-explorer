@@ -6,11 +6,14 @@ import { Component } from "react";
     https://github.com/TypeFox/monaco-languageclient/issues/274
  */
 import * as monaco from "monaco-editor";
-import { MonacoServices } from "monaco-languageclient";
+import { editor } from "monaco-editor";
+import { MonacoLanguageClient, MonacoServices } from "monaco-languageclient";
 import { Channel } from "@shared/types/Channel";
 import { Project } from "@shared/types/Project";
 import { ExampleProject } from "@shared/types/ExampleProject";
 import { startLanguageClient } from "./client";
+import { Loading } from "./types/Loading";
+import ITextModel = editor.ITextModel;
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
 (self as any).MonacoEnvironment = {
@@ -22,8 +25,17 @@ import { startLanguageClient } from "./client";
   },
 };
 
-export class Modeler extends Component {
+type State = {
+  modelerIsReady: boolean;
+};
+
+export class Modeler extends Component<Loading, State> {
   private static readonly MONACO_CONTAINER_ID = "monaco-container";
+  private static monacoLanguageClient: MonacoLanguageClient;
+
+  state: State = {
+    modelerIsReady: false,
+  };
 
   async componentDidMount() {
     monaco.languages.register({
@@ -40,6 +52,10 @@ export class Modeler extends Component {
     await this.setupMonaco(exampleProject);
   }
 
+  async componentWillUnmount() {
+    //FIXME await Modeler.monacoLanguageClient.stop();
+  }
+
   private async setupMonaco(project: Project) {
     // FIXME: get example path from main
     const fileContents = await window.api.invoke<string, string>(
@@ -48,13 +64,9 @@ export class Modeler extends Component {
     );
 
     monaco.editor.create(document.getElementById(Modeler.MONACO_CONTAINER_ID), {
-      model: monaco.editor.createModel(
-        fileContents,
-        "csharp",
-        monaco.Uri.file(project.entryFilePath)
-      ),
+      model: this.createOrGetModel(project.entryFilePath, fileContents),
       glyphMargin: true,
-      theme: "vs-dark",
+      // theme: "vs-dark",
       fontSize: 16,
       language: "csharp",
     });
@@ -75,8 +87,28 @@ export class Modeler extends Component {
       rootUri,
     });
 
-    await startLanguageClient();
+    if (Modeler.monacoLanguageClient) {
+      // Modeler.monacoLanguageClient.start();
+      this.props.setLoading(false);
+    } else {
+      Modeler.monacoLanguageClient = await startLanguageClient();
+      void Modeler.monacoLanguageClient
+        .onReady()
+        .then(() => this.props.setLoading(false));
+    }
   }
+
+  private createOrGetModel = (path: string, content: string): ITextModel => {
+    const modelUri = monaco.Uri.file(path);
+
+    let model = monaco.editor.getModel(modelUri);
+
+    if (model) return model;
+
+    model = monaco.editor.createModel(content, "csharp", modelUri);
+
+    return model;
+  };
 
   render() {
     return (
