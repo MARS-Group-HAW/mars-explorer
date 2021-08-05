@@ -42,7 +42,6 @@ const OMNISHARP_CONFIG: OmnisharpConfiguration = {
   msbuild: {
     enabled: true,
     EnablePackageAutoRestore: false,
-    // "MSBuildSDKsPath": path.join(app.getPath('home'), 'Library', 'ApplicationSupport', 'MARS-Explorer', 'dotnet-sdk', 'sdk', '3.1.410'),
   },
 };
 

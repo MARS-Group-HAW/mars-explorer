@@ -89,10 +89,14 @@ export class Logger implements ILogger {
     typeof param === "object" ? JSON.stringify(param, null, 4) : param;
 
   debug = (...params: any[]): void =>
-    this.electronLog.debug(this.format(params));
+    this.electronLog.debug(`%c${this.format(params)}`, "color: Magenta");
+
   error = (...params: any[]): void =>
-    this.electronLog.error(this.format(params));
-  info = (...params: any[]): void => this.electronLog.info(this.format(params));
-  log = (...params: any[]): void => this.electronLog.info(this.format(params));
-  warn = (...params: any[]): void => this.electronLog.warn(this.format(params));
+    this.electronLog.error(`%c${this.format(params)}`, "color: Red");
+
+  info = (...params: any[]): void =>
+    this.electronLog.info(`%c${this.format(params)}`, "color: Cyan");
+  log = (...params: any[]): void => this.electronLog.log(this.format(params));
+  warn = (...params: any[]): void =>
+    this.electronLog.warn(`%c${this.format(params)}`, "color: Yellow");
 }
