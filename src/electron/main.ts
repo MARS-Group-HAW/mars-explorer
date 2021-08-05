@@ -134,6 +134,13 @@ ipcMain.handle(
 );
 
 ipcMain.handle(Channel.GET_WEBSOCKET_PORT, () => webSocketPort);
-ipcMain.handle(Channel.START_LANGUAGE_SERVER, () =>
-  launchLanguageServer(mainWindow)
-);
+
+let languageServerChannel: string;
+
+ipcMain.handle(Channel.START_LANGUAGE_SERVER, () => {
+  if (languageServerChannel) {
+    log.info(`Reusing LSP running at ${languageServerChannel}`);
+    return languageServerChannel;
+  }
+  return launchLanguageServer(mainWindow);
+});

@@ -4,19 +4,26 @@ import "@fontsource/roboto";
 import { Channel } from "@shared/types/Channel";
 import { CssBaseline } from "@material-ui/core";
 import { Sidebar } from "./Sidebar/Sidebar";
-import { Page } from "./types/Page";
-import { EmptyElement } from "./types/EmptyElement";
+import { Page } from "./types/Navigation";
+import { Empty } from "./types/utils";
+import { Modeler } from "./Modeler";
 
 interface State {
   currentPage: Page | null;
+  isPageLoading: boolean;
 }
 
-export class App extends Component<EmptyElement, State> {
+export class App extends Component<Empty, State> {
   state: State = {
     currentPage: null,
+    isPageLoading: false,
   };
 
-  changePage = (page: Page) => this.setState({ currentPage: page });
+  changePage = (page: Page) =>
+    this.setState({ currentPage: page, isPageLoading: true });
+
+  setPageLoading = (isLoading: boolean) =>
+    this.setState({ isPageLoading: isLoading });
 
   componentDidMount() {
     window.api.logger.info("App mounted.");
@@ -31,12 +38,18 @@ export class App extends Component<EmptyElement, State> {
   };
 
   render() {
-    const { currentPage } = this.state;
+    const { isPageLoading, currentPage } = this.state;
 
     return (
       <CssBaseline>
-        <Sidebar page={this.state.currentPage} onPageChange={this.changePage}>
-          {currentPage === "model" && <p>Model content</p>}
+        <Sidebar
+          isPageLoading={isPageLoading}
+          page={currentPage}
+          onPageChange={this.changePage}
+        >
+          {currentPage === "model" && (
+            <Modeler setLoading={this.setPageLoading} />
+          )}
           {currentPage === "configure" && <p>Configure content</p>}
           {currentPage === "analyze" && <p>Analyze content</p>}
         </Sidebar>
