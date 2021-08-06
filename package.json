@@ -32,6 +32,7 @@
     "normalize-url": "^2.0.1",
     "react": "^17.0.2",
     "react-dom": "^17.0.2",
+    "react-router-dom": "^5.2.0",
     "reconnecting-websocket": "^3.2.2",
     "vscode-languageserver": "7.0.0",
     "ws": "^5.0.0"
@@ -49,6 +50,7 @@
     "@types/node": "^13.1.7",
     "@types/react": "^17.0.13",
     "@types/react-dom": "^17.0.8",
+    "@types/react-router-dom": "^5.1.8",
     "@types/vscode": "1.52.0",
     "@types/ws": "0.0.39",
     "@typescript-eslint/eslint-plugin": "^4.28.4",
