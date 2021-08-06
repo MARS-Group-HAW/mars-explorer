@@ -77,26 +77,29 @@ export class Logger implements ILogger {
     labels.forEach((label) => (this.label = label));
   }
 
-  private format = (...params: any[]): string =>
+  private format = (...params: unknown[]): string =>
     params
       .flat()
       .filter((param) => param !== null)
       .map(this.formatParam)
       .join("\n");
 
-  private formatParam = (param: any): string =>
+  private formatParam = (param: unknown): string =>
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    typeof param === "object" ? JSON.stringify(param, null, 4) : param;
+    typeof param === "object"
+      ? JSON.stringify(param, null, 4)
+      : (param as string);
 
-  debug = (...params: any[]): void =>
+  debug = (...params: unknown[]): void =>
     this.electronLog.debug(`%c${this.format(params)}`, "color: Magenta");
 
-  error = (...params: any[]): void =>
+  error = (...params: unknown[]): void =>
     this.electronLog.error(`%c${this.format(params)}`, "color: Red");
 
-  info = (...params: any[]): void =>
+  info = (...params: unknown[]): void =>
     this.electronLog.info(`%c${this.format(params)}`, "color: Cyan");
-  log = (...params: any[]): void => this.electronLog.log(this.format(params));
-  warn = (...params: any[]): void =>
+  log = (...params: unknown[]): void =>
+    this.electronLog.log(this.format(params));
+  warn = (...params: unknown[]): void =>
     this.electronLog.warn(`%c${this.format(params)}`, "color: Yellow");
 }

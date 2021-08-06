@@ -1,4 +1,4 @@
-type LogFunction = (...params: any[]) => void;
+type LogFunction = (...params: unknown[]) => void;
 
 export interface ILogger {
   error: LogFunction;

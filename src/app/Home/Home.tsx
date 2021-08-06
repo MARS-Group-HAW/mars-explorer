@@ -1,11 +1,13 @@
 import * as React from "react";
-import { PageProps } from "../shared/types/Navigation";
 import { useEffect } from "react";
+import { PageProps } from "../shared/types/Navigation";
 
-export const Home = (props: PageProps) => {
+const Home = (props: PageProps) => {
   useEffect(() => {
     props.setLoading(false);
   }, []);
 
   return <p>Home Page</p>;
 };
+
+export default Home;

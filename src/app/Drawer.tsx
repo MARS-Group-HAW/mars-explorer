@@ -18,8 +18,8 @@ import TuneIcon from "@material-ui/icons/Tune";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import HomeIcon from "@material-ui/icons/Home";
 
-import { NavItem } from "./shared/components/NavItem";
-import { Path } from "./shared/enums/AppPaths";
+import NavItem from "./shared/components/NavItem";
+import Path from "./shared/enums/AppPaths";
 
 const drawerWidth = 180;
 const barHeight = 50;
@@ -85,7 +85,7 @@ type Props = {
   onPageChange: () => void;
 };
 
-export const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
+const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
   const classes = useStyles();
 
   return (
@@ -101,10 +101,10 @@ export const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
         <Container className={classes.headerContainer}>
           <Typography
             className={classes.header}
-            color={"primary"}
-            align={"center"}
-            variant={"h4"}
-            component={"h1"}
+            color="primary"
+            align="center"
+            variant="h4"
+            component="h1"
           >
             MARS Explorer
           </Typography>
@@ -113,19 +113,19 @@ export const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
         <List className={classes.list} component="nav">
           <NavItem
             path={Path.MODEL}
-            text={"Model"}
+            text="Model"
             icon={<BubbleChartIcon />}
             onClick={() => onPageChange()}
           />
           <NavItem
             path={Path.CONFIGURE}
-            text={"Configure"}
+            text="Configure"
             icon={<TuneIcon />}
             onClick={() => onPageChange()}
           />
           <NavItem
             path={Path.ANALYZE}
-            text={"Analyze"}
+            text="Analyze"
             icon={<BarChartIcon />}
             onClick={() => onPageChange()}
           />
@@ -134,7 +134,7 @@ export const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
         <Box className={classes.home}>
           <NavItem
             path={Path.HOME}
-            text={"Home"}
+            text="Home"
             icon={<HomeIcon />}
             onClick={() => onPageChange()}
           />
@@ -156,3 +156,5 @@ export const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
     </div>
   );
 };
+
+export default Drawer;

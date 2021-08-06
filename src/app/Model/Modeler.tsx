@@ -11,13 +11,14 @@ import { MonacoLanguageClient, MonacoServices } from "monaco-languageclient";
 import { Channel } from "@shared/types/Channel";
 import { Project } from "@shared/types/Project";
 import { ExampleProject } from "@shared/types/ExampleProject";
-import { startLanguageClient } from "./client";
 import { Loading } from "../shared/types/Loading";
+import { Empty } from "../shared/types/utils";
 import ITextModel = editor.ITextModel;
+import startLanguageClient from "./client";
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
+// eslint-disable-next-line no-restricted-globals
 (self as any).MonacoEnvironment = {
-  getWorkerUrl: function (moduleId: string, label: string) {
+  getWorkerUrl(moduleId: string, label: string) {
     window.api.logger.info(
       `Getting worker URL (moduleId: ${moduleId}, label: ${label})`
     );
@@ -25,17 +26,10 @@ import ITextModel = editor.ITextModel;
   },
 };
 
-type State = {
-  modelerIsReady: boolean;
-};
-
-export class Modeler extends Component<Loading, State> {
+class Modeler extends Component<Loading, Empty> {
   private static readonly MONACO_CONTAINER_ID = "monaco-container";
-  private static monacoLanguageClient: MonacoLanguageClient;
 
-  state: State = {
-    modelerIsReady: false,
-  };
+  private static monacoLanguageClient: MonacoLanguageClient;
 
   async componentDidMount() {
     monaco.languages.register({
@@ -53,7 +47,7 @@ export class Modeler extends Component<Loading, State> {
   }
 
   async componentWillUnmount() {
-    //FIXME await Modeler.monacoLanguageClient.stop();
+    // FIXME await Modeler.monacoLanguageClient.stop();
   }
 
   private async setupMonaco(project: Project) {
@@ -87,14 +81,14 @@ export class Modeler extends Component<Loading, State> {
       rootUri,
     });
 
+    const { setLoading } = this.props;
+
     if (Modeler.monacoLanguageClient) {
       // Modeler.monacoLanguageClient.start();
-      this.props.setLoading(false);
+      setLoading(false);
     } else {
       Modeler.monacoLanguageClient = await startLanguageClient();
-      void Modeler.monacoLanguageClient
-        .onReady()
-        .then(() => this.props.setLoading(false));
+      Modeler.monacoLanguageClient.onReady().finally(() => setLoading(false));
     }
   }
 
@@ -119,3 +113,5 @@ export class Modeler extends Component<Loading, State> {
     );
   }
 }
+
+export default Modeler;
