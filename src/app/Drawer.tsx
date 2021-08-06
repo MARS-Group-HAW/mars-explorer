@@ -3,14 +3,12 @@ import { ReactNode } from "react";
 import {
   AppBar,
   Backdrop,
+  Box,
   CircularProgress,
   Container,
   Divider,
-  Drawer,
+  Drawer as MUIDrawer,
   List,
-  ListItem,
-  ListItemIcon,
-  ListItemText,
   makeStyles,
   Toolbar,
   Typography,
@@ -18,7 +16,10 @@ import {
 import BubbleChartIcon from "@material-ui/icons/BubbleChart";
 import TuneIcon from "@material-ui/icons/Tune";
 import BarChartIcon from "@material-ui/icons/BarChart";
-import { Page } from "../types/Navigation";
+import HomeIcon from "@material-ui/icons/Home";
+
+import { NavItem } from "./shared/components/NavItem";
+import { Path } from "./shared/enums/AppPaths";
 
 const drawerWidth = 180;
 const barHeight = 50;
@@ -33,6 +34,11 @@ const useStyles = makeStyles((theme) => ({
   },
   header: {
     fontWeight: theme.typography.fontWeightBold,
+  },
+  home: {
+    padding: theme.spacing(1),
+    display: "flex",
+    justifyContent: "center",
   },
   appBar: {
     // width: `calc(100% - ${drawerWidth}px)`,
@@ -54,9 +60,9 @@ const useStyles = makeStyles((theme) => ({
   },
   drawerPaper: {
     width: drawerWidth,
+    height: `calc(100% - ${barHeight}px)`,
   },
   // necessary for content to be below app bar
-  toolbar: theme.mixins.toolbar,
   content: {
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
@@ -73,46 +79,18 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type MenuItem = {
-  [key in Page]: {
-    text: string;
-    icon: ReactNode;
-  };
-};
-
-const MENU_ITEMS: MenuItem = {
-  model: {
-    text: "Model",
-    icon: <BubbleChartIcon />,
-  },
-  configure: {
-    text: "Configure",
-    icon: <TuneIcon />,
-  },
-  analyze: {
-    text: "Analyze",
-    icon: <BarChartIcon />,
-  },
-};
-
 type Props = {
   children: ReactNode;
   isPageLoading: boolean;
-  page: Page | null;
-  onPageChange: (page: Page) => void;
+  onPageChange: () => void;
 };
 
-export const Sidebar = ({
-  isPageLoading,
-  page,
-  onPageChange,
-  children,
-}: Props) => {
+export const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
   const classes = useStyles();
 
   return (
     <div className={classes.root}>
-      <Drawer
+      <MUIDrawer
         className={classes.drawer}
         variant="permanent"
         classes={{
@@ -132,24 +110,35 @@ export const Sidebar = ({
           </Typography>
         </Container>
         <Divider />
-        <List className={classes.list}>
-          {Object.keys(MENU_ITEMS).map((menuItemKey) => {
-            const menuItem = MENU_ITEMS[menuItemKey as Page];
-
-            return (
-              <ListItem
-                button
-                key={menuItemKey}
-                selected={menuItemKey === page}
-                onClick={() => onPageChange(menuItemKey as Page)}
-              >
-                <ListItemIcon>{menuItem.icon}</ListItemIcon>
-                <ListItemText primary={menuItem.text} />
-              </ListItem>
-            );
-          })}
+        <List className={classes.list} component="nav">
+          <NavItem
+            path={Path.MODEL}
+            text={"Model"}
+            icon={<BubbleChartIcon />}
+            onClick={() => onPageChange()}
+          />
+          <NavItem
+            path={Path.CONFIGURE}
+            text={"Configure"}
+            icon={<TuneIcon />}
+            onClick={() => onPageChange()}
+          />
+          <NavItem
+            path={Path.ANALYZE}
+            text={"Analyze"}
+            icon={<BarChartIcon />}
+            onClick={() => onPageChange()}
+          />
         </List>
-        <div className={classes.toolbar} />
+        <Divider />
+        <Box className={classes.home}>
+          <NavItem
+            path={Path.HOME}
+            text={"Home"}
+            icon={<HomeIcon />}
+            onClick={() => onPageChange()}
+          />
+        </Box>
         <AppBar position="fixed" className={classes.appBar}>
           <Toolbar variant="dense">
             <Typography variant="h6" noWrap>
@@ -157,7 +146,7 @@ export const Sidebar = ({
             </Typography>
           </Toolbar>
         </AppBar>
-      </Drawer>
+      </MUIDrawer>
       <main className={classes.content}>
         <Backdrop className={classes.backdrop} open={isPageLoading}>
           <CircularProgress color="secondary" />

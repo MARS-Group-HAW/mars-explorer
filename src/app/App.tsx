@@ -3,24 +3,25 @@ import { Component } from "react";
 import "@fontsource/roboto";
 import { Channel } from "@shared/types/Channel";
 import { CssBaseline } from "@material-ui/core";
-import { Sidebar } from "./Sidebar/Sidebar";
-import { Page } from "./types/Navigation";
-import { Empty } from "./types/utils";
-import { Modeler } from "./Modeler";
+import { Empty } from "./shared/types/utils";
+import { Modeler } from "./Model/Modeler";
+import { Route } from "react-router-dom";
+import { Configure } from "./Configure/Configure";
+import { Analyze } from "./Analyze/Analyze";
+import { Home } from "./Home/Home";
+import { Path } from "./shared/enums/AppPaths";
+import { Drawer } from "./Drawer";
 
 interface State {
-  currentPage: Page | null;
   isPageLoading: boolean;
 }
 
 export class App extends Component<Empty, State> {
   state: State = {
-    currentPage: null,
     isPageLoading: false,
   };
 
-  changePage = (page: Page) =>
-    this.setState({ currentPage: page, isPageLoading: true });
+  changePage = () => this.setState({ isPageLoading: true });
 
   setPageLoading = (isLoading: boolean) =>
     this.setState({ isPageLoading: isLoading });
@@ -38,21 +39,24 @@ export class App extends Component<Empty, State> {
   };
 
   render() {
-    const { isPageLoading, currentPage } = this.state;
+    const { isPageLoading } = this.state;
 
     return (
       <CssBaseline>
-        <Sidebar
-          isPageLoading={isPageLoading}
-          page={currentPage}
-          onPageChange={this.changePage}
-        >
-          {currentPage === "model" && (
+        <Drawer isPageLoading={isPageLoading} onPageChange={this.changePage}>
+          <Route path={Path.HOME} exact>
+            <Home setLoading={this.setPageLoading} />
+          </Route>
+          <Route path={Path.MODEL}>
             <Modeler setLoading={this.setPageLoading} />
-          )}
-          {currentPage === "configure" && <p>Configure content</p>}
-          {currentPage === "analyze" && <p>Analyze content</p>}
-        </Sidebar>
+          </Route>
+          <Route path={Path.CONFIGURE}>
+            <Configure setLoading={this.setPageLoading} />
+          </Route>
+          <Route path={Path.ANALYZE}>
+            <Analyze setLoading={this.setPageLoading} />
+          </Route>
+        </Drawer>
       </CssBaseline>
     );
   }

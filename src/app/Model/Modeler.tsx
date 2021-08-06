@@ -12,7 +12,7 @@ import { Channel } from "@shared/types/Channel";
 import { Project } from "@shared/types/Project";
 import { ExampleProject } from "@shared/types/ExampleProject";
 import { startLanguageClient } from "./client";
-import { Loading } from "./types/Loading";
+import { Loading } from "../shared/types/Loading";
 import ITextModel = editor.ITextModel;
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
