@@ -22,14 +22,13 @@ import {
 } from "vscode-languageserver";
 import { LoggerLabel } from "@shared/types/Logger";
 import { fileURLToPath } from "url";
-
-import fs = require("fs-extra");
 import {
   OmnisharpErrorMessage,
   OmnisharpErrorNotification,
   OmnisharpErrorNotificationParams,
 } from "./Omnisharp";
 import { Channel } from "@shared/types/Channel";
+import fs = require("fs-extra");
 
 type Test = {
   msgType: string;
@@ -127,15 +126,10 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
           break;
         }
         case OmnisharpErrorNotification:
-          const errorParams = msg.params as OmnisharpErrorNotificationParams;
-          lspLogger.error(errorParams.Text);
-
-          if (
-            errorParams.Text.startsWith(OmnisharpErrorMessage.DOTNET_NOT_FOUND)
-          ) {
-            mainWindow.webContents.send(Channel.DOTNET_NOT_FOUND);
-          }
-
+          handleOmnisharpErrorNotification(
+            msg.params as OmnisharpErrorNotificationParams,
+            mainWindow
+          );
           break;
         default:
           lspLogger.log(msg.params);
@@ -152,7 +146,7 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
   });
 
   // listen to incoming messages and forward them to the language server process
-  ipcMain.on(ipcChannel, (event: any, message: Message) => {
+  ipcMain.on(ipcChannel, (event: unknown, message: Message) => {
     lspLogger.scope = "Client => LSP";
 
     if (rpc.isRequestMessage(message)) {
@@ -230,4 +224,15 @@ function handleLogMessageNotification(params: LogMessageParams) {
 
 function handleShowMessageNotification(params: ShowMessageParams) {
   logMessageByType(params);
+}
+
+function handleOmnisharpErrorNotification(
+  params: OmnisharpErrorNotificationParams,
+  mainWindow: Electron.BrowserWindow
+) {
+  lspLogger.error(params.Text);
+
+  if (params.Text.startsWith(OmnisharpErrorMessage.DOTNET_NOT_FOUND)) {
+    mainWindow.webContents.send(Channel.DOTNET_NOT_FOUND);
+  }
 }

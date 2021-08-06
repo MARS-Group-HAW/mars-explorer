@@ -1,10 +1,10 @@
-{
-  "env": {
-    "browser": true,
-    "es6": true,
-    "node": true
+module.exports = {
+  env: {
+    browser: true,
+    es6: true,
+    node: true,
   },
-  "extends": [
+  extends: [
     "eslint:recommended",
     "plugin:@typescript-eslint/eslint-recommended",
     "plugin:@typescript-eslint/recommended",
@@ -12,21 +12,21 @@
     "plugin:import/errors",
     "plugin:import/warnings",
     "plugin:import/typescript",
-    "prettier"
+    "prettier",
   ],
-  "rules": {
+  rules: {
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-var-requires": "off",
-    "@typescript-eslint/ban-ts-comment": "off"
+    "@typescript-eslint/ban-ts-comment": "off",
   },
-  "parser": "@typescript-eslint/parser",
-  "parserOptions": {
-    "project": "./tsconfig.json",
-    "tsconfigRootDir": "./"
+  parser: "@typescript-eslint/parser",
+  parserOptions: {
+    project: __dirname + "../../../tsconfig.json",
+    tsconfigRootDir: "./",
   },
-  "settings": {
+  settings: {
     "import/resolver": {
-      "typescript": {}
-    }
-  }
-}
+      typescript: {},
+    },
+  },
+};
