@@ -14,6 +14,9 @@ module.exports = {
     project: __dirname + "../../../tsconfig.json",
     tsconfigRootDir: "./",
   },
+  rules: {
+    "react/jsx-props-no-spreading": "off",
+  },
   plugins: ["react"],
   settings: {
     "import/resolver": {
