@@ -1,46 +1,50 @@
-import moment from "moment";
 import * as Yup from "yup";
+import { SchemaOf } from "yup";
 import FieldNames from "./fieldNames";
+import { ALL_TIME_UNITS } from "../FormComponents/types";
+import { Globals } from "../types";
+import TimeSpecification from "./types";
 
-export default Yup.object().shape({
+const ValidationSchema: SchemaOf<Globals> = Yup.object().shape({
   [FieldNames.DELTA_T]: Yup.number()
     .required("Required")
     .integer()
     .min(0, "Must be greater than 0."),
-  [FieldNames.DELTA_T_UNIT]: Yup.string().oneOf(["day", "minute", "hour"]), // FIXME
+  [FieldNames.DELTA_T_UNIT]: Yup.string().oneOf(ALL_TIME_UNITS),
+  [FieldNames.TIME_SPECIFICATION]: Yup.string().oneOf(
+    Object.values(TimeSpecification)
+  ),
   [FieldNames.STEPS]: Yup.number()
     .integer()
     .min(0, "Must be greater than 0.")
-    .when("startPoint", {
-      is: (val: Date | null) => !val,
+    .when(FieldNames.TIME_SPECIFICATION, {
+      is: TimeSpecification.STEP,
       then: Yup.number().required(
         "Steps is required if no start/end point provided"
       ),
     }),
-  [FieldNames.START_POINT]: Yup.date()
-    .test(
-      "is-undefined-but-endPoint",
-      // eslint-disable-next-line no-template-curly-in-string
-      "${path} is required if endPoint is defined.",
-      function (date): boolean {
-        return this.parent.endPoint ? Boolean(date) : true;
-      }
-    )
-    .test(
-      "is-before-endPoint",
-      // eslint-disable-next-line no-template-curly-in-string
-      "${path} must be before endPoint.",
-      function (date): boolean {
-        if (!date || !this.parent.endPoint) return true;
-        return moment(this.parent.endPoint).isAfter(date);
-      }
-    ),
-  [FieldNames.END_POINT]: Yup.date().test(
-    "is-undefined-but-startPoint",
-    // eslint-disable-next-line no-template-curly-in-string
-    "${path} is required if startPoint is defined.",
-    function (date): boolean {
-      return this.parent.startPoint ? Boolean(date) : true;
-    }
-  ),
+  [FieldNames.START_POINT]: Yup.mixed().when(FieldNames.TIME_SPECIFICATION, {
+    is: TimeSpecification.DATETIME,
+    then: Yup.date()
+      .required("A date is required if steps is not provided")
+      .when(FieldNames.END_POINT, {
+        is: (val: Date | null) => val,
+        then: Yup.date().required(
+          "Start Point is required if End Point is defined"
+        ),
+      }),
+    otherwise: Yup.mixed().nullable(),
+  }),
+  [FieldNames.END_POINT]: Yup.mixed().when(FieldNames.TIME_SPECIFICATION, {
+    is: TimeSpecification.DATETIME,
+    then: Yup.date()
+      .required("A date is required if steps is not provided")
+      .min(
+        Yup.ref(FieldNames.START_POINT),
+        "End Point must be after Start Point"
+      ),
+    otherwise: Yup.mixed().nullable(),
+  }),
 });
+
+export default ValidationSchema;

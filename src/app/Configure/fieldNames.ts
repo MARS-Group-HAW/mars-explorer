@@ -1,5 +1,5 @@
 enum FieldNames {
-  GLOBALS = "GLOBALS",
+  GLOBALS = "globals",
 }
 
 export default FieldNames;
