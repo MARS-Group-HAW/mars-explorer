@@ -81,7 +81,7 @@ const TimeSpecificationForm = ({ namespace }: { namespace: string }) => {
         />
       </Grid>
       <Grid item xs={1}>
-        <Typography variant="caption">or</Typography>
+        <Typography variant="caption">OR</Typography>
       </Grid>
       <Grid xs={8} item className={classes.datesContainer}>
         <PaddedBox>

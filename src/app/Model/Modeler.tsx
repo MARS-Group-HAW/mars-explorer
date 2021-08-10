@@ -1,53 +1,27 @@
 import * as React from "react";
-import { Component } from "react";
-/* FIXME
-    should be: monaco-editor/esm/vs/editor/editor.api";
-    but leads to error on Service installation.
-    https://github.com/TypeFox/monaco-languageclient/issues/274
- */
-import * as monaco from "monaco-editor";
-import { editor } from "monaco-editor";
-import { MonacoLanguageClient, MonacoServices } from "monaco-languageclient";
+import { Component, RefObject } from "react";
 import { Channel } from "@shared/types/Channel";
 import { Project } from "@shared/types/Project";
 import { ExampleProject } from "@shared/types/ExampleProject";
 import { Loading } from "../shared/types/Loading";
 import { Empty } from "../shared/types/utils";
-import ITextModel = editor.ITextModel;
-import startLanguageClient from "./client";
-
-// eslint-disable-next-line no-restricted-globals
-(self as any).MonacoEnvironment = {
-  getWorkerUrl(moduleId: string, label: string) {
-    window.api.logger.info(
-      `Getting worker URL (moduleId: ${moduleId}, label: ${label})`
-    );
-    return "editor.worker.js";
-  },
-};
+import Editor from "./Editor";
 
 class Modeler extends Component<Loading, Empty> {
-  private static readonly MONACO_CONTAINER_ID = "monaco-container";
+  container: RefObject<HTMLDivElement>;
 
-  private static monacoLanguageClient: MonacoLanguageClient;
+  constructor(props: Loading) {
+    super(props);
+    this.container = React.createRef();
+  }
 
   async componentDidMount() {
-    monaco.languages.register({
-      id: "csharp",
-      extensions: [".cs"],
-      aliases: ["C#", "csharp"],
-    });
-
     const exampleProject = await window.api.invoke<ExampleProject, Project>(
       Channel.GET_EXAMPLE_PROJECT,
       "MyTestApp"
     );
 
     await this.setupMonaco(exampleProject);
-  }
-
-  async componentWillUnmount() {
-    // FIXME await Modeler.monacoLanguageClient.stop();
   }
 
   private async setupMonaco(project: Project) {
@@ -57,59 +31,15 @@ class Modeler extends Component<Loading, Empty> {
       project.entryFilePath
     );
 
-    monaco.editor.create(document.getElementById(Modeler.MONACO_CONTAINER_ID), {
-      model: this.createOrGetModel(project.entryFilePath, fileContents),
-      glyphMargin: true,
-      // theme: "vs-dark",
-      fontSize: 16,
-      language: "csharp",
-    });
-
-    const rootUri = monaco.Uri.parse(project.rootPath).path;
-
-    window.api.logger.debug({
-      projectRootPath: project.rootPath,
-      projectRootUri: monaco.Uri.parse(project.rootPath),
-    });
-    window.api.logger.debug({
-      entryFilePath: project.entryFilePath,
-      entryFileUri: monaco.Uri.file(project.entryFilePath),
-    });
-
-    // install Monaco language client services
-    MonacoServices.install(monaco as any, {
-      rootUri,
-    });
-
     const { setLoading } = this.props;
 
-    if (Modeler.monacoLanguageClient) {
-      // Modeler.monacoLanguageClient.start();
-      setLoading(false);
-    } else {
-      Modeler.monacoLanguageClient = await startLanguageClient();
-      Modeler.monacoLanguageClient.onReady().finally(() => setLoading(false));
-    }
+    await Editor.create(this.container.current, project, fileContents);
+    setLoading(false);
   }
-
-  private createOrGetModel = (path: string, content: string): ITextModel => {
-    const modelUri = monaco.Uri.file(path);
-
-    let model = monaco.editor.getModel(modelUri);
-
-    if (model) return model;
-
-    model = monaco.editor.createModel(content, "csharp", modelUri);
-
-    return model;
-  };
 
   render() {
     return (
-      <div
-        style={{ height: "100%", width: "100%" }}
-        id={Modeler.MONACO_CONTAINER_ID}
-      />
+      <div ref={this.container} style={{ height: "100%", width: "100%" }} />
     );
   }
 }

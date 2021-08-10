@@ -46,6 +46,7 @@ async function startLanguageClient(): Promise<MonacoLanguageClient> {
 
   // create and start the language client
   const client = createBaseLanguageClient(connection);
+
   client.start();
 
   return client;
