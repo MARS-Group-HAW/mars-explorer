@@ -35,7 +35,7 @@ export class Logger implements ILogger {
       const labelsInFormat = options.labels
         .map((label) => `[{${label}}]`)
         .join(" ");
-      const newFormat = `[{h}:{i}:{s}.{ms}] [{level}] [{scope}] ${labelsInFormat} {text}`;
+      const newFormat = `[{h}:{i}:{s}.{ms}] [{level}]{scope} ${labelsInFormat} {text}`;
       this.electronLog.transports.console.format = newFormat;
       this.electronLog.transports.file.format = newFormat;
     }
