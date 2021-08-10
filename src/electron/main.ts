@@ -133,8 +133,6 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(Channel.GET_WEBSOCKET_PORT, () => webSocketPort);
-
 let languageServerChannel: string;
 
 ipcMain.handle(Channel.START_LANGUAGE_SERVER, () => {
