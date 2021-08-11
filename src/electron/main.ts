@@ -19,8 +19,6 @@ const RESOURCES_PATH = is.development
   : process.resourcesPath;
 const WORKSPACE_PATH = path.join(USER_DOCUMENTS_PATH, "mars-explorer");
 
-let webSocketPort: number;
-
 export const PATHS = {
   workspace: WORKSPACE_PATH,
   workspaceExamples: path.join(WORKSPACE_PATH, "examples"),
