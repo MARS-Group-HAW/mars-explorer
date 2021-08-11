@@ -1,6 +1,5 @@
 enum FieldNames {
-  GLOBALS = "globals",
-  OUTPUTS = "outputs",
+  OUTPUT_SPECIFICATION = "Output",
 }
 
 export default FieldNames;
