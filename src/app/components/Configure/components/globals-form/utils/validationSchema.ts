@@ -10,7 +10,7 @@ const ValidationSchema: SchemaOf<Globals> = Yup.object().shape({
     .integer()
     .min(0, "Must be greater than 0."),
   [FieldNames.DELTA_T_UNIT]: Yup.string().oneOf(ALL_TIME_UNITS),
-  [FieldNames.TIME_SPECIFICATION]: Yup.string().oneOf(
+  [FieldNames.TIME_SPECIFICATION]: Yup.mixed().oneOf(
     Object.values(TimeSpecification)
   ),
   [FieldNames.STEPS]: Yup.number()

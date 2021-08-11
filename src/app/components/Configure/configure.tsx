@@ -11,6 +11,7 @@ import validationSchema from "./utils/validationSchema";
 import FieldNames from "./utils/fieldNames";
 import useConfigure from "./hooks";
 import useStyles from "./configure-styles";
+import OutputsForm from "./components/outputs-form";
 
 export default function Configure(props: PageProps) {
   const classes = useStyles();
@@ -32,7 +33,9 @@ export default function Configure(props: PageProps) {
                 </Paper>
               </Grid>
               <Grid item xs={6}>
-                <Paper className={classes.paper}>xs=6</Paper>
+                <Paper className={classes.paper}>
+                  <OutputsForm namespace={FieldNames.OUTPUTS} />
+                </Paper>
               </Grid>
               <Grid item xs={12}>
                 <Paper className={classes.paper}>xs=12</Paper>
