@@ -10,7 +10,7 @@ import { ALL_TIME_UNITS } from "./utils/types";
 
 // eslint-disable-next-line react/require-default-props
 const GlobalsForm = ({ namespace }: { namespace: string }) => (
-  <>
+  <div>
     <FormBox>
       <Grid container spacing={2}>
         <Grid item xs={4}>
@@ -34,7 +34,7 @@ const GlobalsForm = ({ namespace }: { namespace: string }) => (
     <FormBox>
       <TimeSpecificationForm namespace={namespace} />
     </FormBox>
-  </>
+  </div>
 );
 
 export default GlobalsForm;

@@ -1,4 +1,5 @@
 import { FieldInputProps, useField } from "formik";
+import { namespaceToLabel } from "../../utils/namespaces";
 
 type State = {
   value: string;
@@ -15,7 +16,7 @@ type Props = { nameWithNamespace: string; disabled: boolean };
 function useFormInput({ nameWithNamespace, disabled }: Props): State {
   const [{ value, name, onBlur, onChange }, { touched, error }] =
     useField<string>(nameWithNamespace);
-  const label = nameWithNamespace.split(".").pop(); // remove namespace
+  const label = namespaceToLabel(nameWithNamespace);
   const hasError = Boolean(touched && error && !disabled);
 
   return {
