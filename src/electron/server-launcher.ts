@@ -80,7 +80,6 @@ export function launchLanguageServer(mainWindow: BrowserWindow): string {
   launcherLogger.info("Spawning Server");
   launcherLogger.info(connectTo);
 
-  // FIXME:   handle WINDOWS    process.platform.startsWith("win") ? ".cmd" : ""
   const lsProcess = spawn(connectTo.command, connectTo.args, connectTo.options);
 
   // choose a unique channel name, e.g. by using the PID

@@ -1,4 +1,5 @@
 import monaco from "../monaco";
+import registerSnippet from "./register-snippet";
 
 function createDependencyProposals(range: any) {
   // returning a static list of proposals, not even looking at the prefix (filtering is done by the Monaco editor),
@@ -15,7 +16,7 @@ function createDependencyProposals(range: any) {
   ];
 }
 
-export default monaco.languages.registerCompletionItemProvider("csharp", {
+export default registerSnippet({
   provideCompletionItems(model, position, context, token) {
     const word = model.getWordUntilPosition(position);
     console.info(model, position, context, token);

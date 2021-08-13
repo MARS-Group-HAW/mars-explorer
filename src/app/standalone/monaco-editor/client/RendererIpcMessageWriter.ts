@@ -1,14 +1,20 @@
 // eslint-disable-next-line import/no-extraneous-dependencies
 import { Message, MessageWriter } from "vscode-jsonrpc";
-import dummyDisposable from "./DummyDisposable";
+import { Disposable } from "vscode";
 
 export default class RendererIpcMessageWriter implements MessageWriter {
   constructor(private channel: string) {}
 
   // events are not implemented for this example
-  public onError = () => dummyDisposable();
+  public onError = () =>
+    new Disposable(() =>
+      window.api.logger.error("(RendererIpcMessageWriter) An error occurred.")
+    );
 
-  public onClose = () => dummyDisposable();
+  public onClose = () =>
+    new Disposable(() =>
+      window.api.logger.info("(RendererIpcMessageWriter) Got closed.")
+    );
 
   public write(msg: Message): Promise<void> {
     // send all requests for the language server to the backend
