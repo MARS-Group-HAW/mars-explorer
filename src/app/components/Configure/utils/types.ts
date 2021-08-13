@@ -1,10 +1,14 @@
 import GlobalFieldNames from "../components/globals-form/utils/fieldNames";
 import OutputFieldNames from "../components/outputs-form/utils/fieldNames";
+import CsvFieldNames from "../components/output-csv-form/utils/fieldNames";
+
 import TimeSpecification, {
   TimeUnit,
 } from "../components/globals-form/utils/types";
 import OutputSpecification from "../components/outputs-form/utils/types";
 import FieldNames from "./fieldNames";
+import { Delimiter } from "../components/output-csv-form/utils/types";
+import { Empty } from "../../../util/types/utils";
 
 export type Config = {
   [FieldNames.GLOBALS]: Globals;
@@ -22,4 +26,13 @@ export type Globals = {
 
 export type Outputs = {
   [OutputFieldNames.OUTPUT_SPECIFICATION]: OutputSpecification;
+  [OutputFieldNames.OPTIONS]: CsvOutputs | Empty;
+};
+
+export type CsvOutputs = {
+  [CsvFieldNames.DELIMITER]: Delimiter;
+  [CsvFieldNames.CULTURE]: string;
+  [CsvFieldNames.ENCODING]: string;
+  [CsvFieldNames.FILE_SUFFIX]: string;
+  [CsvFieldNames.INCLUDE_HEADER]: boolean;
 };

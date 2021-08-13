@@ -4,25 +4,31 @@ import {
   FormControlLabel,
   FormLabel,
   Grid,
+  Link,
   Radio,
   RadioGroup,
+  Typography,
 } from "@material-ui/core";
+import { Link as RouterLink } from "react-router-dom";
 import FormBox from "../form-box";
 import useOutputsForm from "./outputs-form.hook";
 import OutputSpecification from "./utils/types";
 import OutputsCsvForm from "../output-csv-form";
 import OutputsSqliteForm from "../output-sqlite-form";
+import Path from "../../../App/utils/AppPaths";
+import StyledFileIcon from "./output-form-styles";
 
 type Props = {
   namespace: string;
 };
 
 function OutputsForm({ namespace }: Props) {
-  const { value, handleChange, choices, name } = useOutputsForm(namespace);
+  const { value, handleChange, choices, name, optionsNamespace } =
+    useOutputsForm(namespace);
 
   return (
     <FormBox>
-      <Grid container direction="column" justifyContent="flex-end" spacing={2}>
+      <Grid container spacing={2} style={{ height: "100%" }}>
         <Grid item xs={12}>
           <FormControl component="fieldset">
             <FormLabel component="legend">Choose an output</FormLabel>
@@ -43,14 +49,38 @@ function OutputsForm({ namespace }: Props) {
               ))}
             </RadioGroup>
           </FormControl>
+          <Grid item xs={12}>
+            {value === OutputSpecification.NONE && (
+              <Typography variant="caption">
+                No additional output selected. The results of your simulation
+                will still be saved internally and can be analyzed in{" "}
+                <Link component={RouterLink} to={Path.ANALYZE}>
+                  Analyze
+                </Link>
+                .
+              </Typography>
+            )}
+            {value === OutputSpecification.CSV && ( // TODO
+              <Typography variant="caption">
+                Insert explanation about CSV
+              </Typography>
+            )}
+            {value === OutputSpecification.SQLITE && ( // TODO
+              <Typography variant="caption">
+                Insert explanation about SQLite
+              </Typography>
+            )}
+          </Grid>
         </Grid>
         <Grid item xs={12}>
-          {value === OutputSpecification.NONE && "Nothing to show"}
+          {value === OutputSpecification.NONE && (
+            <StyledFileIcon fontSize="large" />
+          )}
           {value === OutputSpecification.CSV && (
-            <OutputsCsvForm namespace={namespace} />
+            <OutputsCsvForm namespace={optionsNamespace} />
           )}
           {value === OutputSpecification.SQLITE && (
-            <OutputsSqliteForm namespace={namespace} />
+            <OutputsSqliteForm namespace={optionsNamespace} />
           )}
         </Grid>
       </Grid>
