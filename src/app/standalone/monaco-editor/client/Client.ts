@@ -12,6 +12,7 @@ import RendererIpcMessageWriter from "./RendererIpcMessageWriter";
 
 function createBaseLanguageClient(connection: MessageConnection) {
   const client = new MonacoLanguageClient({
+    id: "csharp-lsp",
     clientOptions: {
       documentSelector: ["csharp"],
       errorHandler: {
@@ -44,6 +45,7 @@ async function startLanguageClient(): Promise<MonacoLanguageClient> {
   const writer = new RendererIpcMessageWriter(ipcChannel);
   const connection = createMessageConnection(reader, writer);
 
+  // FIXME doppelte writings zum lsp
   // create and start the language client
   const client = createBaseLanguageClient(connection);
 

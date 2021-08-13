@@ -6,20 +6,22 @@
 import { editor } from "monaco-editor";
 import { MonacoLanguageClient, MonacoServices } from "monaco-languageclient";
 import { Project } from "@shared/types/Project";
-import ITextModel = editor.ITextModel;
 import startLanguageClient from "./client";
 import monaco from "./monaco";
-import registerAll from "./snippets";
+import ITextModel = editor.ITextModel;
+import CSHARP from "./types";
+// import "./snippets";
+// import "./signature-helper";
 
 // eslint-disable-next-line no-restricted-globals
 (self as any).MonacoEnvironment = {
   getWorkerUrl: () => "editor.worker.js",
 };
 
-monaco.languages.register({
-  id: "csharp",
-  extensions: [".cs"],
-  aliases: ["C#", "csharp"],
+monaco.languages.register(CSHARP);
+
+monaco.languages.onLanguage(CSHARP.id, () => {
+  console.log("lang loaded");
 });
 
 class Editor {
@@ -38,23 +40,29 @@ class Editor {
     monaco.editor.create(container, {
       model: this.createOrGetModel(project.entryFilePath, content),
       glyphMargin: true,
-      // theme: "vs-dark",
       fontSize: 16,
-      language: "csharp",
     });
 
     const rootUri = monaco.Uri.parse(project.rootPath).path;
 
     // install Monaco language client services
-    this.monacoService = MonacoServices.install(monaco, {
-      rootUri,
-    });
 
-    registerAll(this.monacoService);
+    if (!this.monacoService) {
+      this.monacoService = MonacoServices.install(monaco, {
+        rootUri,
+      });
+
+      // TODO monaco langauge client features methoden anschauen
+    }
 
     if (!this.monacoLanguageClient) {
       this.monacoLanguageClient = await startLanguageClient();
+
+      // FIXME wait for ready
+      return this.monacoLanguageClient.onReady();
     }
+
+    return Promise.resolve();
   }
 
   private static createOrGetModel = (
@@ -67,7 +75,7 @@ class Editor {
 
     if (textModel) return textModel;
 
-    textModel = monaco.editor.createModel(content, "csharp", modelUri);
+    textModel = monaco.editor.createModel(content, CSHARP.id, modelUri);
 
     return textModel;
   };
