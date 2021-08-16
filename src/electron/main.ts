@@ -7,12 +7,15 @@ import { Project } from "@shared/types/Project";
 import { Logger } from "./logger";
 import { launchLanguageServer } from "./server-launcher";
 import fixPath from "fix-path";
+import { ModelsJson } from "./types/ModelsJson";
+import { ModelRef } from "@shared/types/Model";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
 
 const log = new Logger("main");
 
+const EXAMPLES_DIR_NAME = "examples";
 const USER_DOCUMENTS_PATH = app.getPath("documents");
 const RESOURCES_PATH = is.development
   ? path.join(__dirname, "..", "..", "resources")
@@ -21,7 +24,8 @@ const WORKSPACE_PATH = path.join(USER_DOCUMENTS_PATH, "mars-explorer");
 
 export const PATHS = {
   workspace: WORKSPACE_PATH,
-  workspaceExamples: path.join(WORKSPACE_PATH, "examples"),
+  workspaceExamples: path.join(WORKSPACE_PATH, EXAMPLES_DIR_NAME),
+  modelsJson: path.resolve(RESOURCES_PATH, EXAMPLES_DIR_NAME, "models.json"),
   resources: RESOURCES_PATH,
 };
 
@@ -113,9 +117,42 @@ ipcMain.handle(Channel.GET_WORKSPACE_PATH, () => PATHS.workspace);
 
 ipcMain.handle(Channel.GET_EXAMPLES_PATH, () => PATHS.workspaceExamples);
 
+ipcMain.handle(Channel.GET_EXAMPLE_PROJECTS, (): ModelRef[] => {
+  const modelsJson = fs.readJsonSync(PATHS.modelsJson) as ModelsJson;
+  return modelsJson.map(({ name, path }) => ({
+    name,
+    path,
+  }));
+});
+
+ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
+  const userProjects = fs
+    .readdirSync(PATHS.workspace)
+    .filter((file) => file !== EXAMPLES_DIR_NAME) // no example dir
+    .filter((item) => !/(^|\/)\.[^/.]/g.test(item)) // remove hidden dirs
+    .map((file) => path.join(PATHS.workspace, file)) // to full path
+    .filter((file) => fs.lstatSync(file).isDirectory());
+
+  return userProjects.map((file) => ({
+    name: file.split(path.sep).pop(),
+    path: file,
+  }));
+});
+
+/*
+ipcMain.handle(Channel.OPEN_PROJECT, (_, modelRef: ModelRef): Model => {
+  const modelDir = fs.readFileSync(modelRef.path, "utf-8");
+  const modelsJson = JSON.parse(rawdata) as ModelsJson;
+  return modelsJson.map(({ name, path }) => ({
+    name,
+    path,
+  }));
+});
+ */
+
 ipcMain.handle(
   Channel.GET_EXAMPLE_PROJECT,
-  (ev: IpcMainInvokeEvent, project: ExampleProject): Project => {
+  (_, project: ExampleProject): Project => {
     const root = path.join(PATHS.workspaceExamples, project);
     return {
       name: project,

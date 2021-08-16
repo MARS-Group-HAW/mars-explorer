@@ -1,0 +1,57 @@
+{
+	"globals": {
+		"steps" : 100,
+		"output": "csv",
+		"options": {
+			"delimiter": ";",
+			"format": "en-EN"
+		}
+	},
+	"layers": [
+		{
+			"name":"myGrid",
+			"file":"grid.csv",
+			"dimensionx": 50,
+			"dimensiony": 50
+		}
+	],
+	"agents": [ {
+      "name":"Sheep",
+      "count":100,
+      "mapping": [
+      	{
+      		"parameter" : "Sheep_gain_from_food",
+      		"value" : 4
+      	},
+      	{
+      		"parameter" : "Sheep_reproduce",
+      		"value" : 4
+      	}
+      ]
+}, 
+{
+      "name":"Wolf",
+      "count":50,
+      "mapping": [
+      	{
+      		"parameter" : "Wolf_gain_from_food",
+      		"value" : 20
+      	},
+      	{
+      		"parameter" : "Wolf_reproduce",
+      		"value" : 5
+      	}
+      ]
+},
+{
+	  "name":"GrassGrowthAgent",
+	  "count":1,
+	  "mapping": [
+      	{
+      		"parameter" : "Grass_regrowth_per_step",
+      		"value" : 1
+      	}
+      ]
+}
+  ]
+}
