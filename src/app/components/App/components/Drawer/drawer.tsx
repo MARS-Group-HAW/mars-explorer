@@ -9,7 +9,6 @@ import {
   Divider,
   Drawer as MUIDrawer,
   List,
-  Toolbar,
   Typography,
 } from "@material-ui/core";
 import BubbleChartIcon from "@material-ui/icons/BubbleChart";
@@ -17,6 +16,7 @@ import TuneIcon from "@material-ui/icons/Tune";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import HomeIcon from "@material-ui/icons/Home";
 
+import QuickStartBar from "@app/components/QuickStartBar";
 import Path from "../../utils/app-paths";
 import useStyles from "./drawer-styles";
 import useDrawer from "./drawer.hook";
@@ -87,11 +87,7 @@ const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
           />
         </Box>
         <AppBar position="fixed" className={classes.appBar}>
-          <Toolbar variant="dense">
-            <Typography variant="h6" noWrap>
-              Permanent drawer
-            </Typography>
-          </Toolbar>
+          <QuickStartBar />
         </AppBar>
       </MUIDrawer>
       <main className={classes.content}>

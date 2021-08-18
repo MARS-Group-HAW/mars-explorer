@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ModelRef } from "@shared/types/Model";
-import type { RootState } from "./store";
+import type { RootState } from "../../App/utils/store";
 
 // Define a type for the slice state
 interface ProjectState extends ModelRef {}

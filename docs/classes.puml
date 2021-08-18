@@ -1,0 +1,33 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+'home
+class ModelRef {
+    name: string;
+    path: string;
+}
+
+'model
+class ModelFile extends ModelRef {
+    content: string;
+}
+
+class WorkingModel {
+    models: ModelFile[]
+}
+
+WorkingModel --> ModelFile
+
+'configure
+class Config {
+    ...
+}
+
+'run
+class Model extends ModelRef {
+    config: Config
+}
+
+Model --> Config
+
+@enduml
