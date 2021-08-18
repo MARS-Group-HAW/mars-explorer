@@ -9,16 +9,12 @@ import { launchLanguageServer } from "./server-launcher";
 import fixPath from "fix-path";
 import { ModelsJson } from "./types/ModelsJson";
 import { ModelRef, WorkingModel } from "@shared/types/Model";
-import installExtension, {
-  REACT_DEVELOPER_TOOLS,
-  REDUX_DEVTOOLS,
-} from "electron-devtools-installer";
+import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
 import FileRef from "./types/FileRef";
+import ModelFile from "./types/ModelFile";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
-import { readFileSync } from "fs";
-import ModelFile from "./types/ModelFile";
 
 const log = new Logger("main");
 
@@ -203,10 +199,13 @@ ipcMain.handle(
 
 let languageServerChannel: string;
 
-ipcMain.handle(Channel.START_LANGUAGE_SERVER, () => {
-  if (languageServerChannel) {
-    log.info(`Reusing LSP running at ${languageServerChannel}`);
-    return languageServerChannel;
+ipcMain.handle(
+  Channel.START_LANGUAGE_SERVER,
+  (_, projectPath: string): string => {
+    if (languageServerChannel) {
+      log.info(`Reusing LSP running at ${languageServerChannel}`);
+      return languageServerChannel;
+    }
+    return launchLanguageServer(mainWindow, projectPath);
   }
-  return launchLanguageServer(mainWindow);
-});
+);

@@ -34,10 +34,13 @@ function createBaseLanguageClient(connection: MessageConnection) {
   return client;
 }
 
-async function startLanguageClient(): Promise<MonacoLanguageClient> {
+async function startLanguageClient(
+  rootPath: string
+): Promise<MonacoLanguageClient> {
   // launch language server
-  const ipcChannel = await window.api.invoke<void, string>(
-    Channel.START_LANGUAGE_SERVER
+  const ipcChannel = await window.api.invoke<string, string>(
+    Channel.START_LANGUAGE_SERVER,
+    rootPath
   );
 
   // wire up the IPC connection

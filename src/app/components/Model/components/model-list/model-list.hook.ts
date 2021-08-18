@@ -8,34 +8,40 @@ import { useAppDispatch, useAppSelector } from "../../../App/hooks/use-store";
 
 type State = {
   models: WorkingModel;
-  loading: boolean;
+  selectedModel: IModelFile;
+  showLoading: boolean;
+  showEmptyModels: boolean;
   handleModelClick: (model: IModelFile) => void;
 };
 
 function useModelList(): State {
   const dispatch = useAppDispatch();
   const projectRef = useAppSelector(selectProject);
+  const [selectedModel, setSelectedModel] = useState<IModelFile>(null);
   const [models, setModels] = useState<WorkingModel>([]);
 
   const { loading } = useAsync(async () => {
-    console.log(projectRef);
-
     if (projectRef) {
       const workingModel = await window.api.invoke<ModelRef, WorkingModel>(
         Channel.GET_USER_PROJECT,
         projectRef
       );
-      console.log(workingModel);
       setModels(workingModel);
     }
   }, [projectRef]);
 
   const handleModelClick = (model: IModelFile) => {
-    console.log("Model was clicked: ", model);
+    setSelectedModel(model);
     dispatch(set(model));
   };
 
-  return { models, loading, handleModelClick };
+  return {
+    selectedModel,
+    models,
+    showLoading: loading,
+    showEmptyModels: models.length === 0,
+    handleModelClick,
+  };
 }
 
 export default useModelList;

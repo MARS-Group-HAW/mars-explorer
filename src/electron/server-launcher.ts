@@ -75,10 +75,13 @@ function setLabels(labels: Partial<Test>) {
   lspLogger.labels = x;
 }
 
-export function launchLanguageServer(mainWindow: BrowserWindow): string {
-  const connectTo = getServer();
+export function launchLanguageServer(
+  mainWindow: BrowserWindow,
+  projectPath: string
+): string {
+  const connectTo = getServer(projectPath);
   launcherLogger.info("Spawning Server");
-  launcherLogger.info(connectTo);
+  launcherLogger.info("Project Path: ", projectPath);
 
   const lsProcess = spawn(connectTo.command, connectTo.args, connectTo.options);
 
