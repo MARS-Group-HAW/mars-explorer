@@ -2,6 +2,8 @@ import { useState } from "react";
 import { ModelRef } from "@shared/types/Model";
 import { useAsync } from "react-use";
 import { Channel } from "@shared/types/Channel";
+import { useAppDispatch } from "../../App/hooks/use-store";
+import { set } from "../../App/utils/project-slice";
 
 type Props = {
   setLoading: (isLoading: boolean) => void;
@@ -13,6 +15,8 @@ type State = {
 };
 
 function useHome({ setLoading }: Props): State {
+  const dispatch = useAppDispatch();
+
   const [projects, setProject] = useState<ModelRef[]>([]);
 
   useAsync(async () => {
@@ -23,9 +27,7 @@ function useHome({ setLoading }: Props): State {
     setLoading(false);
   }, []);
 
-  const handleProjectClick = (project: ModelRef) => {
-    console.log("Project was clicked: ", project);
-  };
+  const handleProjectClick = (modelRef: ModelRef) => dispatch(set(modelRef));
 
   return { projects, handleProjectClick };
 }

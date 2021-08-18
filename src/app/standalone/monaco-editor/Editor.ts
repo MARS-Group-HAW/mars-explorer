@@ -5,7 +5,6 @@
  */
 import { editor } from "monaco-editor";
 import { MonacoLanguageClient, MonacoServices } from "monaco-languageclient";
-import { Project } from "@shared/types/Project";
 import startLanguageClient from "./client";
 import monaco from "./monaco";
 import ITextModel = editor.ITextModel;
@@ -34,16 +33,19 @@ class Editor {
 
   public static async create(
     container: HTMLElement,
-    project: Project,
-    content: string
+    rootPath: string,
+    model: {
+      path: string;
+      content: string;
+    }
   ): Promise<void> {
     monaco.editor.create(container, {
-      model: this.createOrGetModel(project.entryFilePath, content),
+      model: this.createOrGetModel(model.path, model.content),
       glyphMargin: true,
       fontSize: 16,
     });
 
-    const rootUri = monaco.Uri.parse(project.rootPath).path;
+    const rootUri = monaco.Uri.parse(rootPath).path;
 
     // install Monaco language client services
 

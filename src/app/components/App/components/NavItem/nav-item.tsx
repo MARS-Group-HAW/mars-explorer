@@ -2,7 +2,7 @@ import * as React from "react";
 import { ReactNode } from "react";
 import { ListItem, ListItemIcon, ListItemText } from "@material-ui/core";
 import { NavLink, useRouteMatch } from "react-router-dom";
-import Path from "../../utils/AppPaths";
+import Path from "../../utils/app-paths";
 
 type Props = {
   path: Path;

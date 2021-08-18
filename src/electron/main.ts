@@ -8,10 +8,17 @@ import { Logger } from "./logger";
 import { launchLanguageServer } from "./server-launcher";
 import fixPath from "fix-path";
 import { ModelsJson } from "./types/ModelsJson";
-import { ModelRef } from "@shared/types/Model";
+import { ModelRef, WorkingModel } from "@shared/types/Model";
+import installExtension, {
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from "electron-devtools-installer";
+import FileRef from "./types/FileRef";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
+import { readFileSync } from "fs";
+import ModelFile from "./types/ModelFile";
 
 const log = new Logger("main");
 
@@ -76,8 +83,21 @@ function createWindow() {
     .loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
     .catch((e: Error) => log.error("main window could not be loaded: ", e));
 
-  // Open the DevTools.
-  mainWindow.webContents.openDevTools();
+  Promise.all([
+    installExtension(REACT_DEVELOPER_TOOLS, {
+      loadExtensionOptions: { allowFileAccess: true },
+    }),
+    installExtension(
+      REDUX_DEVTOOLS,
+      { loadExtensionOptions: { allowFileAccess: true } } //this is the key line
+    ),
+  ])
+    .then((names) => console.log(`Added Extensions: ${names.join(", ")}`))
+    .catch((err) => console.log("An error occurred: ", err));
+
+  mainWindow.webContents.on("did-frame-finish-load", () =>
+    mainWindow.webContents.openDevTools()
+  );
 }
 
 // This method will be called when Electron has finished
@@ -133,11 +153,23 @@ ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
     .map((file) => path.join(PATHS.workspace, file)) // to full path
     .filter((file) => fs.lstatSync(file).isDirectory());
 
-  return userProjects.map((file) => ({
-    name: file.split(path.sep).pop(),
-    path: file,
-  }));
+  return userProjects.map((file) => new FileRef(file));
 });
+
+const MODEL_FILE_EXTENSION = ".cs";
+
+ipcMain.handle(
+  Channel.GET_USER_PROJECT,
+  (_, modelRef: ModelRef): WorkingModel => {
+    return fs
+      .readdirSync(modelRef.path)
+      .filter(
+        (file) => path.extname(file).toLowerCase() === MODEL_FILE_EXTENSION
+      )
+      .map((file) => path.resolve(modelRef.path, file))
+      .map((file) => new ModelFile(file));
+  }
+);
 
 /*
 ipcMain.handle(Channel.OPEN_PROJECT, (_, modelRef: ModelRef): Model => {
