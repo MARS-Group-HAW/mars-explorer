@@ -15,6 +15,7 @@ function useModeler({ setLoading, containerRef }: Props) {
   const model = useAppSelector(selectModel);
 
   useAsync(async () => {
+    console.log("CHANGE MODEL", model);
     if (model) {
       await Editor.create(containerRef.current, projectRef.path, model);
     }

@@ -7,8 +7,9 @@ import { editor } from "monaco-editor";
 import { MonacoLanguageClient, MonacoServices } from "monaco-languageclient";
 import startLanguageClient from "./client";
 import monaco from "./monaco";
-import ITextModel = editor.ITextModel;
 import CSHARP from "./types";
+import ITextModel = editor.ITextModel;
+import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 // import "./snippets";
 // import "./signature-helper";
 
@@ -24,6 +25,8 @@ monaco.languages.onLanguage(CSHARP.id, () => {
 });
 
 class Editor {
+  private static editor: IStandaloneCodeEditor;
+
   private static monacoLanguageClient: MonacoLanguageClient;
 
   private static monacoService: MonacoServices;
@@ -39,12 +42,17 @@ class Editor {
       content: string;
     }
   ): Promise<void> {
-    monaco.editor.create(container, {
-      model: this.createOrGetModel(model.path, model.content),
-      glyphMargin: true,
-      fontSize: 16,
-    });
+    const newModel = this.createOrGetModel(model.path, model.content);
 
+    if (!this.editor) {
+      this.editor = monaco.editor.create(container, {
+        model: newModel,
+        glyphMargin: true,
+        fontSize: 16,
+      });
+    } else {
+      this.editor.setModel(newModel);
+    }
     const rootUri = monaco.Uri.parse(rootPath).path;
 
     // install Monaco language client services
@@ -53,12 +61,11 @@ class Editor {
       this.monacoService = MonacoServices.install(monaco, {
         rootUri,
       });
-
       // TODO monaco langauge client features methoden anschauen
     }
 
     if (!this.monacoLanguageClient) {
-      this.monacoLanguageClient = await startLanguageClient();
+      this.monacoLanguageClient = await startLanguageClient(rootUri);
 
       // FIXME wait for ready
       return this.monacoLanguageClient.onReady();

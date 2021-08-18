@@ -2,9 +2,8 @@ import * as path from "path";
 import { OmnisharpConfiguration } from "./types/OmnisharpConfiguration";
 import { Server } from "./types/OmnisharpServerConfiguration";
 import { PATHS } from "./main";
-
-import os = require("os");
 import { is } from "electron-util";
+import os = require("os");
 
 let currentOS: "linux" | "osx" | "win";
 
@@ -68,14 +67,11 @@ const OMNISHARP_BASE: Omit<Server, "command" | "options"> = {
   ],
 };
 
-export function getServer(): Server {
+export function getServer(projectPath: string): Server {
   return {
     command: is.windows ? "Omnisharp.exe" : "sh run",
     ...OMNISHARP_BASE,
-    args: [
-      ...OMNISHARP_BASE.args,
-      `-s ${path.join(PATHS.workspaceExamples, "MyTestApp", "MyTestApp.sln")}`,
-    ],
+    args: [...OMNISHARP_BASE.args, `-s ${projectPath}`],
     options: {
       cwd: path.join(PATHS.resources, "omnisharp", currentOS),
       shell: true,
