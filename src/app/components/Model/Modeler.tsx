@@ -1,9 +1,9 @@
 import * as React from "react";
 import { useRef } from "react";
 import { Grid } from "@material-ui/core";
-import ProjectList from "./components/project-list/project-list";
+import { PageProps } from "@app/util/types/Navigation";
+import ModelList from "./components/model-list/model-list";
 import useModeler from "./hooks";
-import { PageProps } from "../../util/types/Navigation";
 
 type Props = PageProps;
 
@@ -14,7 +14,7 @@ function Modeler({ setLoading }: Props) {
   return (
     <Grid container style={{ height: "100%" }}>
       <Grid item xs={2}>
-        <ProjectList />
+        <ModelList />
       </Grid>
       <Grid component="div" innerRef={ref} item xs={10} />
     </Grid>

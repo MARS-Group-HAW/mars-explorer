@@ -15,7 +15,7 @@ import useOutputsForm from "./outputs-form.hook";
 import OutputSpecification from "./utils/types";
 import OutputsCsvForm from "../output-csv-form";
 import OutputsSqliteForm from "../output-sqlite-form";
-import Path from "../../../App/utils/AppPaths";
+import Path from "../../../App/utils/app-paths";
 import StyledFileIcon from "./output-form-styles";
 
 type Props = {

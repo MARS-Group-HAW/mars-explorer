@@ -11,8 +11,10 @@ import {
   TableRow,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
+import { Link } from "react-router-dom";
 import { PageProps } from "../../util/types/Navigation";
 import useHome from "./hooks/use-home";
+import Path from "../App/utils/app-paths";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -43,13 +45,15 @@ const Home = (props: PageProps) => {
                 </TableCell>
                 <TableCell>{row.path}</TableCell>
                 <TableCell align="right">
-                  <Button
-                    variant="contained"
-                    color="primary"
-                    onClick={() => handleProjectClick(row)}
-                  >
-                    Open
-                  </Button>
+                  <Link to={Path.MODEL}>
+                    <Button
+                      variant="contained"
+                      color="primary"
+                      onClick={() => handleProjectClick(row)}
+                    >
+                      Open
+                    </Button>
+                  </Link>
                 </TableCell>
               </TableRow>
             ))}

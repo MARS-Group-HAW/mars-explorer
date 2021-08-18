@@ -17,7 +17,7 @@ import TuneIcon from "@material-ui/icons/Tune";
 import BarChartIcon from "@material-ui/icons/BarChart";
 import HomeIcon from "@material-ui/icons/Home";
 
-import Path from "../../utils/AppPaths";
+import Path from "../../utils/app-paths";
 import useStyles from "./drawer-styles";
 import useDrawer from "./drawer.hook";
 import NavItem from "../NavItem";
