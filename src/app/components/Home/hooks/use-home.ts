@@ -3,7 +3,7 @@ import { ModelRef } from "@shared/types/Model";
 import { useAsync } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { useAppDispatch } from "../../App/hooks/use-store";
-import { set } from "../../App/utils/project-slice";
+import { set } from "../utils/project-slice";
 
 type Props = {
   setLoading: (isLoading: boolean) => void;

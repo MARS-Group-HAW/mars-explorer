@@ -3,7 +3,7 @@ import { Channel } from "@shared/types/Channel";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import { useAsync } from "react-use";
 import { set } from "@app/components/Model/utils/model-slice";
-import { selectProject } from "@app/components/App/utils/project-slice";
+import { selectProject } from "@app/components/Home/utils/project-slice";
 import { useAppDispatch, useAppSelector } from "../../../App/hooks/use-store";
 
 type State = {

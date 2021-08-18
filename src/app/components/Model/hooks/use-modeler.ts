@@ -1,6 +1,6 @@
 import { RefObject, useEffect } from "react";
 import { useAsync } from "react-use";
-import { selectProject } from "@app/components/App/utils/project-slice";
+import { selectProject } from "@app/components/Home/utils/project-slice";
 import { PageProps } from "@app/util/types/Navigation";
 import { selectModel } from "@app/components/Model/utils/model-slice";
 import Editor from "../../../standalone/monaco-editor/Editor";
