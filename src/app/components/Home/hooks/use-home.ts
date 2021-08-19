@@ -5,16 +5,12 @@ import { Channel } from "@shared/types/Channel";
 import { useAppDispatch } from "../../App/hooks/use-store";
 import { set } from "../utils/project-slice";
 
-type Props = {
-  setLoading: (isLoading: boolean) => void;
-};
-
 type State = {
   projects: ModelRef[];
   handleProjectClick: (model: ModelRef) => void;
 };
 
-function useHome({ setLoading }: Props): State {
+function useHome(): State {
   const dispatch = useAppDispatch();
 
   const [projects, setProject] = useState<ModelRef[]>([]);
@@ -24,7 +20,6 @@ function useHome({ setLoading }: Props): State {
       Channel.GET_USER_PROJECTS
     );
     setProject(userProjects);
-    setLoading(false);
   }, []);
 
   const handleProjectClick = (modelRef: ModelRef) => dispatch(set(modelRef));

@@ -2,9 +2,7 @@ import * as React from "react";
 import { ReactNode } from "react";
 import {
   AppBar,
-  Backdrop,
   Box,
-  CircularProgress,
   Container,
   Divider,
   Drawer as MUIDrawer,
@@ -24,8 +22,6 @@ import NavItem from "../NavItem";
 
 type Props = {
   children: ReactNode;
-  isPageLoading: boolean;
-  onPageChange: () => void;
 };
 
 const NAV_ITEMS: { path: Path; icon: JSX.Element; text: string }[] = [
@@ -46,9 +42,9 @@ const NAV_ITEMS: { path: Path; icon: JSX.Element; text: string }[] = [
   },
 ];
 
-const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
+const Drawer = ({ children }: Props) => {
   const classes = useStyles();
-  const { handleClick } = useDrawer({ onPageChange });
+  useDrawer();
 
   return (
     <div className={classes.root}>
@@ -74,28 +70,18 @@ const Drawer = ({ isPageLoading, onPageChange, children }: Props) => {
         <Divider />
         <List className={classes.list} component="nav">
           {NAV_ITEMS.map((navItem) => (
-            <NavItem key={navItem.path} {...navItem} onClick={handleClick} />
+            <NavItem key={navItem.path} {...navItem} />
           ))}
         </List>
         <Divider />
         <Box className={classes.home}>
-          <NavItem
-            path={Path.HOME}
-            text="Home"
-            icon={<HomeIcon />}
-            onClick={handleClick}
-          />
+          <NavItem path={Path.HOME} text="Home" icon={<HomeIcon />} />
         </Box>
         <AppBar position="fixed" className={classes.appBar}>
           <QuickStartBar />
         </AppBar>
       </MUIDrawer>
-      <main className={classes.content}>
-        <Backdrop className={classes.backdrop} open={isPageLoading}>
-          <CircularProgress color="secondary" />
-        </Backdrop>
-        {children}
-      </main>
+      <main className={classes.content}>{children}</main>
     </div>
   );
 };

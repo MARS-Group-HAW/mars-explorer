@@ -8,10 +8,9 @@ type Props = {
   path: Path;
   text: string;
   icon: ReactNode;
-  onClick: () => void;
 };
 
-const NavItem = ({ path, text, icon, onClick }: Props) => {
+const NavItem = ({ path, text, icon }: Props) => {
   const matched = useRouteMatch(path);
 
   return (
@@ -20,7 +19,6 @@ const NavItem = ({ path, text, icon, onClick }: Props) => {
       key={path}
       component={NavLink}
       to={path}
-      onClick={onClick}
       selected={matched?.isExact}
     >
       <ListItemIcon>{icon}</ListItemIcon>

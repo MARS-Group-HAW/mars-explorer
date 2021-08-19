@@ -12,7 +12,6 @@ import {
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
-import { PageProps } from "../../util/types/Navigation";
 import useHome from "./hooks/use-home";
 import Path from "../App/utils/app-paths";
 
@@ -22,9 +21,9 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-const Home = (props: PageProps) => {
+const Home = () => {
   const classes = useStyles();
-  const { projects, handleProjectClick } = useHome(props);
+  const { projects, handleProjectClick } = useHome();
 
   return (
     <Box className={classes.table}>
