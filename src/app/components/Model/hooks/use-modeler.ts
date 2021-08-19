@@ -15,13 +15,15 @@ function useModeler({ setLoading, containerRef }: Props) {
   const model = useAppSelector(selectModel);
 
   useAsync(async () => {
-    console.log("CHANGE MODEL", model);
+    await Editor.create(containerRef.current, projectRef.path);
+    setLoading(false);
+  }, []);
+
+  useEffect(() => {
     if (model) {
-      await Editor.create(containerRef.current, projectRef.path, model);
+      Editor.setModel(model.path, model.content);
     }
   }, [model]);
-
-  useEffect(() => setLoading(false), []);
 }
 
 export default useModeler;
