@@ -1,6 +1,3 @@
-enum FieldNames {
-  OUTPUT_SPECIFICATION = "Output",
-  OPTIONS = "Options",
-}
+enum FieldNames {}
 
 export default FieldNames;

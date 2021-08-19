@@ -25,6 +25,7 @@ function useGetConfig(path?: string): State {
 
     const defaultValuesAsString = JSON.stringify(defaultValues, null, 4);
 
+    // TODO: add to main
     await window.api.invoke<{ path: string; content: string }, unknown>(
       Channel.CREATE_DEFAULT_CONFIG,
       { path, content: defaultValuesAsString }
