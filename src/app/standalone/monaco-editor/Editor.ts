@@ -10,6 +10,7 @@ import monaco from "./monaco";
 import CSHARP from "./types";
 import ITextModel = editor.ITextModel;
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
+import IStandaloneEditorConstructionOptions = editor.IStandaloneEditorConstructionOptions;
 // import "./snippets";
 // import "./signature-helper";
 
@@ -21,8 +22,14 @@ import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 monaco.languages.register(CSHARP);
 
 monaco.languages.onLanguage(CSHARP.id, () => {
+  // TODO: setup which only needs to be done on startup
   console.log("lang loaded");
 });
+
+const MONACO_OPTIONS: IStandaloneEditorConstructionOptions = {
+  // glyphMargin: true,
+  fontSize: 16,
+};
 
 class Editor {
   private static editor: IStandaloneCodeEditor;
@@ -36,26 +43,11 @@ class Editor {
 
   public static async create(
     container: HTMLElement,
-    rootPath: string,
-    model: {
-      path: string;
-      content: string;
-    }
+    rootPath: string
   ): Promise<void> {
-    const newModel = this.createOrGetModel(model.path, model.content);
+    this.editor = monaco.editor.create(container, MONACO_OPTIONS);
 
-    if (!this.editor) {
-      this.editor = monaco.editor.create(container, {
-        model: newModel,
-        glyphMargin: true,
-        fontSize: 16,
-      });
-    } else {
-      this.editor.setModel(newModel);
-    }
     const rootUri = monaco.Uri.parse(rootPath).path;
-
-    // install Monaco language client services
 
     if (!this.monacoService) {
       this.monacoService = MonacoServices.install(monaco, {
@@ -72,6 +64,11 @@ class Editor {
     }
 
     return Promise.resolve();
+  }
+
+  public static setModel(path: string, content: string) {
+    const newModel = Editor.createOrGetModel(path, content);
+    Editor.editor.setModel(newModel);
   }
 
   private static createOrGetModel = (
