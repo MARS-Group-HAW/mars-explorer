@@ -1,11 +1,8 @@
 import * as React from "react";
-import { PageProps } from "../../util/types/Navigation";
 import useAnalyze from "./hooks";
 
-export type Props = PageProps;
-
-const Analyze = (props: Props) => {
-  useAnalyze(props);
+const Analyze = () => {
+  useAnalyze();
 
   return <p>Analyze content</p>;
 };

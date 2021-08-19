@@ -4,7 +4,6 @@ import Grid from "@material-ui/core/Grid";
 import { Form, Formik } from "formik";
 import SaveIcon from "@material-ui/icons/Save";
 import { Fab } from "@material-ui/core";
-import { PageProps } from "../../util/types/Navigation";
 import GlobalsForm from "./components/globals-form";
 import defaultValues from "./utils/defaultValues";
 import validationSchema from "./utils/validationSchema";
@@ -13,9 +12,9 @@ import useConfigure from "./hooks";
 import useStyles from "./configure-styles";
 import OutputsForm from "./components/outputs-form";
 
-export default function Configure(props: PageProps) {
+export default function Configure() {
   const classes = useStyles();
-  const { handleSubmit } = useConfigure(props);
+  const { handleSubmit } = useConfigure();
 
   return (
     <div className={classes.root}>

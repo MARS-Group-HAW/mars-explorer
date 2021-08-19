@@ -1,15 +1,12 @@
 import * as React from "react";
 import { useRef } from "react";
 import { Grid } from "@material-ui/core";
-import { PageProps } from "@app/util/types/Navigation";
 import ModelList from "./components/model-list/model-list";
 import useModeler from "./hooks";
 
-type Props = PageProps;
-
-function Modeler({ setLoading }: Props) {
+function Modeler() {
   const ref = useRef();
-  useModeler({ setLoading, containerRef: ref });
+  useModeler({ containerRef: ref });
 
   return (
     <Grid container style={{ height: "100%" }}>

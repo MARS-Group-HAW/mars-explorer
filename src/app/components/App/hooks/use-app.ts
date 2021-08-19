@@ -1,15 +1,9 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Channel } from "@shared/types/Channel";
 
-type State = {
-  isPageLoading: boolean;
-  setPageLoading: (isLoading: boolean) => void;
-  onPageChange: () => void;
-};
+type State = {};
 
 function useApp(): State {
-  const [isPageLoading, setPageLoading] = useState(false);
-
   const onDotnetNotFound = () => {
     window.api.logger.warn(".NET SDK not found.");
     // eslint-disable-next-line no-alert
@@ -23,11 +17,7 @@ function useApp(): State {
     window.api.on(Channel.DOTNET_NOT_FOUND, onDotnetNotFound);
   }, []);
 
-  return {
-    isPageLoading,
-    setPageLoading,
-    onPageChange: () => setPageLoading(true),
-  };
+  return {};
 }
 
 export default useApp;
