@@ -25,7 +25,7 @@ export type Globals = {
 };
 
 export type Outputs = {
-  [OutputFieldNames.OUTPUT_SPECIFICATION]: OutputSpecification;
+  [OutputFieldNames.OUTPUT]: OutputSpecification;
   [OutputFieldNames.OPTIONS]: CsvOutputs | Empty;
 };
 

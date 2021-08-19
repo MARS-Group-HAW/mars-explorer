@@ -34,7 +34,7 @@ const CHOICES = [
 ];
 
 function useOutputsForm(namespace: string): State {
-  const name = withNamespace(FieldNames.OUTPUT_SPECIFICATION, namespace);
+  const name = withNamespace(FieldNames.OUTPUT, namespace);
   const optionsNamespace = withNamespace(FieldNames.OPTIONS, namespace);
   const [{ value, onChange }] = useField(name);
   const [, , { setValue }] = useField(optionsNamespace);

@@ -9,7 +9,10 @@ import { launchLanguageServer } from "./server-launcher";
 import fixPath from "fix-path";
 import { ModelsJson } from "./types/ModelsJson";
 import { ModelRef, WorkingModel } from "@shared/types/Model";
-import installExtension, { REACT_DEVELOPER_TOOLS, REDUX_DEVTOOLS } from "electron-devtools-installer";
+import installExtension, {
+  REACT_DEVELOPER_TOOLS,
+  REDUX_DEVTOOLS,
+} from "electron-devtools-installer";
 import FileRef from "./types/FileRef";
 import ModelFile from "./types/ModelFile";
 // @ts-ignore - no types available
@@ -164,6 +167,19 @@ ipcMain.handle(
       )
       .map((file) => path.resolve(modelRef.path, file))
       .map((file) => new ModelFile(file));
+  }
+);
+
+ipcMain.handle(
+  Channel.GET_CONFIG_IN_PROJECT,
+  (_, rootPath: string): unknown | null => {
+    const pathToDefaultConfig = path.resolve(rootPath, "config.json");
+
+    if (fs.existsSync(pathToDefaultConfig)) {
+      return fs.readJsonSync(pathToDefaultConfig);
+    } else {
+      return null;
+    }
   }
 );
 
