@@ -7,15 +7,13 @@ import CsvValidationSchema from "../../output-csv-form/utils/validationSchema";
 
 // @ts-ignore
 const ValidationSchema: SchemaOf<Outputs> = Yup.object().shape({
-  [FieldNames.OUTPUT_SPECIFICATION]: Yup.mixed().oneOf(
-    Object.values(OutputSpecification)
-  ),
+  [FieldNames.OUTPUT]: Yup.mixed().oneOf(Object.values(OutputSpecification)),
   [FieldNames.OPTIONS]: Yup.object()
-    .when([FieldNames.OUTPUT_SPECIFICATION], {
+    .when([FieldNames.OUTPUT], {
       is: OutputSpecification.NONE,
       then: Yup.object().shape({}),
     })
-    .when([FieldNames.OUTPUT_SPECIFICATION], {
+    .when([FieldNames.OUTPUT], {
       is: OutputSpecification.CSV,
       then: CsvValidationSchema,
     }),
