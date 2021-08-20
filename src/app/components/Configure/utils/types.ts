@@ -8,14 +8,14 @@ import TimeSpecification, {
 import OutputSpecification from "../components/outputs-form/utils/types";
 import FieldNames from "./fieldNames";
 import { Delimiter } from "../components/output-csv-form/utils/types";
-import { Empty } from "../../../util/types/utils";
 
 export type Config = {
   [FieldNames.GLOBALS]: Globals;
-  [FieldNames.OUTPUTS]: Outputs;
 };
 
-export type Globals = {
+export type Globals = GlobalsOptions & Outputs;
+
+export type GlobalsOptions = {
   [GlobalFieldNames.TIME_SPECIFICATION]: TimeSpecification;
   [GlobalFieldNames.DELTA_T]: number;
   [GlobalFieldNames.DELTA_T_UNIT]: TimeUnit;
@@ -26,10 +26,19 @@ export type Globals = {
 
 export type Outputs = {
   [OutputFieldNames.OUTPUT]: OutputSpecification;
-  [OutputFieldNames.OPTIONS]: CsvOutputs | Empty;
+};
+
+export type NonOutput = {
+  [OutputFieldNames.OUTPUT]: OutputSpecification.NONE;
+  [OutputFieldNames.OPTIONS]: null;
 };
 
 export type CsvOutputs = {
+  [OutputFieldNames.OUTPUT]: OutputSpecification.CSV;
+  [OutputFieldNames.OPTIONS]: CsvOutputs;
+};
+
+export type CsvOutputOptions = {
   [CsvFieldNames.DELIMITER]: Delimiter;
   [CsvFieldNames.CULTURE]: string;
   [CsvFieldNames.ENCODING]: string;

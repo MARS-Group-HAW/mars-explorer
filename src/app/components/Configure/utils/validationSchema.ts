@@ -7,8 +7,7 @@ import outputsValidationSchema from "../components/outputs-form/utils/validation
 import { Config } from "./types";
 
 const Schema: SchemaOf<Config> = Yup.object({
-  [FieldNames.GLOBALS]: globalsValidationSchema,
-  [FieldNames.OUTPUTS]: outputsValidationSchema,
+  [FieldNames.GLOBALS]: globalsValidationSchema.concat(outputsValidationSchema),
 });
 
 export default Schema;

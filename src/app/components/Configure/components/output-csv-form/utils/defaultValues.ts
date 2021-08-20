@@ -1,5 +1,5 @@
 import FieldNames from "./fieldNames";
-import { CsvOutputs } from "../../../utils/types";
+import { CsvOutputOptions } from "../../../utils/types";
 
 export default {
   [FieldNames.DELIMITER]: ",",
@@ -7,4 +7,4 @@ export default {
   [FieldNames.INCLUDE_HEADER]: true,
   [FieldNames.CULTURE]: "en-EN",
   [FieldNames.FILE_SUFFIX]: "",
-} as CsvOutputs;
+} as CsvOutputOptions;

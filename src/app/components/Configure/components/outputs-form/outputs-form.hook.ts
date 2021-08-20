@@ -1,14 +1,15 @@
-import { FieldInputProps, useField } from "formik";
+import { FieldInputProps } from "formik";
 import { useEffect } from "react";
+import useNamespacedField from "@app/components/Configure/hooks/use-namespaced-field";
+import { NonOutput } from "@app/components/Configure/utils/types";
 import OutputSpecification from "./utils/types";
-import withNamespace from "../../utils/withNamespace";
 import FieldNames from "./utils/fieldNames";
 import outputDefaultValues from "./utils/defaultValues";
 import csvDefaultValues from "../output-csv-form/utils/defaultValues";
 import sqlightDefaultValues from "../output-sqlite-form/utils/defaultValues";
 
 type State = {
-  name: string;
+  outputNamespace: string;
   optionsNamespace: string;
   value: OutputSpecification;
   handleChange: FieldInputProps<string>["onChange"];
@@ -34,10 +35,12 @@ const CHOICES = [
 ];
 
 function useOutputsForm(namespace: string): State {
-  const name = withNamespace(FieldNames.OUTPUT, namespace);
-  const optionsNamespace = withNamespace(FieldNames.OPTIONS, namespace);
-  const [{ value, onChange }] = useField(name);
-  const [, , { setValue }] = useField(optionsNamespace);
+  const [{ value, onChange }, , , outputNamespace] =
+    useNamespacedField<OutputSpecification>(FieldNames.OUTPUT, namespace);
+  const [, , { setValue }, optionsNamespace] = useNamespacedField(
+    FieldNames.OPTIONS,
+    namespace
+  );
 
   useEffect(() => {
     switch (value) {
@@ -47,14 +50,19 @@ function useOutputsForm(namespace: string): State {
       case OutputSpecification.SQLITE:
         setValue(sqlightDefaultValues);
         break;
-      default:
-        setValue(outputDefaultValues[FieldNames.OPTIONS]);
+      case OutputSpecification.NONE:
+        setValue((outputDefaultValues as NonOutput)[FieldNames.OPTIONS]);
         break;
+      default:
+        window.api.logger.warn(
+          "An unknown output specification was provided to the output form: ",
+          value
+        );
     }
   }, [value]);
 
   return {
-    name,
+    outputNamespace,
     optionsNamespace,
     value,
     handleChange: onChange,
