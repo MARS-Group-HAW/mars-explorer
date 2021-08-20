@@ -1,9 +1,11 @@
 import * as Yup from "yup";
-import { SchemaOf } from "yup";
+import { SchemaOf, TypeOf } from "yup";
 import { Outputs } from "../../../utils/types";
 import FieldNames from "./fieldNames";
 import OutputSpecification from "./types";
 import CsvValidationSchema from "../../output-csv-form/utils/validationSchema";
+
+export type OutputsValidationSchema = TypeOf<typeof ValidationSchema>;
 
 // @ts-ignore
 const ValidationSchema: SchemaOf<Outputs> = Yup.object().shape({
