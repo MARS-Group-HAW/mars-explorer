@@ -24,19 +24,20 @@ export type GlobalsOptions = {
   [GlobalFieldNames.END_POINT]: string | null; // FIXME bug with yup
 };
 
-export type Outputs = {
+export interface Outputs {
   [OutputFieldNames.OUTPUT]: OutputSpecification;
-};
+  [OutputFieldNames.OPTIONS]: CsvOutputOptions | null;
+}
 
-export type NonOutput = {
+export interface NonOutput extends Outputs {
   [OutputFieldNames.OUTPUT]: OutputSpecification.NONE;
   [OutputFieldNames.OPTIONS]: null;
-};
+}
 
-export type CsvOutputs = {
+export interface CsvOutputs extends Outputs {
   [OutputFieldNames.OUTPUT]: OutputSpecification.CSV;
-  [OutputFieldNames.OPTIONS]: CsvOutputs;
-};
+  [OutputFieldNames.OPTIONS]: CsvOutputOptions;
+}
 
 export type CsvOutputOptions = {
   [CsvFieldNames.DELIMITER]: Delimiter;

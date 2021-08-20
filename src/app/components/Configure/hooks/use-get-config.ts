@@ -1,6 +1,7 @@
 import { Channel } from "@shared/types/Channel";
 import { useAsync } from "react-use";
 import defaultValues from "@app/components/Configure/utils/defaultValues";
+import FormTransformer from "@app/components/Configure/utils/transform";
 
 type State = {
   config: any | null;
@@ -23,7 +24,11 @@ function useGetConfig(path?: string): State {
   useAsync(async () => {
     if (value && !loading && !error) return value;
 
-    const defaultValuesAsString = JSON.stringify(defaultValues, null, 4);
+    const defaultValuesAsString = JSON.stringify(
+      FormTransformer.formToConfig(defaultValues),
+      null,
+      4
+    );
 
     // TODO: add to main
     await window.api.invoke<{ path: string; content: string }, unknown>(
