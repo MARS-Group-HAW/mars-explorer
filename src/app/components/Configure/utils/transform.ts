@@ -1,7 +1,6 @@
 import { TypeOf } from "yup";
 import TimeSpecification from "@app/components/Configure/components/globals-form/utils/types";
 import { OutputsValidationSchema } from "@app/components/Configure/components/outputs-form/utils/validationSchema";
-import OutputSpecification from "@app/components/Configure/components/outputs-form/utils/types";
 import validationSchema from "./validationSchema";
 import defaultValues from "./defaultValues";
 import { GlobalsValidationSchema } from "../components/globals-form/utils/validationSchema";
@@ -36,9 +35,10 @@ class FormTransformer {
   private static removeUndefined(obj: any) {
     const newObj: any = {};
     Object.keys(obj).forEach((key) => {
-      if (obj[key] === Object(obj[key]))
+      if (obj[key] === Object(obj[key]) && obj[key] !== null)
         newObj[key] = FormTransformer.removeUndefined(obj[key]);
-      else if (obj[key] !== undefined) newObj[key] = obj[key];
+      else if (obj[key] !== undefined && obj[key] !== null)
+        newObj[key] = obj[key];
     });
     return newObj;
   }
@@ -62,24 +62,26 @@ class FormTransformer {
     return newObj;
   }
 
-  /*
-  public static formToConfig({ globals, outputs }: FormSchema): any {
-    const { deltaT, deltaTUnit, steps, startPoint, endPoint } = globals;
-    const { output, options } = outputs;
+  public static formToConfig(schema: FormSchema): any {
+    const cleanSchema = this.removeEmptyObj(this.removeUndefined(schema));
+    const globals = cleanSchema.globals as GlobalsValidationSchema &
+      OutputsValidationSchema;
 
-    return {
-      globals: {
-        deltaT,
-        deltaTUnit,
-        steps,
-        startPoint,
-        endPoint,
-        output,
-        options,
-      },
-    };
+    if (globals.timeSpecification) {
+      if (globals.timeSpecification === TimeSpecification.STEP) {
+        delete globals.startPoint;
+        delete globals.endPoint;
+      }
+
+      if (globals.timeSpecification === TimeSpecification.DATETIME) {
+        delete globals.steps;
+      }
+
+      delete globals.timeSpecification;
+    }
+
+    return cleanSchema;
   }
-   */
 }
 
 export default FormTransformer;
