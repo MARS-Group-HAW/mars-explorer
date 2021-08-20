@@ -4,5 +4,5 @@ import OutputSpecification from "./types";
 
 export default {
   [FieldNames.OUTPUT]: OutputSpecification.NONE,
-  [FieldNames.OPTIONS]: {},
+  [FieldNames.OPTIONS]: null,
 } as Outputs;

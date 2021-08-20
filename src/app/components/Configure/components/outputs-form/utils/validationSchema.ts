@@ -11,7 +11,7 @@ const ValidationSchema: SchemaOf<Outputs> = Yup.object().shape({
   [FieldNames.OPTIONS]: Yup.object()
     .when([FieldNames.OUTPUT], {
       is: OutputSpecification.NONE,
-      then: Yup.object().shape({}),
+      then: Yup.object().nullable(),
     })
     .when([FieldNames.OUTPUT], {
       is: OutputSpecification.CSV,

@@ -33,7 +33,7 @@ export default function Configure() {
               </Grid>
               <Grid item xs={6}>
                 <Paper className={classes.paper}>
-                  <OutputsForm namespace={FieldNames.OUTPUTS} />
+                  <OutputsForm namespace={FieldNames.GLOBALS} />
                 </Paper>
               </Grid>
               <Grid item xs={12}>

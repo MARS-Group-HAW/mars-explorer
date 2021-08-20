@@ -1,5 +1,5 @@
 import FieldNames from "./fieldNames";
-import { Globals } from "../../../utils/types";
+import { GlobalsOptions } from "../../../utils/types";
 
 export default {
   [FieldNames.TIME_SPECIFICATION]: "step",
@@ -8,4 +8,4 @@ export default {
   [FieldNames.END_POINT]: null,
   [FieldNames.START_POINT]: null,
   [FieldNames.STEPS]: 1,
-} as Globals;
+} as GlobalsOptions;

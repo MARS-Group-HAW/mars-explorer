@@ -1,10 +1,10 @@
 import * as Yup from "yup";
 import { SchemaOf } from "yup";
-import { CsvOutputs } from "../../../utils/types";
+import { CsvOutputOptions } from "../../../utils/types";
 import FieldNames from "./fieldNames";
 import { ALL_DELIMITERS } from "./types";
 
-const ValidationSchema: SchemaOf<CsvOutputs> = Yup.object().shape({
+const ValidationSchema: SchemaOf<CsvOutputOptions> = Yup.object().shape({
   [FieldNames.DELIMITER]: Yup.string().oneOf(ALL_DELIMITERS),
   [FieldNames.FILE_SUFFIX]: Yup.string(),
   [FieldNames.ENCODING]: Yup.string(),

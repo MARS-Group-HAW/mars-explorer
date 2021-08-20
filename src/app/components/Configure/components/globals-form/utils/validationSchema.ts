@@ -1,12 +1,12 @@
 import * as Yup from "yup";
 import { SchemaOf, TypeOf } from "yup";
 import FieldNames from "./fieldNames";
-import { Globals } from "../../../utils/types";
+import { GlobalsOptions } from "../../../utils/types";
 import TimeSpecification, { ALL_TIME_UNITS } from "./types";
 
 export type GlobalsValidationSchema = TypeOf<typeof ValidationSchema>;
 
-const ValidationSchema: SchemaOf<Globals> = Yup.object().shape({
+const ValidationSchema: SchemaOf<GlobalsOptions> = Yup.object().shape({
   [FieldNames.DELTA_T]: Yup.number()
     .required("Required")
     .integer()

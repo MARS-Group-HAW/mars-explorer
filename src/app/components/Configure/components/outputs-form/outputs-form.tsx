@@ -23,7 +23,7 @@ type Props = {
 };
 
 function OutputsForm({ namespace }: Props) {
-  const { value, handleChange, choices, name, optionsNamespace } =
+  const { value, handleChange, choices, outputNamespace, optionsNamespace } =
     useOutputsForm(namespace);
 
   return (
@@ -34,7 +34,7 @@ function OutputsForm({ namespace }: Props) {
             <FormLabel component="legend">Choose an output</FormLabel>
             <RadioGroup
               aria-label="output"
-              name={name}
+              name={outputNamespace}
               value={value}
               onChange={handleChange}
               row
