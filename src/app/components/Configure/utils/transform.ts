@@ -1,6 +1,7 @@
 import { TypeOf } from "yup";
 import TimeSpecification from "@app/components/Configure/components/globals-form/utils/types";
 import { OutputsValidationSchema } from "@app/components/Configure/components/outputs-form/utils/validationSchema";
+import OutputSpecification from "@app/components/Configure/components/outputs-form/utils/types";
 import validationSchema from "./validationSchema";
 import defaultValues from "./defaultValues";
 import { GlobalsValidationSchema } from "../components/globals-form/utils/validationSchema";
@@ -27,6 +28,10 @@ class FormTransformer {
       globals.timeSpecification = TimeSpecification.DATETIME;
     } else {
       globals.timeSpecification = TimeSpecification.STEP;
+    }
+
+    if (!globals.output) {
+      globals.output = OutputSpecification.NONE;
     }
 
     return parsedConfig;

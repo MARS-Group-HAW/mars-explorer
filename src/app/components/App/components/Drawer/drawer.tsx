@@ -44,7 +44,7 @@ const NAV_ITEMS: { path: Path; icon: JSX.Element; text: string }[] = [
 
 const Drawer = ({ children }: Props) => {
   const classes = useStyles();
-  useDrawer();
+  const { disableNavigation } = useDrawer();
 
   return (
     <div className={classes.root}>
@@ -70,7 +70,11 @@ const Drawer = ({ children }: Props) => {
         <Divider />
         <List className={classes.list} component="nav">
           {NAV_ITEMS.map((navItem) => (
-            <NavItem key={navItem.path} {...navItem} />
+            <NavItem
+              key={navItem.path}
+              disabled={disableNavigation}
+              {...navItem}
+            />
           ))}
         </List>
         <Divider />

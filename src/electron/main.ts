@@ -175,11 +175,21 @@ ipcMain.handle(
   (_, rootPath: string): unknown | null => {
     const pathToDefaultConfig = path.resolve(rootPath, "config.json");
 
+    console.log(rootPath, pathToDefaultConfig);
+
     if (fs.existsSync(pathToDefaultConfig)) {
       return fs.readJsonSync(pathToDefaultConfig);
     } else {
       return null;
     }
+  }
+);
+
+ipcMain.handle(
+  Channel.CREATE_DEFAULT_CONFIG,
+  (_, { path, content }: { path: string; content: string }): void => {
+    fs.writeJSONSync(path, content);
+    return;
   }
 );
 

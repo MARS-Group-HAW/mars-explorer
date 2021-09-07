@@ -12,9 +12,9 @@ type State = {
 };
 
 function useQuickStartBar(): State {
-  const project = useAppSelector(selectProject);
+  const { path, name } = useAppSelector(selectProject);
 
-  const isProjectDefined = Boolean(project);
+  const isProjectDefined = Boolean(path);
 
   const isModelValid = true; // TODO
   const isConfigValid = true; // TODO
@@ -38,7 +38,7 @@ function useQuickStartBar(): State {
   );
 
   return {
-    projectName: project?.name || "No project selected",
+    projectName: name || "No project selected",
     modelState,
     configState,
     areActionsDisabled,

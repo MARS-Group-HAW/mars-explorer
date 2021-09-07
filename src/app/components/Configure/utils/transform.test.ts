@@ -82,6 +82,20 @@ describe("Transform", () => {
       );
       expect(globals).toHaveProperty(OutputsFieldNames.OPTIONS, null);
     });
+
+    test("should parse config with agents to agent array", () => {
+      const input = {
+        agents: [
+          {
+            name: "Test",
+            count: 50,
+          },
+        ],
+      };
+
+      const { agents } = transformer.configToForm(input);
+      expect(agents).toEqual(input.agents);
+    });
   });
   describe("formToConfig", () => {
     let form: ConfigValidationSchema;
@@ -98,6 +112,7 @@ describe("Transform", () => {
           output: OutputSpecification.NONE,
           options: null,
         },
+        agents: [],
       };
     });
 

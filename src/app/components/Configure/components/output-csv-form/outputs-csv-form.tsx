@@ -23,23 +23,25 @@ function OutputsCsvForm({ namespace }: Props) {
         style={{ height: "100%" }}
       >
         <Grid container spacing={2}>
-          <Grid item xs={4}>
-            <FormSelect
-              name={withNamespace(FieldNames.DELIMITER, namespace)}
-              options={ALL_DELIMITERS.map((delimiter) => ({
-                label: delimiter,
-                value: delimiter,
-              }))}
-            />
-          </Grid>
-          <Grid item xs={4}>
-            <FormInput name={withNamespace(FieldNames.ENCODING, namespace)} />
-          </Grid>
-          <Grid item xs={4}>
-            <FormInput name={withNamespace(FieldNames.CULTURE, namespace)} />
+          <Grid container spacing={2}>
+            <Grid item xs={4}>
+              <FormSelect
+                name={withNamespace(FieldNames.DELIMITER, namespace)}
+                options={ALL_DELIMITERS.map((delimiter) => ({
+                  label: delimiter,
+                  value: delimiter,
+                }))}
+              />
+            </Grid>
+            <Grid item xs={4}>
+              <FormInput name={withNamespace(FieldNames.ENCODING, namespace)} />
+            </Grid>
+            <Grid item xs={4}>
+              <FormInput name={withNamespace(FieldNames.CULTURE, namespace)} />
+            </Grid>
           </Grid>
         </Grid>
-        <Grid container spacing={2} alignItems="flex-end">
+        <Grid container spacing={2}>
           <Grid item xs={6}>
             <FormInput
               name={withNamespace(FieldNames.FILE_SUFFIX, namespace)}

@@ -10,18 +10,20 @@ type Props = {
 };
 
 function useModeler({ containerRef }: Props) {
-  const projectRef = useAppSelector(selectProject);
-  const model = useAppSelector(selectModel);
+  const { path } = useAppSelector(selectProject);
+  const { path: modelPath, content } = useAppSelector(selectModel);
 
   useAsync(async () => {
-    await Editor.create(containerRef.current, projectRef.path);
-  }, []);
+    if (path) {
+      await Editor.create(containerRef.current, path);
+    }
+  }, [path]);
 
   useEffect(() => {
-    if (model) {
-      Editor.setModel(model.path, model.content);
+    if (modelPath) {
+      Editor.setModel(modelPath, content);
     }
-  }, [model]);
+  }, [modelPath]);
 }
 
 export default useModeler;
