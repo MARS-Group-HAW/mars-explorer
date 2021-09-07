@@ -3,10 +3,10 @@ import { ModelRef } from "@shared/types/Model";
 import type { RootState } from "../../App/utils/store";
 
 // Define a type for the slice state
-interface ProjectState extends ModelRef {}
+type ProjectState = Partial<ModelRef>;
 
 // Define the initial state using that type
-const initialState: ProjectState = null;
+const initialState: ProjectState = {};
 
 export const projectSlice = createSlice({
   name: "project",

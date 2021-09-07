@@ -16,19 +16,19 @@ type State = {
 
 function useModelList(): State {
   const dispatch = useAppDispatch();
-  const projectRef = useAppSelector(selectProject);
+  const { path, name } = useAppSelector(selectProject);
   const [selectedModel, setSelectedModel] = useState<IModelFile>(null);
   const [models, setModels] = useState<WorkingModel>([]);
 
   const { loading } = useAsync(async () => {
-    if (projectRef) {
+    if (path) {
       const workingModel = await window.api.invoke<ModelRef, WorkingModel>(
         Channel.GET_USER_PROJECT,
-        projectRef
+        { path, name }
       );
       setModels(workingModel);
     }
-  }, [projectRef]);
+  }, [path]);
 
   const handleModelClick = (model: IModelFile) => {
     setSelectedModel(model);

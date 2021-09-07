@@ -9,6 +9,7 @@ import {
   TableContainer,
   TableHead,
   TableRow,
+  Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { Link } from "react-router-dom";
@@ -40,9 +41,13 @@ const Home = () => {
             {projects.map((row) => (
               <TableRow key={row.name}>
                 <TableCell component="th" scope="row">
-                  {row.name}
+                  <Typography>{row.name}</Typography>
                 </TableCell>
-                <TableCell>{row.path}</TableCell>
+                <TableCell>
+                  <Typography color="textSecondary" variant="caption">
+                    {row.path}
+                  </Typography>
+                </TableCell>
                 <TableCell align="right">
                   <Link to={Path.MODEL}>
                     <Button

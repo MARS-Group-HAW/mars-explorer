@@ -3,10 +3,10 @@ import { IModelFile } from "@shared/types/Model";
 import type { RootState } from "../../App/utils/store";
 
 // Define a type for the slice state
-interface ModelState extends IModelFile {}
+type ModelState = Partial<IModelFile>;
 
 // Define the initial state using that type
-const initialState: ModelState = null;
+const initialState: ModelState = {};
 
 export const modelSlice = createSlice({
   name: "model",

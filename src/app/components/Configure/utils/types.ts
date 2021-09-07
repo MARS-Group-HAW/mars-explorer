@@ -1,7 +1,7 @@
 import GlobalFieldNames from "../components/globals-form/utils/fieldNames";
 import OutputFieldNames from "../components/outputs-form/utils/fieldNames";
 import CsvFieldNames from "../components/output-csv-form/utils/fieldNames";
-
+import AgentsType from "../components/agents-form/utils/types";
 import TimeSpecification, {
   TimeUnit,
 } from "../components/globals-form/utils/types";
@@ -11,6 +11,7 @@ import { Delimiter } from "../components/output-csv-form/utils/types";
 
 export type Config = {
   [FieldNames.GLOBALS]: Globals;
+  [FieldNames.AGENTS]: AgentsType;
 };
 
 export type Globals = GlobalsOptions & Outputs;

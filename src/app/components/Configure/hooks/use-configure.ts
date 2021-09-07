@@ -1,22 +1,61 @@
 import { FormikValues } from "formik";
 import { TypeOf } from "yup";
 import useGetConfig from "@app/components/Configure/hooks/use-get-config";
+import { useAppSelector } from "@app/components/App/hooks/use-store";
+import { selectProject } from "@app/components/Home/utils/project-slice";
+import { useEffect } from "react";
+import { useBoolean, useTimeoutFn } from "react-use";
+import useSnackbar from "@app/components/Configure/hooks/use-snackbar";
 import validationSchema from "../utils/validationSchema";
 
 interface ConfigSchema extends TypeOf<typeof validationSchema> {}
 
 type State = {
+  config: any;
+  showNoPathMsg: boolean;
+  showForm: boolean;
+  showSpinner: boolean;
+  showExistingConfigMsg: boolean;
+  showNewConfigMsg: boolean;
+  showErrorMsg: boolean;
+  error?: Error;
   handleSubmit: (values: FormikValues) => void;
 };
 
 function useConfigure(): State {
-  useGetConfig();
+  const { path } = useAppSelector(selectProject);
+  const { config, loading, error, wasCreated } = useGetConfig(path);
+  const { showSnackbar } = useSnackbar(loading);
+
+  const configLoadedSuccessfully = !loading && !error && Boolean(config);
+
   const handleSubmit = (values: FormikValues) => {
-    const config: ConfigSchema = validationSchema.validateSync(values);
-    window.api.logger.info("Submitting", config);
+    const parsedConfig: ConfigSchema = validationSchema.validateSync(values);
+    window.api.logger.info("Submitting", parsedConfig);
   };
 
+  useEffect(
+    () =>
+      configLoadedSuccessfully &&
+      window.api.logger.info("Config loaded successfully", config),
+    [configLoadedSuccessfully]
+  );
+
+  useEffect(
+    () => error && window.api.logger.warn(`${error?.name}: ${error?.message}`),
+    [error]
+  );
+
   return {
+    showNoPathMsg: !path,
+    config,
+    showForm: configLoadedSuccessfully,
+    showSpinner: loading,
+    showExistingConfigMsg:
+      showSnackbar && configLoadedSuccessfully && !wasCreated,
+    showNewConfigMsg: showSnackbar && configLoadedSuccessfully && wasCreated,
+    showErrorMsg: !loading && Boolean(error),
+    error,
     handleSubmit,
   };
 }
