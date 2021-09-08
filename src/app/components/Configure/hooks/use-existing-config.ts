@@ -1,8 +1,16 @@
 import { useAsync } from "react-use";
 import { Channel } from "@shared/types/Channel";
-import FormTransformer from "@app/components/Configure/utils/transform";
+import FormTransformer, {
+  FormSchema,
+} from "@app/components/Configure/utils/transform";
 
-function useExistingConfig(path: string) {
+type State = {
+  existingConfig: FormSchema | null;
+  configSearchLoading: boolean;
+  configSearchError?: Error;
+};
+
+function useExistingConfig(path: string): State {
   const {
     value: existingConfig,
     loading: configSearchLoading,

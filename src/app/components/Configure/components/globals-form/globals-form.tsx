@@ -2,39 +2,44 @@ import * as React from "react";
 import { Grid } from "@material-ui/core";
 import FieldNames from "./utils/fieldNames";
 import withNamespace from "../../utils/withNamespace";
-import FormBox from "../form-box";
 import TimeSpecificationForm from "../time-specification-form/time-specification-form";
 import FormInput from "../form-input";
 import FormSelect from "../form-select";
 import { ALL_TIME_UNITS } from "./utils/types";
+import OutputsForm from "../outputs-form";
+import FormPaper from "../form-paper";
 
-// eslint-disable-next-line react/require-default-props
 const GlobalsForm = ({ namespace }: { namespace: string }) => (
-  <div>
-    <FormBox>
-      <Grid container spacing={2}>
-        <Grid item xs={4}>
-          <FormInput
-            name={withNamespace(FieldNames.DELTA_T, namespace)}
-            type="number"
-            InputProps={{ inputProps: { min: 1 } }}
-          />
+  <Grid container spacing={2}>
+    <Grid item xs={6}>
+      <FormPaper>
+        <Grid container spacing={2}>
+          <Grid item xs={4}>
+            <FormInput
+              name={withNamespace(FieldNames.DELTA_T, namespace)}
+              type="number"
+              InputProps={{ inputProps: { min: 1 } }}
+            />
+          </Grid>
+          <Grid item xs={8}>
+            <FormSelect
+              name={withNamespace(FieldNames.DELTA_T_UNIT, namespace)}
+              options={ALL_TIME_UNITS.map((unit) => ({
+                label: unit,
+                value: unit,
+              }))}
+            />
+          </Grid>
         </Grid>
-        <Grid item xs={8}>
-          <FormSelect
-            name={withNamespace(FieldNames.DELTA_T_UNIT, namespace)}
-            options={ALL_TIME_UNITS.map((unit) => ({
-              label: unit,
-              value: unit,
-            }))}
-          />
-        </Grid>
-      </Grid>
-    </FormBox>
-    <FormBox>
-      <TimeSpecificationForm namespace={namespace} />
-    </FormBox>
-  </div>
+        <TimeSpecificationForm namespace={namespace} />
+      </FormPaper>
+    </Grid>
+    <Grid item xs={6}>
+      <FormPaper>
+        <OutputsForm namespace={namespace} />
+      </FormPaper>
+    </Grid>
+  </Grid>
 );
 
 export default GlobalsForm;

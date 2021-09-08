@@ -1,5 +1,5 @@
 import FieldNames from "./fieldNames";
-import { CsvOutputOptions } from "../../../utils/types";
+import CsvOutputOptions from "./types";
 
 export default {
   [FieldNames.DELIMITER]: ",",

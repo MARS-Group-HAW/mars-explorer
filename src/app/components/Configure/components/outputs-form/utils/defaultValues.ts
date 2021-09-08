@@ -1,8 +1,8 @@
 import FieldNames from "./fieldNames";
-import { Outputs } from "../../../utils/types";
-import OutputSpecification from "./types";
+import defaultValues from "../../output-none-form/utils/defaultValues";
+import Outputs, { OutputSpecification } from "./types";
 
 export default {
   [FieldNames.OUTPUT]: OutputSpecification.NONE,
-  [FieldNames.OPTIONS]: null,
+  [FieldNames.OPTIONS]: defaultValues,
 } as Outputs;
