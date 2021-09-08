@@ -6,9 +6,4 @@ export default makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(2),
   },
-  paper: {
-    padding: theme.spacing(2),
-    flexGrow: 1,
-    height: "100%",
-  },
 }));

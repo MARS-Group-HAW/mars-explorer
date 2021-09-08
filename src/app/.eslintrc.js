@@ -16,7 +16,8 @@ module.exports = {
   },
   rules: {
     "react/jsx-props-no-spreading": "off",
-    "eact/require-default-props": "off",
+    "react/require-default-props": "off",
+    "import/no-named-as-default": "off"
   },
   plugins: ["react"],
   settings: {

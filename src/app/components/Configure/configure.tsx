@@ -1,5 +1,4 @@
 import * as React from "react";
-import Paper from "@material-ui/core/Paper";
 import Grid from "@material-ui/core/Grid";
 import { Form, Formik } from "formik";
 import SaveIcon from "@material-ui/icons/Save";
@@ -16,7 +15,7 @@ import validationSchema from "./utils/validationSchema";
 import FieldNames from "./utils/fieldNames";
 import useConfigure from "./hooks";
 import useStyles from "./configure-styles";
-import OutputsForm from "./components/outputs-form";
+import FormPaper from "./components/form-paper";
 
 export default function Configure() {
   const classes = useStyles();
@@ -65,20 +64,13 @@ export default function Configure() {
           {(formik) => (
             <Form>
               <Grid container spacing={3} alignItems="stretch">
-                <Grid item xs={6}>
-                  <Paper className={classes.paper}>
-                    <GlobalsForm namespace={FieldNames.GLOBALS} />
-                  </Paper>
-                </Grid>
-                <Grid item xs={6}>
-                  <Paper className={classes.paper}>
-                    <OutputsForm namespace={FieldNames.GLOBALS} />
-                  </Paper>
+                <Grid item xs={12}>
+                  <GlobalsForm namespace={FieldNames.GLOBALS} />
                 </Grid>
                 <Grid item xs={12}>
-                  <Paper className={classes.paper}>
+                  <FormPaper>
                     <ObjectsForm namespaceAgents={FieldNames.AGENTS} />
-                  </Paper>
+                  </FormPaper>
                 </Grid>
               </Grid>
               <Fab

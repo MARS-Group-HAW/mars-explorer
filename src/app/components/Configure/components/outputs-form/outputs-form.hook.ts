@@ -1,12 +1,12 @@
 import { FieldInputProps } from "formik";
 import { useEffect } from "react";
 import useNamespacedField from "@app/components/Configure/hooks/use-namespaced-field";
-import { NonOutput } from "@app/components/Configure/utils/types";
-import OutputSpecification from "./utils/types";
 import FieldNames from "./utils/fieldNames";
-import outputDefaultValues from "./utils/defaultValues";
+import defaultValues from "./utils/defaultValues";
+import noneDefaultValues from "../output-none-form/utils/defaultValues";
 import csvDefaultValues from "../output-csv-form/utils/defaultValues";
 import sqlightDefaultValues from "../output-sqlite-form/utils/defaultValues";
+import { OutputSpecification } from "./utils/types";
 
 type State = {
   outputNamespace: string;
@@ -51,13 +51,15 @@ function useOutputsForm(namespace: string): State {
         setValue(sqlightDefaultValues);
         break;
       case OutputSpecification.NONE:
-        setValue((outputDefaultValues as NonOutput)[FieldNames.OPTIONS]);
+        setValue(noneDefaultValues);
         break;
       default:
         window.api.logger.warn(
           "An unknown output specification was provided to the output form: ",
           value
         );
+        setValue(defaultValues);
+        break;
     }
   }, [value]);
 

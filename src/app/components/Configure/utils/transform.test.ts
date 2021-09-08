@@ -3,10 +3,11 @@ import OutputsFieldNames from "@app/components/Configure/components/outputs-form
 
 import defaultValues from "@app/components/Configure/utils/defaultValues";
 
-import TimeSpecification from "@app/components/Configure/components/globals-form/utils/types";
-import OutputSpecification from "@app/components/Configure/components/outputs-form/utils/types";
+import GlobalsOptions, {
+  TimeSpecification,
+} from "@app/components/Configure/components/globals-form/utils/types";
+import { OutputSpecification } from "@app/components/Configure/components/outputs-form/utils/types";
 import { ConfigValidationSchema } from "@app/components/Configure/utils/validationSchema";
-import { Globals } from "@app/components/Configure/utils/types";
 import transformer from "./transform";
 
 // GIVEN, WHEN, THEN
@@ -150,7 +151,7 @@ describe("Transform", () => {
       const startPoint = "2018-01-01T00:00:00";
       const endPoint = "2018-04-01T23:00:00";
 
-      const formGlobals = form.globals as Globals;
+      const formGlobals = form.globals as GlobalsOptions;
       formGlobals.startPoint = startPoint;
       formGlobals.endPoint = endPoint;
       formGlobals.timeSpecification = TimeSpecification.DATETIME;

@@ -1,12 +1,12 @@
 import { TypeOf } from "yup";
-import TimeSpecification from "@app/components/Configure/components/globals-form/utils/types";
+import { TimeSpecification } from "@app/components/Configure/components/globals-form/utils/types";
 import { OutputsValidationSchema } from "@app/components/Configure/components/outputs-form/utils/validationSchema";
-import OutputSpecification from "@app/components/Configure/components/outputs-form/utils/types";
+import { OutputSpecification } from "@app/components/Configure/components/outputs-form/utils/types";
 import validationSchema from "./validationSchema";
 import defaultValues from "./defaultValues";
 import { GlobalsValidationSchema } from "../components/globals-form/utils/validationSchema";
 
-type FormSchema = TypeOf<typeof validationSchema>;
+export type FormSchema = TypeOf<typeof validationSchema>;
 
 class FormTransformer {
   public static configToForm(config: unknown): FormSchema {

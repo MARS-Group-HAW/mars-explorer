@@ -12,11 +12,12 @@ import {
 import { Link as RouterLink } from "react-router-dom";
 import FormBox from "../form-box";
 import useOutputsForm from "./outputs-form.hook";
-import OutputSpecification from "./utils/types";
+import { OutputSpecification } from "./utils/types";
 import OutputsCsvForm from "../output-csv-form";
 import OutputsSqliteForm from "../output-sqlite-form";
 import Path from "../../../App/utils/app-paths";
 import StyledFileIcon from "./output-form-styles";
+import OutputsNoneForm from "../output-none-form";
 
 type Props = {
   namespace: string;
@@ -73,9 +74,7 @@ function OutputsForm({ namespace }: Props) {
           </Grid>
         </Grid>
         <Grid item xs={12}>
-          {value === OutputSpecification.NONE && (
-            <StyledFileIcon fontSize="large" />
-          )}
+          {value === OutputSpecification.NONE && <OutputsNoneForm />}
           {value === OutputSpecification.CSV && (
             <OutputsCsvForm namespace={optionsNamespace} />
           )}

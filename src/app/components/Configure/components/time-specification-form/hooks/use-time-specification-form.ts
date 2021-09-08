@@ -1,7 +1,7 @@
 import { useField } from "formik";
 import { useEffect } from "react";
 import { FormSwitchOption } from "../../form-switch/types";
-import TimeSpecification from "../../globals-form/utils/types";
+import { TimeSpecification } from "../../globals-form/utils/types";
 import withNamespace from "../../../utils/withNamespace";
 import useStepForm from "./use-step-form";
 import useDatePointsForm from "./use-date-points-form";
