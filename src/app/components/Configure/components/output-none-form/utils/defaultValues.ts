@@ -1,3 +1,3 @@
 import NoneOutputOption from "./types";
 
-export default {} as NoneOutputOption;
+export default null as NoneOutputOption;

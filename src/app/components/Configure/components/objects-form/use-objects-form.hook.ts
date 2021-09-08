@@ -6,9 +6,8 @@ type State = {
 };
 
 function useObjectsForm(namespaceAgents: string): State {
-  console.log(namespaceAgents);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [{ value }] = useField<ObjectMappings>(namespaceAgents);
-  console.log(value);
 
   return { agents: [] };
 }

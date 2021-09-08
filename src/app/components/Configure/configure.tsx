@@ -61,28 +61,31 @@ export default function Configure() {
           initialValues={config}
           validationSchema={validationSchema}
         >
-          {(formik) => (
-            <Form>
-              <Grid container spacing={3} alignItems="stretch">
-                <Grid item xs={12}>
-                  <GlobalsForm namespace={FieldNames.GLOBALS} />
+          {(formik) => {
+            console.log(formik.errors);
+            return (
+              <Form>
+                <Grid container spacing={3} alignItems="stretch">
+                  <Grid item xs={12}>
+                    <GlobalsForm namespace={FieldNames.GLOBALS} />
+                  </Grid>
+                  <Grid item xs={12}>
+                    <FormPaper>
+                      <ObjectsForm namespaceAgents={FieldNames.AGENTS} />
+                    </FormPaper>
+                  </Grid>
                 </Grid>
-                <Grid item xs={12}>
-                  <FormPaper>
-                    <ObjectsForm namespaceAgents={FieldNames.AGENTS} />
-                  </FormPaper>
-                </Grid>
-              </Grid>
-              <Fab
-                disabled={Object.keys(formik.errors).length > 0}
-                color="primary"
-                aria-label="save"
-                type="submit"
-              >
-                <SaveIcon />
-              </Fab>
-            </Form>
-          )}
+                <Fab
+                  disabled={Object.keys(formik.errors).length > 0}
+                  color="primary"
+                  aria-label="save"
+                  type="submit"
+                >
+                  <SaveIcon />
+                </Fab>
+              </Form>
+            );
+          }}
         </Formik>
       )}
     </div>

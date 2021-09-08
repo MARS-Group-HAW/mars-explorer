@@ -1,1 +1,3 @@
-export default {} as any;
+import SqliteOutput from "./types";
+
+export default {} as SqliteOutput;

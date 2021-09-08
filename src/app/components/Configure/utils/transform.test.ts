@@ -125,13 +125,12 @@ describe("Transform", () => {
       const { globals } = transformer.formToConfig(form);
       expect(globals).not.toHaveProperty(GlobalsFieldNames.START_POINT);
       expect(globals).not.toHaveProperty(GlobalsFieldNames.END_POINT);
-      expect(globals).not.toHaveProperty(OutputsFieldNames.OPTIONS);
     });
 
     test("should not mutate the input object", () => {
       const clone = JSON.parse(JSON.stringify(form));
       transformer.formToConfig(form);
-      expect(form).toStrictEqual(clone);
+      expect(clone).toMatchObject(form);
     });
 
     test("should remove form-exclusive attributes", () => {
