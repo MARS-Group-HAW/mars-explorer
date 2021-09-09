@@ -2,14 +2,14 @@ import FieldNames from "./fieldNames";
 
 type ObjectMappings = ObjectMapping[];
 
-type ObjectMapping = {
+export type ObjectMapping = {
   [FieldNames.NAME]: string;
   [FieldNames.COUNT]: number;
   [FieldNames.FILE]: string;
   [FieldNames.MAPPING]: IndividualMapping[];
 };
 
-type IndividualMapping = {
+export type IndividualMapping = {
   [FieldNames.PARAMETER]: string;
   [FieldNames.VALUE]: number;
 };

@@ -8,7 +8,7 @@ export type MappingsValidationSchema = TypeOf<typeof ValidationSchema>;
 const ValidationSchema: SchemaOf<ObjectMappings> = Yup.array().of(
   Yup.object().shape({
     [FieldNames.NAME]: Yup.string().required(),
-    [FieldNames.COUNT]: Yup.number().integer(),
+    [FieldNames.COUNT]: Yup.number().integer().min(0),
     [FieldNames.FILE]: Yup.string(),
     [FieldNames.MAPPING]: Yup.array().of(
       Yup.object().shape({

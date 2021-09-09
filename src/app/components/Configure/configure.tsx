@@ -1,6 +1,6 @@
 import * as React from "react";
 import Grid from "@material-ui/core/Grid";
-import { Form, Formik } from "formik";
+import { Formik } from "formik";
 import SaveIcon from "@material-ui/icons/Save";
 import {
   Box,
@@ -15,7 +15,6 @@ import validationSchema from "./utils/validationSchema";
 import FieldNames from "./utils/fieldNames";
 import useConfigure from "./hooks";
 import useStyles from "./configure-styles";
-import FormPaper from "./components/form-paper";
 
 export default function Configure() {
   const classes = useStyles();
@@ -64,26 +63,34 @@ export default function Configure() {
           {(formik) => {
             console.log(formik.errors);
             return (
-              <Form>
-                <Grid container spacing={3} alignItems="stretch">
-                  <Grid item xs={12}>
+              <>
+                <Grid
+                  container
+                  spacing={3}
+                  style={{ height: "100%", overflowY: "hidden" }}
+                >
+                  <Grid item xs={12} style={{ height: "40%" }}>
                     <GlobalsForm namespace={FieldNames.GLOBALS} />
                   </Grid>
-                  <Grid item xs={12}>
-                    <FormPaper>
-                      <ObjectsForm namespaceAgents={FieldNames.AGENTS} />
-                    </FormPaper>
+                  <Grid item xs={12} style={{ height: "60%" }}>
+                    <ObjectsForm namespaceAgents={FieldNames.AGENTS} />
                   </Grid>
                 </Grid>
                 <Fab
+                  style={{
+                    position: "absolute",
+                    bottom: 60,
+                    right: 10,
+                  }}
                   disabled={Object.keys(formik.errors).length > 0}
-                  color="primary"
+                  color="secondary"
                   aria-label="save"
                   type="submit"
+                  onClick={() => formik.submitForm()}
                 >
                   <SaveIcon />
                 </Fab>
-              </Form>
+              </>
             );
           }}
         </Formik>
