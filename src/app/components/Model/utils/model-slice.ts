@@ -1,6 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IModelFile } from "@shared/types/Model";
-import type { RootState } from "../../App/utils/store";
+import type { RootState } from "../../../utils/store";
 
 // Define a type for the slice state
 type ModelState = Partial<IModelFile>;

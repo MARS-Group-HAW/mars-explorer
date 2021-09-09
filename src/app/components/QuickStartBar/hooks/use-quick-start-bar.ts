@@ -1,6 +1,6 @@
-import { useAppSelector } from "@app/components/App/hooks/use-store";
 import { selectProject } from "@app/components/Home/utils/project-slice";
-import ValidationState from "@app/util/types/validation-state";
+import ValidationState from "@app/utils/types/validation-state";
+import { useAppSelector } from "../../../utils/hooks/use-store";
 
 type State = {
   projectName: string;

@@ -1,5 +1,5 @@
-import { useAppSelector } from "@app/components/App/hooks/use-store";
 import { selectProject } from "@app/components/Home/utils/project-slice";
+import { useAppSelector } from "../../../../utils/hooks/use-store";
 
 type State = {
   disableNavigation: boolean;

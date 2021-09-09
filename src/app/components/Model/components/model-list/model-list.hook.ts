@@ -4,7 +4,10 @@ import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import { useAsync } from "react-use";
 import { set } from "@app/components/Model/utils/model-slice";
 import { selectProject } from "@app/components/Home/utils/project-slice";
-import { useAppDispatch, useAppSelector } from "../../../App/hooks/use-store";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../utils/hooks/use-store";
 
 type State = {
   models: WorkingModel;

@@ -155,6 +155,14 @@ ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
   return userProjects.map((file) => new FileRef(file));
 });
 
+ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
+  if (fs.pathExistsSync(path)) {
+    return new FileRef(path);
+  } else {
+    return null;
+  }
+});
+
 const MODEL_FILE_EXTENSION = ".cs";
 
 ipcMain.handle(

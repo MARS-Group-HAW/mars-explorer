@@ -80,7 +80,7 @@ export class Logger implements ILogger {
   private format = (...params: unknown[]): string =>
     params
       .flat()
-      .filter((param) => param !== null)
+      .filter((param: unknown) => param !== null)
       .map(this.formatParam)
       .join("\n");
 

@@ -1,10 +1,10 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
-import type { RootState } from "../../App/utils/store";
+import type { RootState } from "../../../utils/store";
 import {
   initialState as ValidationInitialState,
   reducers as ValidationReducer,
   State as ValidationState,
-} from "../../../util/validation-slice";
+} from "../../../utils/validation-slice";
 
 // Define a type for the slice state
 type State = ValidationState & {

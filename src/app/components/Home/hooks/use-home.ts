@@ -2,7 +2,7 @@ import { useState } from "react";
 import { ModelRef } from "@shared/types/Model";
 import { useAsync } from "react-use";
 import { Channel } from "@shared/types/Channel";
-import { useAppDispatch } from "../../App/hooks/use-store";
+import { useAppDispatch } from "../../../utils/hooks/use-store";
 import { set } from "../utils/project-slice";
 
 type State = {
