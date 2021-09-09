@@ -1,10 +1,10 @@
 import { FormikValues } from "formik";
 import { TypeOf } from "yup";
 import useGetConfig from "@app/components/Configure/hooks/use-get-config";
-import { useAppSelector } from "@app/components/App/hooks/use-store";
 import { selectProject } from "@app/components/Home/utils/project-slice";
 import { useEffect } from "react";
 import useSnackbar from "@app/components/Configure/hooks/use-snackbar";
+import { useAppSelector } from "../../../utils/hooks/use-store";
 import validationSchema from "../utils/validationSchema";
 
 interface ConfigSchema extends TypeOf<typeof validationSchema> {}

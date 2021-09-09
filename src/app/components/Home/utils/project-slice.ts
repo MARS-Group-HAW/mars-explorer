@@ -1,6 +1,9 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { ModelRef } from "@shared/types/Model";
-import type { RootState } from "../../App/utils/store";
+import type { RootState } from "../../../utils/store";
+import LocalStorageService, {
+  CacheKey,
+} from "../../../utils/local-storage-service";
 
 // Define a type for the slice state
 type ProjectState = Partial<ModelRef>;
@@ -13,7 +16,10 @@ export const projectSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    set: (state, action: PayloadAction<ModelRef>) => action.payload,
+    set: (state, action: PayloadAction<ModelRef>) => {
+      LocalStorageService.setItem(CacheKey.LAST_PATH, action.payload.path);
+      return action.payload;
+    },
   },
 });
 

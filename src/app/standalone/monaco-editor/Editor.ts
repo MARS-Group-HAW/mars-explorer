@@ -53,7 +53,6 @@ class Editor {
       this.monacoService = MonacoServices.install(monaco, {
         rootUri,
       });
-      // TODO monaco langauge client features methoden anschauen
     }
 
     if (!this.monacoLanguageClient) {
@@ -69,6 +68,15 @@ class Editor {
   public static setModel(path: string, content: string) {
     const newModel = Editor.createOrGetModel(path, content);
     Editor.editor.setModel(newModel);
+
+    // TODO: get errors from markers
+    monaco.editor.getModels().forEach((model) =>
+      console.log(
+        monaco.editor.getModelMarkers({
+          resource: model.uri,
+        })
+      )
+    );
   }
 
   private static createOrGetModel = (

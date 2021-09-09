@@ -3,7 +3,7 @@ import { useAsync } from "react-use";
 import { selectProject } from "@app/components/Home/utils/project-slice";
 import { selectModel } from "@app/components/Model/utils/model-slice";
 import Editor from "../../../standalone/monaco-editor/Editor";
-import { useAppSelector } from "../../App/hooks/use-store";
+import { useAppSelector } from "../../../utils/hooks/use-store";
 
 type Props = {
   containerRef: RefObject<HTMLDivElement>;

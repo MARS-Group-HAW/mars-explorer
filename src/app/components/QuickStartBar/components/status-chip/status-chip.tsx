@@ -3,7 +3,7 @@ import { Chip } from "@material-ui/core";
 import DoneIcon from "@material-ui/icons/Done";
 import ErrorIcon from "@material-ui/icons/Error";
 import HelpIcon from "@material-ui/icons/Help";
-import ValidationState from "../../../../util/types/validation-state";
+import ValidationState from "../../../../utils/types/validation-state";
 
 type Props = {
   label: string;
