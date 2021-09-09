@@ -1,15 +1,40 @@
-import { useField } from "formik";
-import ObjectMappings from "../mappings-form/utils/types";
+import useTabBar from "../../hooks/use-tab-bar";
+
+enum TabIndizes {
+  AGENTS,
+  LAYERS,
+}
+
+type Tabs = {
+  label: string;
+  value: TabIndizes;
+}[];
 
 type State = {
-  agents: string[];
+  currentTab: TabIndizes;
+  handleTabChange: (index: TabIndizes) => void;
+  tabs: Tabs;
 };
 
-function useObjectsForm(namespaceAgents: string): State {
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [{ value }] = useField<ObjectMappings>(namespaceAgents);
+const tabs: Tabs = [
+  {
+    label: "Agents",
+    value: TabIndizes.AGENTS,
+  },
+  {
+    label: "Layers",
+    value: TabIndizes.LAYERS,
+  },
+];
 
-  return { agents: [] };
+function useObjectsForm(): State {
+  const { tab, handleTabChange } = useTabBar<TabIndizes>(TabIndizes.AGENTS);
+
+  return {
+    currentTab: tab,
+    handleTabChange,
+    tabs,
+  };
 }
 
 export default useObjectsForm;
