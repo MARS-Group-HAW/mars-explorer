@@ -19,6 +19,7 @@ module.exports = {
     "react/require-default-props": "off",
     "import/no-named-as-default": "off",
     "no-plusplus": "off",
+    "no-param-reassign": "off",
   },
   plugins: ["react"],
   settings: {
