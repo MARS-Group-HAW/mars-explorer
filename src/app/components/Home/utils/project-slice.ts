@@ -5,24 +5,22 @@ import LocalStorageService, {
   CacheKey,
 } from "../../../utils/local-storage-service";
 
-export enum LoadingState {
-  NOT_STARTED,
-  STARTED,
-  ONE_THIRD,
-  TWO_THIRDS,
-  THREE_THIRDS,
-  FINISHED,
-  UNKNOWN,
+export enum LoadingSteps {
+  DOTNET_INSTALLED = "DOTNET_INSTALLED",
+  MONACO_SERVICES_INSTALLED = "MONACO_SERVICES_INSTALLED",
+  LANGUAGE_CLIENT_STARTED = "LANGUAGE_CLIENT_STARTED",
 }
 
 // Define a type for the slice state
 type ProjectState = Partial<ModelRef> & {
-  loadingState: LoadingState;
+  finishedSteps: LoadingSteps[];
+  maxSteps: number;
 };
 
 // Define the initial state using that type
 const initialState: ProjectState = {
-  loadingState: LoadingState.NOT_STARTED,
+  finishedSteps: [],
+  maxSteps: Object.keys(LoadingSteps).length,
 };
 
 export const projectSlice = createSlice({
@@ -30,55 +28,36 @@ export const projectSlice = createSlice({
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
   reducers: {
-    set: (state, action: PayloadAction<ModelRef>) => {
+    setProject: (state, action: PayloadAction<ModelRef>) => {
       LocalStorageService.setItem(CacheKey.LAST_PATH, action.payload.path);
-      return {
-        ...action.payload,
-        loadingState:
-          action.payload.path === state.path
-            ? state.loadingState
-            : LoadingState.NOT_STARTED,
-      };
+
+      const isSameProject = action.payload.path === state.path;
+
+      state.name = action.payload.name;
+      state.path = action.payload.path;
+      state.finishedSteps = isSameProject ? state.finishedSteps : [];
     },
-    resetLoading: (state) => ({
-      ...state,
-      loadingState: LoadingState.NOT_STARTED,
-    }),
-    startLoading: (state) => ({ ...state, loadingState: LoadingState.STARTED }),
-    setOneThirdLoaded: (state) => ({
-      ...state,
-      loadingState: LoadingState.ONE_THIRD,
-    }),
-    setTwoThirdsLoaded: (state) => ({
-      ...state,
-      loadingState: LoadingState.TWO_THIRDS,
-    }),
-    setThreeThirdsLoaded: (state) => ({
-      ...state,
-      loadingState: LoadingState.THREE_THIRDS,
-    }),
-    finishLoading: (state) => ({
-      ...state,
-      loadingState: LoadingState.FINISHED,
-    }),
-    setUnknown: (state) => ({
-      ...state,
-      loadingState: LoadingState.UNKNOWN,
-    }),
+    finishLoadingStep: (state, { payload }: PayloadAction<LoadingSteps>) => {
+      const foundStep = state.finishedSteps.find((step) => step === payload);
+
+      if (foundStep) return;
+
+      state.finishedSteps = [...state.finishedSteps, payload];
+    },
+    resetLoadingSteps: (state) => {
+      state.finishedSteps = [];
+    },
   },
 });
 
-export const {
-  set,
-  resetLoading,
-  startLoading,
-  finishLoading,
-  setOneThirdLoaded,
-  setTwoThirdsLoaded,
-  setThreeThirdsLoaded,
-} = projectSlice.actions;
+export const { setProject, resetLoadingSteps, finishLoadingStep } =
+  projectSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectProject = (state: RootState) => state.project;
+export const selectProgress = (state: RootState) =>
+  Math.floor(
+    (state.project.finishedSteps.length / state.project.maxSteps) * 100
+  );
 
 export default projectSlice.reducer;

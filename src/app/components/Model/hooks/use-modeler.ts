@@ -1,16 +1,22 @@
-import { RefObject } from "react";
+import { RefObject, useEffect, useState } from "react";
+import { WorkingModel } from "@shared/types/Model";
 import useEditor from "./use-editor";
-import useSelectedModel from "./use-selected-model";
 import { useAppSelector } from "../../../utils/hooks/use-store";
-import { LoadingState, selectProject } from "../../Home/utils/project-slice";
+import { selectProgress } from "../../Home/utils/project-slice";
+import useModels from "./use-models";
 
 type Props = {
   containerRef: RefObject<HTMLDivElement>;
 };
 
 type State = {
+  progress: number;
   loadingMsg: string;
   showLoading: boolean;
+  showModelListLoading: boolean;
+  models: WorkingModel;
+  selectedModelIndex: number;
+  selectModelAtIndex: (index: number) => void;
 };
 
 /*
@@ -20,14 +26,37 @@ const BOTH_MSG = `${EDITOR_LOADING_MSG} & ${INSTALLING_MSG}`;
  */
 
 function useModeler({ containerRef }: Props): State {
-  const { loadingState } = useAppSelector(selectProject);
+  const progress = useAppSelector(selectProgress);
 
-  useEditor(containerRef);
-  useSelectedModel();
+  const [selectedModelIndex, selectModelAtIndex] = useState<number>(0);
+
+  const { models, areModelsLoading } = useModels();
+
+  const { setModel: setModelInMonacoEditor } = useEditor(containerRef);
+
+  useEffect(() => {
+    if (areModelsLoading) return;
+
+    const selectedModel = models[selectedModelIndex];
+
+    if (!selectedModel) {
+      window.api.logger.warn("Tried to access a model at an invalid index.");
+      return;
+    }
+
+    const { path, content } = selectedModel;
+
+    setModelInMonacoEditor(path, content);
+  }, [selectedModelIndex, areModelsLoading]);
 
   return {
-    loadingMsg: "Loading ...",
-    showLoading: loadingState !== LoadingState.FINISHED,
+    progress,
+    loadingMsg: `Loading ...`,
+    showLoading: progress < 100,
+    showModelListLoading: areModelsLoading,
+    models,
+    selectedModelIndex,
+    selectModelAtIndex,
   };
 }
 

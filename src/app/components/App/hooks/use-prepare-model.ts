@@ -4,15 +4,11 @@ import useMonacoServices from "./use-monaco-services";
 import useLanguageClient from "./use-language-client";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
-  finishLoading,
-  resetLoading,
+  finishLoadingStep,
+  LoadingSteps,
+  resetLoadingSteps,
   selectProject,
-  setOneThirdLoaded,
-  setThreeThirdsLoaded,
-  setTwoThirdsLoaded,
-  startLoading,
 } from "../../Home/utils/project-slice";
-import { setUnknownState } from "../../Configure/utils/config-slice";
 
 type State = {};
 
@@ -29,37 +25,19 @@ function usePrepareModel(): State {
 
   useEffect(() => {
     if (!path) {
-      dispatch(resetLoading());
+      dispatch(resetLoadingSteps);
     }
 
-    const loadedArr = [
-      isFrameworkLoading,
-      areServicesLoading,
-      isFrameworkLoading,
-    ];
-
-    const loadedCount = loadedArr.filter((value) => value === false).length;
-
-    switch (loadedCount) {
-      case 0:
-        dispatch(startLoading());
-        break;
-      case 1:
-        dispatch(setOneThirdLoaded());
-        break;
-      case 2:
-        dispatch(setTwoThirdsLoaded());
-        break;
-      case 3:
-        dispatch(setThreeThirdsLoaded());
-        break;
-      default:
-        dispatch(setUnknownState());
-        break;
+    if (!isFrameworkLoading) {
+      dispatch(finishLoadingStep(LoadingSteps.DOTNET_INSTALLED));
     }
 
-    if (loadedCount === loadedArr.length) {
-      setTimeout(() => dispatch(finishLoading()), 500);
+    if (!areServicesLoading) {
+      dispatch(finishLoadingStep(LoadingSteps.MONACO_SERVICES_INSTALLED));
+    }
+
+    if (!isClientLoading) {
+      dispatch(finishLoadingStep(LoadingSteps.LANGUAGE_CLIENT_STARTED));
     }
   }, [path, isFrameworkLoading, areServicesLoading, isClientLoading]);
 

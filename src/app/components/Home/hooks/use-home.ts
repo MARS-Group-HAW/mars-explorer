@@ -3,7 +3,7 @@ import { ModelRef } from "@shared/types/Model";
 import { useAsync } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { useAppDispatch } from "../../../utils/hooks/use-store";
-import { set } from "../utils/project-slice";
+import { setProject as setGlobalProject } from "../utils/project-slice";
 
 type State = {
   projects: ModelRef[];
@@ -22,7 +22,8 @@ function useHome(): State {
     setProject(userProjects);
   }, []);
 
-  const handleProjectClick = (modelRef: ModelRef) => dispatch(set(modelRef));
+  const handleProjectClick = (modelRef: ModelRef) =>
+    dispatch(setGlobalProject(modelRef));
 
   return { projects, handleProjectClick };
 }

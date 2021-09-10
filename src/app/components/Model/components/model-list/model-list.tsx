@@ -7,7 +7,7 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import useModelList from "./model-list.hook";
+import { WorkingModel } from "@shared/types/Model";
 
 const useStyles = makeStyles({
   primaryText: {
@@ -18,28 +18,33 @@ const useStyles = makeStyles({
   },
 });
 
-function ModelList() {
+type Props = {
+  showLoading: boolean;
+  models: WorkingModel;
+  selectedModelIndex: number;
+  selectModelAtIndex: (index: number) => void;
+};
+
+function ModelList({
+  showLoading,
+  models,
+  selectedModelIndex,
+  selectModelAtIndex,
+}: Props) {
   const classes = useStyles();
-  const {
-    selectedModel,
-    models,
-    showLoading,
-    showEmptyModels,
-    handleModelClick,
-  } = useModelList();
 
   return (
     <List aria-label="models" style={{ width: "100%" }}>
       {showLoading && <LinearProgress />}
-      {showEmptyModels && (
+      {models.length === 0 && (
         <Typography variant="caption">No Models found</Typography>
       )}
-      {models.map((model) => (
+      {models.map((model, index) => (
         <ListItem
           key={model.path}
           button
-          selected={model === selectedModel}
-          onClick={() => handleModelClick(model)}
+          selected={selectedModelIndex === index}
+          onClick={() => selectModelAtIndex(index)}
         >
           <ListItemText
             primary={model.name}
