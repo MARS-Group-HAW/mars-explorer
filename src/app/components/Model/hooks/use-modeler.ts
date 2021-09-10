@@ -1,29 +1,26 @@
 import { RefObject, useEffect } from "react";
-import { useAsync } from "react-use";
-import { selectProject } from "@app/components/Home/utils/project-slice";
-import { selectModel } from "@app/components/Model/utils/model-slice";
-import Editor from "../../../standalone/monaco-editor/Editor";
-import { useAppSelector } from "../../../utils/hooks/use-store";
+import useEditor from "./use-editor";
+import useSelectedModel from "./use-selected-model";
+import useInstallMarsFramework from "./use-install-mars-framework";
 
 type Props = {
   containerRef: RefObject<HTMLDivElement>;
 };
 
-function useModeler({ containerRef }: Props) {
-  const { path } = useAppSelector(selectProject);
-  const { path: modelPath, content } = useAppSelector(selectModel);
+type State = {
+  loadingMsg: string;
+  showLoading: boolean;
+};
 
-  useAsync(async () => {
-    if (path) {
-      await Editor.create(containerRef.current, path);
-    }
-  }, [path]);
+function useModeler({ containerRef }: Props): State {
+  useEditor(containerRef);
+  useSelectedModel();
+  const { isInstalling } = useInstallMarsFramework();
 
-  useEffect(() => {
-    if (modelPath) {
-      Editor.setModel(modelPath, content);
-    }
-  }, [modelPath]);
+  return {
+    loadingMsg: "Installing dependencies ...",
+    showLoading: isInstalling,
+  };
 }
 
 export default useModeler;

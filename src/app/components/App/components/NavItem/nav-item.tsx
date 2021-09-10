@@ -22,6 +22,7 @@ const NavItem = ({ path, disabled = false, text, icon }: Props) => {
       to={path}
       disabled={disabled}
       selected={matched?.isExact}
+      style={{ height: "100%" }}
     >
       <ListItemIcon>{icon}</ListItemIcon>
       <ListItemText primary={text} />
