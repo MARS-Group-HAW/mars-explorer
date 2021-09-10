@@ -15,6 +15,7 @@ import installExtension, {
 } from "electron-devtools-installer";
 import FileRef from "./types/FileRef";
 import ModelFile from "./types/ModelFile";
+import * as child_process from "child_process";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -161,6 +162,24 @@ ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
   } else {
     return null;
   }
+});
+
+ipcMain.handle(Channel.INSTALL_MARS, (_, path: string): void => {
+  if (!fs.pathExistsSync(path)) {
+    throw new Error(
+      `Error while installing the MARS-Framework: Path (${path}) does not exist.`
+    );
+  }
+
+  const result = child_process.execSync(
+    "dotnet add package Mars.Life.Simulations --version 4.2.3",
+    {
+      cwd: path,
+    }
+  );
+
+  log.info(result.toString());
+  return;
 });
 
 const MODEL_FILE_EXTENSION = ".cs";
