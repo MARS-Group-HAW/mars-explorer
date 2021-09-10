@@ -5,7 +5,7 @@ import LocalStorageService, {
   CacheKey,
 } from "../../../utils/local-storage-service";
 import { useAppDispatch } from "../../../utils/hooks/use-store";
-import { set } from "../../Home/utils/project-slice";
+import { setProject } from "../../Home/utils/project-slice";
 
 function useLastProjectPath() {
   const dispatch = useAppDispatch();
@@ -23,7 +23,7 @@ function useLastProjectPath() {
     if (!projectRef) return;
 
     window.api.logger.info("Using last project: ", projectRef.name);
-    dispatch(set(projectRef));
+    dispatch(setProject(projectRef));
   }, []);
 }
 

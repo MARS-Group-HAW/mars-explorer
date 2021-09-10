@@ -27,16 +27,35 @@ const useStyles = makeStyles((theme) => ({
 function Modeler() {
   const classes = useStyles();
   const ref = useRef();
-  const { loadingMsg, showLoading } = useModeler({ containerRef: ref });
+  const {
+    progress,
+    loadingMsg,
+    showLoading,
+    models,
+    selectedModelIndex,
+    selectModelAtIndex,
+    showModelListLoading,
+  } = useModeler({
+    containerRef: ref,
+  });
 
   return (
     <Grid className={classes.backdropContainer} container>
       <Backdrop className={classes.backdrop} open={showLoading}>
-        <CircularProgress color="secondary" />
-        <Typography>{loadingMsg}</Typography>
+        <CircularProgress
+          variant="determinate"
+          value={progress}
+          color="secondary"
+        />
+        <Typography>{`${loadingMsg}`}</Typography>
       </Backdrop>
       <Grid item xs={2}>
-        <ModelList />
+        <ModelList
+          models={models}
+          showLoading={showModelListLoading}
+          selectedModelIndex={selectedModelIndex}
+          selectModelAtIndex={selectModelAtIndex}
+        />
       </Grid>
       <Grid id="monaco-container" component="div" innerRef={ref} item xs={10} />
     </Grid>
