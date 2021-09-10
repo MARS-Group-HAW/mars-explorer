@@ -1,21 +1,18 @@
 import { Channel } from "@shared/types/Channel";
 import { useAsync } from "react-use";
-import { useAppSelector } from "../../../utils/hooks/use-store";
-import { selectProject } from "../../Home/utils/project-slice";
 
 type State = {
-  isInstalling: boolean;
+  isLoading: boolean;
   error?: Error;
 };
 
-function useInstallMarsFramework(): State {
-  const { path } = useAppSelector(selectProject);
-
+function useMarsFramework(path?: string): State {
   const { loading, error } = useAsync(async () => {
     if (!path) return;
 
     try {
       await window.api.invoke<string, void>(Channel.INSTALL_MARS, path);
+      window.api.logger.info("MARS Framework installed (1/3)");
     } catch (e) {
       window.api.logger.error(e);
       throw e;
@@ -23,9 +20,9 @@ function useInstallMarsFramework(): State {
   }, [path]);
 
   return {
-    isInstalling: loading,
+    isLoading: loading,
     error,
   };
 }
 
-export default useInstallMarsFramework;
+export default useMarsFramework;
