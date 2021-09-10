@@ -38,7 +38,7 @@ function Modeler() {
       <Grid item xs={2}>
         <ModelList />
       </Grid>
-      <Grid component="div" innerRef={ref} item xs={10} />
+      <Grid id="monaco-container" component="div" innerRef={ref} item xs={10} />
     </Grid>
   );
 }
