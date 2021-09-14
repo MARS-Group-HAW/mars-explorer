@@ -1,19 +1,25 @@
 import { selectProject } from "@app/components/Home/utils/project-slice";
 import ValidationState from "@app/utils/types/validation-state";
 import { useAppSelector } from "../../../utils/hooks/use-store";
+import useSimulation from "./use-simulation";
 
 type State = {
   projectName: string;
   modelState: ValidationState;
   configState: ValidationState;
-  areActionsDisabled: boolean;
+  showStartLoading: boolean;
+  showStopLoading: boolean;
+  showLoading: boolean;
+  disableStart: boolean;
+  disableStop: boolean;
   handleStart: () => void;
   handleStop: () => void;
 };
 
 function useQuickStartBar(): State {
   const { path, name } = useAppSelector(selectProject);
-
+  const { isRunning, runSimulation } = useSimulation();
+  const isStopping = false; // FIXME
   const isProjectDefined = Boolean(path);
 
   const isModelValid = true; // TODO
@@ -25,23 +31,29 @@ function useQuickStartBar(): State {
     return isValid ? ValidationState.VALID : ValidationState.INVALID;
   };
 
-  const handleStart = () => window.api.logger.info("Start pressed");
+  const handleStart = () => runSimulation(path);
   const handleStop = () => window.api.logger.info("Stop pressed");
 
   const modelState = determineValidationState(isModelValid);
   const configState = determineValidationState(isConfigValid);
 
-  const areActionsDisabled = !(
+  const isAllValid =
     modelState === ValidationState.VALID &&
     configState === ValidationState.VALID &&
-    isConfigValid
-  );
+    isConfigValid;
+
+  const disableStart = !isAllValid || isRunning;
+  const disableStop = !isAllValid || !isRunning;
 
   return {
     projectName: name || "No project selected",
     modelState,
     configState,
-    areActionsDisabled,
+    showStartLoading: isRunning,
+    showStopLoading: isStopping,
+    showLoading: isRunning || isStopping,
+    disableStart,
+    disableStop,
     handleStart,
     handleStop,
   };
