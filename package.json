@@ -112,7 +112,6 @@
     "forge": {
       "packagerConfig": {
         "extraResource": [
-          "./models.json",
           "./resources/examples",
           "./resources/omnisharp"
         ]
