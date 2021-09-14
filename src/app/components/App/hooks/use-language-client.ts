@@ -16,7 +16,6 @@ function useLanguageClient(path: string, areServicesInstalled: boolean): State {
     if (!rootUri || !areServicesInstalled) return;
 
     const client = await startLanguageClient(rootUri);
-    window.api.logger.info("LanguageClient started (3/3)");
     setMonacoLanguageClient(client);
   }, [areServicesInstalled]);
 

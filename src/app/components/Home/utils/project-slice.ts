@@ -9,6 +9,7 @@ export enum LoadingSteps {
   DOTNET_INSTALLED = "DOTNET_INSTALLED",
   MONACO_SERVICES_INSTALLED = "MONACO_SERVICES_INSTALLED",
   LANGUAGE_CLIENT_STARTED = "LANGUAGE_CLIENT_STARTED",
+  PROJECT_INITIALIZED = "PROJECT_INITIALIZED",
 }
 
 // Define a type for the slice state
@@ -44,14 +45,23 @@ export const projectSlice = createSlice({
 
       state.finishedSteps = [...state.finishedSteps, payload];
     },
+    resetLoadingStep: (state, { payload }: PayloadAction<LoadingSteps>) => {
+      state.finishedSteps = state.finishedSteps.filter(
+        (step) => step !== payload
+      );
+    },
     resetLoadingSteps: (state) => {
       state.finishedSteps = [];
     },
   },
 });
 
-export const { setProject, resetLoadingSteps, finishLoadingStep } =
-  projectSlice.actions;
+export const {
+  setProject,
+  resetLoadingStep,
+  resetLoadingSteps,
+  finishLoadingStep,
+} = projectSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectProject = (state: RootState) => state.project;

@@ -12,7 +12,6 @@ function useMarsFramework(path?: string): State {
 
     try {
       await window.api.invoke<string, void>(Channel.INSTALL_MARS, path);
-      window.api.logger.info("MARS Framework installed (1/3)");
     } catch (e) {
       window.api.logger.error(e);
       throw e;

@@ -4,11 +4,12 @@ import useMonacoServices from "./use-monaco-services";
 import useLanguageClient from "./use-language-client";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
-  finishLoadingStep,
   LoadingSteps,
   resetLoadingSteps,
   selectProject,
 } from "../../Home/utils/project-slice";
+import useProjectInitialization from "./use-project-initialization";
+import useLoadingStep from "./use-loading-step";
 
 type State = {};
 
@@ -22,24 +23,18 @@ function usePrepareModel(): State {
     path,
     !areServicesLoading
   );
+  const { isLoading: isProjectLoading } = useProjectInitialization(path);
 
   useEffect(() => {
     if (!path) {
       dispatch(resetLoadingSteps);
     }
+  }, [path]);
 
-    if (!isFrameworkLoading) {
-      dispatch(finishLoadingStep(LoadingSteps.DOTNET_INSTALLED));
-    }
-
-    if (!areServicesLoading) {
-      dispatch(finishLoadingStep(LoadingSteps.MONACO_SERVICES_INSTALLED));
-    }
-
-    if (!isClientLoading) {
-      dispatch(finishLoadingStep(LoadingSteps.LANGUAGE_CLIENT_STARTED));
-    }
-  }, [path, isFrameworkLoading, areServicesLoading, isClientLoading]);
+  useLoadingStep(LoadingSteps.DOTNET_INSTALLED, isFrameworkLoading);
+  useLoadingStep(LoadingSteps.MONACO_SERVICES_INSTALLED, areServicesLoading);
+  useLoadingStep(LoadingSteps.LANGUAGE_CLIENT_STARTED, isClientLoading);
+  useLoadingStep(LoadingSteps.PROJECT_INITIALIZED, isProjectLoading);
 
   return {};
 }

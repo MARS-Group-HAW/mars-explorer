@@ -10,7 +10,6 @@ type Props = {
 };
 
 type State = {
-  progress: number;
   loadingMsg: string;
   showLoading: boolean;
   showModelListLoading: boolean;
@@ -50,8 +49,7 @@ function useModeler({ containerRef }: Props): State {
   }, [selectedModelIndex, areModelsLoading]);
 
   return {
-    progress,
-    loadingMsg: `Loading ...`,
+    loadingMsg: `Loading ... (${progress}%)`,
     showLoading: progress < 100,
     showModelListLoading: areModelsLoading,
     models,
