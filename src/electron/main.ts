@@ -17,6 +17,7 @@ import FileRef from "./types/FileRef";
 import ModelFile from "./types/ModelFile";
 import * as child_process from "child_process";
 import { ExecException } from "child_process";
+import { SimulationStates } from "@shared/types/SimulationStates";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -264,7 +265,12 @@ ipcMain.handle(
   }
 );
 
-ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
+enum ProcessExitCode {
+  SUCCESS = 0,
+  CANCELED = 143,
+}
+
+ipcMain.on(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
   if (!fs.pathExistsSync(projectPath)) {
     throw new Error(
       `Error while installing the MARS-Framework: Path (${projectPath}) does not exist.`
@@ -276,15 +282,57 @@ ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
     cwd: projectPath,
   });
 
-  simulationProcess.on("error", (error: ExecException | null) => {
-    if (error) {
-      log.error(`Simulation canceled: ${error.message}`);
-      mainWindow.webContents.send(Channel.SIMULATION_CANCELED);
-    }
+  ipcMain.once(Channel.CANCEL_SIMULATION, () => {
+    log.info(`Canceling simulation of ${projectPath}`);
+    simulationProcess.kill();
   });
 
-  simulationProcess.on("exit", () => {
-    log.info(`Finished simulation.`);
-    mainWindow.webContents.send(Channel.SIMULATION_FINISHED);
+  const cleanupHandler = () => ipcMain.removeHandler(Channel.CANCEL_SIMULATION);
+
+  /*
+
+  log.info("Starting WebSocket Client");
+      const url = "ws://127.0.0.1:4567/progress";
+      const connection = new WebSocket(url);
+
+      connection.onopen = () => {
+        log.info("WS opened");
+      };
+
+      connection.onerror = (err) => {
+        log.error("WS Err: ", err);
+      };
+
+      connection.onmessage = (e) => {
+        log.info("WS MSG", e);
+      };
+   */
+
+  simulationProcess.on("error", (error: ExecException | null) => {
+    if (error) {
+      log.error(`Simulation failed: ${error.message}`);
+      mainWindow.webContents.send(Channel.SIMULATION_FAILED);
+    }
+    cleanupHandler();
+  });
+
+  simulationProcess.on("exit", (code) => {
+    log.info(`Simulation exited with code ${code}.`);
+
+    let exitState: SimulationStates;
+
+    switch (code) {
+      case ProcessExitCode.SUCCESS:
+        exitState = SimulationStates.SUCCESS;
+        break;
+      case ProcessExitCode.CANCELED:
+        exitState = SimulationStates.CANCELED;
+        break;
+      default:
+        exitState = SimulationStates.UNKNOWN;
+    }
+
+    mainWindow.webContents.send(Channel.EXITED, exitState);
+    cleanupHandler();
   });
 });
