@@ -1,4 +1,7 @@
-export const OmnisharpErrorNotification = "o#/error";
+export enum OmnisharpNotification {
+  PROJECT_ADDED = "o#/projectadded",
+  ERROR = "o#/error",
+}
 
 export type OmnisharpErrorNotificationParams = {
   Text: string;

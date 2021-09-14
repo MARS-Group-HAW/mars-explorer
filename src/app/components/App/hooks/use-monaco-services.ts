@@ -16,7 +16,6 @@ function useMonacoServices(path: string): State {
     if (!rootUri) return;
     setMonacoService(undefined);
     setMonacoService(MonacoServices.install(monaco, { rootUri }));
-    window.api.logger.info("Monaco Services installed (2/3)");
   }, [rootUri]);
 
   return {

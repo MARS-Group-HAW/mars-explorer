@@ -2,6 +2,7 @@ import * as React from "react";
 import { useRef } from "react";
 import {
   Backdrop,
+  Box,
   CircularProgress,
   Grid,
   makeStyles,
@@ -22,13 +23,21 @@ const useStyles = makeStyles((theme) => ({
     color: "#fff",
     position: "absolute",
   },
+  spinnerContainer: {
+    width: "40%",
+    display: "flex",
+    justifyContent: "space-around",
+    alignItems: "center",
+  },
+  loadingText: {
+    fontWeight: 600,
+  },
 }));
 
 function Modeler() {
   const classes = useStyles();
   const ref = useRef();
   const {
-    progress,
     loadingMsg,
     showLoading,
     models,
@@ -42,12 +51,12 @@ function Modeler() {
   return (
     <Grid className={classes.backdropContainer} container>
       <Backdrop className={classes.backdrop} open={showLoading}>
-        <CircularProgress
-          variant="determinate"
-          value={progress}
-          color="secondary"
-        />
-        <Typography>{`${loadingMsg}`}</Typography>
+        <Box className={classes.spinnerContainer}>
+          <CircularProgress color="secondary" />
+          <Typography className={classes.loadingText} variant="h6">
+            {`${loadingMsg}`}
+          </Typography>
+        </Box>
       </Backdrop>
       <Grid item xs={2}>
         <ModelList

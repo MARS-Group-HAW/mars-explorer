@@ -24,8 +24,8 @@ import { LoggerLabel } from "@shared/types/Logger";
 import { fileURLToPath } from "url";
 import {
   OmnisharpErrorMessage,
-  OmnisharpErrorNotification,
   OmnisharpErrorNotificationParams,
+  OmnisharpNotification,
 } from "./Omnisharp";
 import { Channel } from "@shared/types/Channel";
 import fs = require("fs-extra");
@@ -118,6 +118,11 @@ export function launchLanguageServer(
           lspLogger.info(msg.params);
           break;
         }
+        case OmnisharpNotification.PROJECT_ADDED: {
+          launcherLogger.info("Project initialized.");
+          mainWindow.webContents.send(Channel.PROJECT_INITIALIZED);
+          break;
+        }
         // TODO: show in GUI by LSP Standard
         case ShowMessageNotification.type.method: {
           handleShowMessageNotification(msg.params as ShowMessageParams);
@@ -127,7 +132,7 @@ export function launchLanguageServer(
           handleLogMessageNotification(msg.params as LogMessageParams);
           break;
         }
-        case OmnisharpErrorNotification:
+        case OmnisharpNotification.ERROR:
           handleOmnisharpErrorNotification(
             msg.params as OmnisharpErrorNotificationParams,
             mainWindow
