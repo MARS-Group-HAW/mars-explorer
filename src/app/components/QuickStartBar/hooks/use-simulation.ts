@@ -1,42 +1,68 @@
 import { Channel } from "@shared/types/Channel";
-import { useBoolean, useEffectOnce } from "react-use";
-import { useEffect } from "react";
+import { useEffectOnce } from "react-use";
+import { useEffect, useState } from "react";
+import { SimulationStates } from "@shared/types/SimulationStates";
 
 type State = {
-  isRunning: boolean;
+  simState: SimulationStates;
   runSimulation: (path: string) => void;
+  cancelSimulation: () => void;
 };
 
 function useSimulation(): State {
-  const [isRunning, setIsRunning] = useBoolean(false);
-
-  const resetRunningState = () => setIsRunning(false);
+  const [simState, setSimState] = useState(SimulationStates.NONE);
 
   function runSimulation(path: string) {
-    setIsRunning(true);
-    window.api.invoke<string, void>(Channel.RUN_SIMULATION, path);
+    setSimState(SimulationStates.RUNNING);
+    window.api.send(Channel.RUN_SIMULATION, path);
+  }
+
+  function cancelSimulation() {
+    window.api.send(Channel.CANCEL_SIMULATION);
   }
 
   // TODO handle err
   useEffectOnce(() =>
-    window.api.on(Channel.SIMULATION_CANCELED, resetRunningState)
+    window.api.on(Channel.SIMULATION_FAILED, () =>
+      setSimState(SimulationStates.FAILED)
+    )
   );
 
   useEffectOnce(() =>
-    window.api.on(Channel.SIMULATION_FINISHED, resetRunningState)
+    window.api.on<SimulationStates>(Channel.EXITED, setSimState)
   );
 
   useEffect(() => {
-    if (isRunning) {
-      window.api.logger.info(`Simulation started.`);
-    } else {
-      window.api.logger.info(`Simulation finished.`);
+    switch (simState) {
+      case SimulationStates.RUNNING:
+        window.api.logger.info(`Simulation is running.`);
+        break;
+      case SimulationStates.SUCCESS:
+        window.api.logger.info(`Simulation finished successfully.`);
+        break;
+      case SimulationStates.CANCELED:
+        window.api.logger.info(`Simulation canceled by user.`);
+        break;
+      case SimulationStates.FAILED:
+        window.api.logger.info(`Simulation errored.`);
+        break;
+      case SimulationStates.PAUSED:
+        window.api.logger.info(`Simulation was paused.`);
+        break;
+      case SimulationStates.NONE:
+        window.api.logger.info("No recent sim state.");
+        break;
+      case SimulationStates.UNKNOWN:
+      default:
+        window.api.logger.warn(`Unknown state.`);
+        break;
     }
-  }, [isRunning]);
+  }, [simState]);
 
   return {
-    isRunning,
+    simState,
     runSimulation,
+    cancelSimulation,
   };
 }
 
