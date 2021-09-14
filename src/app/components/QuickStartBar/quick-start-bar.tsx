@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Grid, Toolbar, Typography } from "@material-ui/core";
+import { CircularProgress, Grid, Toolbar, Typography } from "@material-ui/core";
 import useQuickStartBar from "@app/components/QuickStartBar/hooks";
 import StatusChip from "@app/components/QuickStartBar/components/status-chip";
 import ActionButton from "@app/components/QuickStartBar/components/action-button";
@@ -11,7 +11,11 @@ function QuickStartBar() {
     projectName,
     modelState,
     configState,
-    areActionsDisabled,
+    showStartLoading,
+    disableStart,
+    showStopLoading,
+    disableStop,
+    showLoading,
     handleStart,
     handleStop,
   } = useQuickStartBar();
@@ -31,18 +35,25 @@ function QuickStartBar() {
       <StatusChip label="Config" status={configState} />
       <ActionButton
         icon={<PlayCircleOutlineIcon />}
-        disabled={areActionsDisabled}
+        isLoading={showStartLoading}
+        disabled={disableStart}
         onClick={handleStart}
       >
         Start
       </ActionButton>
       <ActionButton
         icon={<StopIcon />}
-        disabled={areActionsDisabled}
+        isLoading={showStopLoading}
+        disabled={disableStop}
         onClick={handleStop}
       >
         Stop
       </ActionButton>
+      <CircularProgress
+        color="secondary"
+        size={20}
+        style={{ visibility: showLoading ? "visible" : "hidden" }}
+      />
     </Grid>
   );
 }

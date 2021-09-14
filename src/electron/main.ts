@@ -16,6 +16,7 @@ import installExtension, {
 import FileRef from "./types/FileRef";
 import ModelFile from "./types/ModelFile";
 import * as child_process from "child_process";
+import { ExecException } from "child_process";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -262,3 +263,28 @@ ipcMain.handle(
     return launchLanguageServer(mainWindow, projectPath);
   }
 );
+
+ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
+  if (!fs.pathExistsSync(projectPath)) {
+    throw new Error(
+      `Error while installing the MARS-Framework: Path (${projectPath}) does not exist.`
+    );
+  }
+
+  log.info(`Starting simulation in ${projectPath} ...`);
+  const simulationProcess = child_process.exec("dotnet run", {
+    cwd: projectPath,
+  });
+
+  simulationProcess.on("error", (error: ExecException | null) => {
+    if (error) {
+      log.error(`Simulation canceled: ${error.message}`);
+      mainWindow.webContents.send(Channel.SIMULATION_CANCELED);
+    }
+  });
+
+  simulationProcess.on("exit", () => {
+    log.info(`Finished simulation.`);
+    mainWindow.webContents.send(Channel.SIMULATION_FINISHED);
+  });
+});
