@@ -65,6 +65,9 @@ export const {
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectProject = (state: RootState) => state.project;
+export const selectProjectInitializationStatus = (state: RootState): boolean =>
+  state.project.finishedSteps.length === state.project.maxSteps;
+
 export const selectProgress = (state: RootState) =>
   Math.floor(
     (state.project.finishedSteps.length / state.project.maxSteps) * 100

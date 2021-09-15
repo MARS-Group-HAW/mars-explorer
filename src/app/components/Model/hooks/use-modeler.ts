@@ -4,6 +4,7 @@ import useEditor from "./use-editor";
 import { useAppSelector } from "../../../utils/hooks/use-store";
 import { selectProgress } from "../../Home/utils/project-slice";
 import useModels from "./use-models";
+import useProjectInitializationStatus from "../../App/hooks/use-project-initialization-status";
 
 type Props = {
   containerRef: RefObject<HTMLDivElement>;
@@ -18,25 +19,17 @@ type State = {
   selectModelAtIndex: (index: number) => void;
 };
 
-/*
-const EDITOR_LOADING_MSG = "Starting Language Server ...";
-const INSTALLING_MSG = "Installing dependencies ...";
-const BOTH_MSG = `${EDITOR_LOADING_MSG} & ${INSTALLING_MSG}`;
- */
-
 function useModeler({ containerRef }: Props): State {
   const progress = useAppSelector(selectProgress);
 
-  const [selectedModelIndex, selectModelAtIndex] = useState<number>(0);
+  const [selectedModelIndex, setSelectedModelIndex] = useState<number>(0);
 
   const { models, areModelsLoading } = useModels();
 
   const { setModel: setModelInMonacoEditor } = useEditor(containerRef);
 
-  useEffect(() => {
-    if (areModelsLoading) return;
-
-    const selectedModel = models[selectedModelIndex];
+  function selectModelAtIndex(index: number) {
+    const selectedModel = models[index];
 
     if (!selectedModel) {
       window.api.logger.warn("Tried to access a model at an invalid index.");
@@ -46,7 +39,24 @@ function useModeler({ containerRef }: Props): State {
     const { path, content } = selectedModel;
 
     setModelInMonacoEditor(path, content);
+  }
+
+  useEffect(() => {
+    if (areModelsLoading) return;
+    selectModelAtIndex(selectedModelIndex);
   }, [selectedModelIndex, areModelsLoading]);
+
+  const { isProjectFullyInitialized } = useProjectInitializationStatus();
+
+  // TODO: Temp workaround to validate all files
+  useEffect(() => {
+    if (!isProjectFullyInitialized || !models) return;
+
+    // set every model in editor to enable validation of each
+    models.forEach((_, index) => selectModelAtIndex(index));
+    // reset to last state
+    selectModelAtIndex(selectedModelIndex);
+  }, [isProjectFullyInitialized, models]);
 
   return {
     loadingMsg: `Loading ... (${progress}%)`,
@@ -54,7 +64,7 @@ function useModeler({ containerRef }: Props): State {
     showModelListLoading: areModelsLoading,
     models,
     selectedModelIndex,
-    selectModelAtIndex,
+    selectModelAtIndex: setSelectedModelIndex,
   };
 }
 

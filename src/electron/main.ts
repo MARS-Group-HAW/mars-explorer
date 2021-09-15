@@ -173,8 +173,10 @@ ipcMain.handle(Channel.INSTALL_MARS, (_, path: string): void => {
     );
   }
 
+  const versionFlag = ""; // " --version 4.2.3";
+
   const result = child_process.execSync(
-    "dotnet add package Mars.Life.Simulations --version 4.2.3",
+    `dotnet add package Mars.Life.Simulations${versionFlag}`,
     {
       cwd: path,
     }

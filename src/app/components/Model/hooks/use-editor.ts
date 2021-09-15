@@ -41,15 +41,6 @@ function useEditor(containerRef: React.RefObject<HTMLDivElement>): State {
   function setModel(path: string, content: string) {
     const newModel = createOrGetModel(path, content);
     monacoEditor.setModel(newModel);
-
-    // TODO: get errors from markers
-    monaco.editor.getModels().forEach((model) =>
-      console.log(
-        monaco.editor.getModelMarkers({
-          resource: model.uri,
-        })
-      )
-    );
   }
 
   return {
