@@ -37,6 +37,7 @@ function QuickStartBar() {
   const {
     projectName,
     modelState,
+    modelErrorFiles,
     configState,
     showStartLoading,
     disableStart,
@@ -58,7 +59,8 @@ function QuickStartBar() {
       <Grid item xs={3}>
         <Typography variant="h6">{projectName}</Typography>
       </Grid>
-      <StatusChip label="Model" status={modelState} />
+
+      <StatusChip label="Model" status={modelState} errors={modelErrorFiles} />
       <StatusChip label="Config" status={configState} />
       <ActionButton
         icon={<PlayCircleOutlineIcon />}

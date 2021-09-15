@@ -10,11 +10,19 @@ import {
 } from "../../Home/utils/project-slice";
 import useProjectInitialization from "./use-project-initialization";
 import useLoadingStep from "./use-loading-step";
+import { selectModel } from "../../Model/utils/model-slice";
 
 type State = {};
 
 function usePrepareModel(): State {
   const { path } = useAppSelector(selectProject);
+
+  // FIXME temp
+  /*
+  const { hasErrorsIn } = useAppSelector(selectModel);
+  useEffect(() => console.log("Errors in: ", hasErrorsIn), [hasErrorsIn]);
+   */
+
   const dispatch = useAppDispatch();
 
   const { isLoading: isFrameworkLoading } = useMarsFramework(path);

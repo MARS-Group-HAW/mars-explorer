@@ -1,1 +1,1 @@
-export { default } from "./Client";
+export { default } from "./CSharpLanguageClient";
