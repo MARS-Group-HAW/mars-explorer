@@ -2,9 +2,9 @@ import { RefObject, useEffect, useState } from "react";
 import { WorkingModel } from "@shared/types/Model";
 import useEditor from "./use-editor";
 import { useAppSelector } from "../../../utils/hooks/use-store";
-import { selectProgress } from "../../Home/utils/project-slice";
 import useModels from "./use-models";
-import useProjectInitializationStatus from "../../App/hooks/use-project-initialization-status";
+import useProjectInitializationStatus from "../../App/hooks/bootstrap/model/use-project-initialization-status";
+import { selectModelLoadingProgress } from "../utils/model-slice";
 
 type Props = {
   containerRef: RefObject<HTMLDivElement>;
@@ -20,7 +20,7 @@ type State = {
 };
 
 function useModeler({ containerRef }: Props): State {
-  const progress = useAppSelector(selectProgress);
+  const progress = useAppSelector(selectModelLoadingProgress);
 
   const [selectedModelIndex, setSelectedModelIndex] = useState<number>(0);
 

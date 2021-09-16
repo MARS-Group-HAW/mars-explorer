@@ -22,7 +22,7 @@ function useNewConfig(path: string, existingConfigFound: boolean) {
     window.api.logger.info(`Creating ${defaultConfig} in ${path}`);
 
     await window.api.invoke<{ path: string; content: string }, void>(
-      Channel.CREATE_DEFAULT_CONFIG,
+      Channel.WRITE_CONTENT_TO_FILE,
       { path, content: defaultConfig }
     );
 

@@ -4,11 +4,11 @@ import {
   initialState as ValidationInitialState,
   reducers as ValidationReducer,
   State as ValidationState,
-} from "../../../utils/validation-slice";
+} from "../../../utils/slices/validation-slice";
 
 // Define a type for the slice state
 type State = ValidationState & {
-  path?: string;
+  pathToConfigJson?: string;
 };
 
 // Define the initial state using that type
@@ -20,15 +20,22 @@ export const configSlice = createSlice({
   name: "config",
   initialState,
   reducers: {
-    setPath: (state: State, action: PayloadAction<string>) => {
-      state.path = action.payload;
+    setPathToConfig: (state: State, { payload }: PayloadAction<string>) => {
+      window.api.logger.info(`[CONFIG] ${payload}`);
+      state.pathToConfigJson = payload;
     },
     ...ValidationReducer,
   },
 });
 
-export const { setPath, setUnknownState, setValidState, setInvalidState } =
-  configSlice.actions;
+export const {
+  setPathToConfig,
+  setLoadingState,
+  setInvalidState,
+  setValidState,
+  setErrorState,
+  setUnknownState,
+} = configSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 // TODO: connect to root store

@@ -203,6 +203,14 @@ ipcMain.handle(
   }
 );
 
+ipcMain.handle(Channel.GET_DEFAULT_CONFIG_PATH, (_, rootPath: string): string =>
+  path.resolve(rootPath, "config.json")
+);
+
+ipcMain.handle(Channel.CONFIG_EXISTS, (_, path: string): boolean =>
+  fs.existsSync(path)
+);
+
 ipcMain.handle(
   Channel.GET_CONFIG_IN_PROJECT,
   (_, rootPath: string): unknown | null => {
@@ -219,11 +227,9 @@ ipcMain.handle(
 );
 
 ipcMain.handle(
-  Channel.CREATE_DEFAULT_CONFIG,
-  (_, { path, content }: { path: string; content: string }): void => {
-    fs.writeJSONSync(path, content);
-    return;
-  }
+  Channel.WRITE_CONTENT_TO_FILE,
+  (_, { path, content }: { path: string; content: string }): void =>
+    fs.writeJSONSync(path, content)
 );
 
 /*

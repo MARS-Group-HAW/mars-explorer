@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useAppSelector } from "../../../utils/hooks/use-store";
 import useSimulation from "./use-simulation";
 import { selectModel } from "../../Model/utils/model-slice";
-import useProjectInitializationStatus from "../../App/hooks/use-project-initialization-status";
+import useProjectInitializationStatus from "../../App/hooks/bootstrap/model/use-project-initialization-status";
 
 type State = {
   projectName: string;
@@ -15,8 +15,6 @@ type State = {
   modelState: ValidationState;
   modelErrorFiles?: string[];
   configState: ValidationState;
-  showStartLoading: boolean;
-  showStopLoading: boolean;
   disableStart: boolean;
   disableStop: boolean;
   handleStart: () => void;
@@ -28,7 +26,7 @@ function useQuickStartBar(): State {
   const { path, name } = useAppSelector(selectProject);
   const { simState, progress, runSimulation, cancelSimulation } =
     useSimulation();
-  const isStopping = false; // FIXME
+
   const isProjectDefined = Boolean(path);
 
   const { hasErrorsIn } = useAppSelector(selectModel);
@@ -83,8 +81,6 @@ function useQuickStartBar(): State {
       modelValidationState === ValidationState.INVALID && hasErrorsIn,
     configState,
     simState,
-    showStartLoading: isRunning,
-    showStopLoading: isStopping,
     disableStart,
     disableStop,
     handleStart,

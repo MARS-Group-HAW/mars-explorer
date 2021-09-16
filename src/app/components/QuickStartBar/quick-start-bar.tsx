@@ -38,9 +38,7 @@ function QuickStartBar() {
     modelState,
     modelErrorFiles,
     configState,
-    showStartLoading,
     disableStart,
-    showStopLoading,
     disableStop,
     simState,
     progress,
@@ -65,7 +63,6 @@ function QuickStartBar() {
       <StatusChip label="Config" status={configState} />
       <ActionButton
         icon={<PlayCircleOutlineIcon />}
-        isLoading={showStartLoading}
         disabled={disableStart}
         onClick={handleStart}
       >
@@ -73,7 +70,6 @@ function QuickStartBar() {
       </ActionButton>
       <ActionButton
         icon={<StopIcon />}
-        isLoading={showStopLoading}
         disabled={disableStop}
         onClick={handleStop}
       >
