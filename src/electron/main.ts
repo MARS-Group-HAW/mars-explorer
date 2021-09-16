@@ -168,7 +168,7 @@ ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
   }
 });
 
-ipcMain.handle(Channel.INSTALL_MARS, (_, path: string): void => {
+ipcMain.on(Channel.INSTALL_MARS, (_, path: string) => {
   if (!fs.pathExistsSync(path)) {
     throw new Error(
       `Error while installing the MARS-Framework: Path (${path}) does not exist.`
@@ -177,15 +177,19 @@ ipcMain.handle(Channel.INSTALL_MARS, (_, path: string): void => {
 
   const versionFlag = " --version 4.3.0";
 
-  const result = child_process.execSync(
+  const installProcess = child_process.exec(
     `dotnet add package Mars.Life.Simulations${versionFlag}`,
     {
       cwd: path,
     }
   );
 
-  log.info(result.toString());
-  return;
+  installProcess.on("message", (msg: MessageEvent) => log.info(msg.data));
+
+  installProcess.on("exit", (code) => {
+    log.info(`Installation exited with code ${code}.`);
+    mainWindow.webContents.send(Channel.MARS_INSTALLED);
+  });
 });
 
 const MODEL_FILE_EXTENSION = ".cs";
