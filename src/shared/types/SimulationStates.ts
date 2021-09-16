@@ -6,4 +6,5 @@ export enum SimulationStates {
   FAILED,
   NONE,
   UNKNOWN,
+  STARTED,
 }

@@ -18,6 +18,8 @@ import ModelFile from "./types/ModelFile";
 import * as child_process from "child_process";
 import { ExecException } from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
+import ReconnectingWebSocket from "reconnecting-websocket";
+import WS from "ws";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -173,7 +175,7 @@ ipcMain.handle(Channel.INSTALL_MARS, (_, path: string): void => {
     );
   }
 
-  const versionFlag = ""; // " --version 4.2.3";
+  const versionFlag = " --version 4.3.0";
 
   const result = child_process.execSync(
     `dotnet add package Mars.Life.Simulations${versionFlag}`,
@@ -272,10 +274,35 @@ enum ProcessExitCode {
   CANCELED = 143,
 }
 
+enum WebSocketCloseCodes {
+  RETRYING = 1000,
+  EXITING = 4000,
+}
+
+type ProgressMessage = {
+  currentDateTime: string;
+  currentStep: number;
+  maxTicks: number;
+  currentTick: number;
+  progressInPercentage: number;
+  isTimeReferenced: boolean;
+  oneTickTimeSpan: string;
+  startTimePoint: string;
+  endTimePoint: string;
+  isFinished: boolean;
+  isInitialized: boolean;
+  isPaused: boolean;
+  isAborted: boolean;
+  iterations: number;
+  lastSuccessfullyDateTime: string;
+  lastSuccessfullyStep: number;
+  lastSuccessfullyTick: number;
+};
+
 ipcMain.on(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
   if (!fs.pathExistsSync(projectPath)) {
     throw new Error(
-      `Error while installing the MARS-Framework: Path (${projectPath}) does not exist.`
+      `Error while starting the simulation: Path (${projectPath}) does not exist.`
     );
   }
 
@@ -289,26 +316,56 @@ ipcMain.on(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
     simulationProcess.kill();
   });
 
-  const cleanupHandler = () => ipcMain.removeHandler(Channel.CANCEL_SIMULATION);
+  const options = {
+    WebSocket: WS, // custom WebSocket constructor
+    maxRetries: 50,
+  };
+  const rws = new ReconnectingWebSocket(
+    "ws://127.0.0.1:4567/progress",
+    [],
+    options
+  );
 
-  /*
+  rws.onopen = () => log.info("WebSocket for Simulation opened.");
 
-  log.info("Starting WebSocket Client");
-      const url = "ws://127.0.0.1:4567/progress";
-      const connection = new WebSocket(url);
+  let lastProgress: number;
 
-      connection.onopen = () => {
-        log.info("WS opened");
-      };
+  rws.onmessage = (msg: MessageEvent<string>) => {
+    const { currentTick, maxTicks } = JSON.parse(msg.data) as ProgressMessage;
+    const progress = Math.floor((currentTick / maxTicks) * 100);
 
-      connection.onerror = (err) => {
-        log.error("WS Err: ", err);
-      };
+    if (lastProgress === undefined || lastProgress < progress) {
+      log.debug(
+        `Simulation-Progress: ${currentTick} von ${maxTicks} (${progress}%)`
+      );
+      mainWindow.webContents.send(Channel.SIMULATION_PROGRESS, progress);
+      lastProgress = progress;
+    }
+  };
+  rws.onclose = (msg) => {
+    if (rws.retryCount === options.maxRetries) {
+      log.warn(
+        "Could not connect to the simulation process. Exiting the simulation. Is the 'console' flag set in the config.json?"
+      );
+      simulationProcess.kill();
+      return;
+    }
 
-      connection.onmessage = (e) => {
-        log.info("WS MSG", e);
-      };
-   */
+    // see codes at https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
+    switch (msg.code) {
+      case WebSocketCloseCodes.RETRYING:
+        log.info("Could not connect to WebSocket. Retrying ...");
+        break;
+      case WebSocketCloseCodes.EXITING:
+        log.info("WebSocket closed by simulation end.");
+        break;
+    }
+  };
+
+  const cleanupHandler = () => {
+    ipcMain.removeHandler(Channel.CANCEL_SIMULATION);
+    rws.close(WebSocketCloseCodes.EXITING);
+  };
 
   simulationProcess.on("error", (error: ExecException | null) => {
     if (error) {
