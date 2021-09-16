@@ -1,31 +1,33 @@
-import { useState } from "react";
 import { ModelRef } from "@shared/types/Model";
 import { useAsync } from "react-use";
 import { Channel } from "@shared/types/Channel";
-import { useAppDispatch } from "../../../utils/hooks/use-store";
-import { setProject as setGlobalProject } from "../utils/project-slice";
+import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
+import {
+  selectProject,
+  setProject as setGlobalProject,
+} from "../utils/project-slice";
 
 type State = {
   projects: ModelRef[];
+  isModelSelected: (project: ModelRef) => boolean;
   handleProjectClick: (model: ModelRef) => void;
 };
 
 function useHome(): State {
   const dispatch = useAppDispatch();
+  const { path } = useAppSelector(selectProject);
 
-  const [projects, setProject] = useState<ModelRef[]>([]);
+  const { value = [] } = useAsync(
+    async () => window.api.invoke<void, ModelRef[]>(Channel.GET_USER_PROJECTS),
+    []
+  );
 
-  useAsync(async () => {
-    const userProjects = await window.api.invoke<void, ModelRef[]>(
-      Channel.GET_USER_PROJECTS
-    );
-    setProject(userProjects);
-  }, []);
+  const isModelSelected = (project: ModelRef) => project.path === path;
 
   const handleProjectClick = (modelRef: ModelRef) =>
     dispatch(setGlobalProject(modelRef));
 
-  return { projects, handleProjectClick };
+  return { projects: value, isModelSelected, handleProjectClick };
 }
 
 export default useHome;

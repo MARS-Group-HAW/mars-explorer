@@ -24,7 +24,7 @@ const useStyles = makeStyles((theme) => ({
 
 const Home = () => {
   const classes = useStyles();
-  const { projects, handleProjectClick } = useHome();
+  const { projects, isModelSelected, handleProjectClick } = useHome();
 
   return (
     <Box className={classes.table}>
@@ -49,15 +49,16 @@ const Home = () => {
                   </Typography>
                 </TableCell>
                 <TableCell align="right">
-                  <Link to={Path.MODEL}>
-                    <Button
-                      variant="contained"
-                      color="primary"
-                      onClick={() => handleProjectClick(row)}
-                    >
-                      Open
-                    </Button>
-                  </Link>
+                  <Button
+                    component={Link}
+                    to={Path.MODEL}
+                    variant="contained"
+                    color="primary"
+                    disabled={isModelSelected(row)}
+                    onClick={() => handleProjectClick(row)}
+                  >
+                    Open
+                  </Button>
                 </TableCell>
               </TableRow>
             ))}
