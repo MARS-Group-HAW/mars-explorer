@@ -36,7 +36,8 @@ const OMNISHARP_CONFIG: OmnisharpConfiguration = {
     enabled: false,
   },
   fileOptions: {
-    excludeSearchPatterns: ["**/var/**/*", "**/obj/**/*"],
+    excludeSearchPatterns: ["**/var/**/*", "**/obj/**/*", "**/bin/**/*"],
+    systemExcludeSearchPatterns: ["**/var/**/*", "**/obj/**/*", "**/bin/**/*"],
   },
   msbuild: {
     enabled: true,

@@ -14,6 +14,7 @@ export type OmnisharpConfiguration = {
   };
   fileOptions: {
     excludeSearchPatterns: string[];
+    systemExcludeSearchPatterns?: string[];
   };
   msbuild: {
     enabled: boolean;
