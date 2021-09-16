@@ -10,6 +10,8 @@ import useProjectInitializationStatus from "../../App/hooks/use-project-initiali
 type State = {
   projectName: string;
   simState: SimulationStates;
+  progress: number;
+  showProgress: boolean;
   modelState: ValidationState;
   modelErrorFiles?: string[];
   configState: ValidationState;
@@ -24,7 +26,8 @@ type State = {
 function useQuickStartBar(): State {
   const { isProjectFullyInitialized } = useProjectInitializationStatus();
   const { path, name } = useAppSelector(selectProject);
-  const { simState, runSimulation, cancelSimulation } = useSimulation();
+  const { simState, progress, runSimulation, cancelSimulation } =
+    useSimulation();
   const isStopping = false; // FIXME
   const isProjectDefined = Boolean(path);
 
@@ -72,6 +75,10 @@ function useQuickStartBar(): State {
   return {
     projectName: name || "No project selected",
     modelState: modelValidationState,
+    progress,
+    showProgress:
+      simState === SimulationStates.STARTED ||
+      simState === SimulationStates.RUNNING,
     modelErrorFiles:
       modelValidationState === ValidationState.INVALID && hasErrorsIn,
     configState,

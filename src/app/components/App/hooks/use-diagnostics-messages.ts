@@ -19,6 +19,10 @@ type State = {
 const isDiagnosticMessage = (msg: NotificationMessage): boolean =>
   msg.method === "textDocument/publishDiagnostics";
 
+// FIXME is quickfix, omnisharp should ignore these
+const isAssembly = (uri: string): boolean =>
+  uri.endsWith("AssemblyAttributes.cs") || uri.endsWith("AssemblyInfo.cs");
+
 const diagnosticIsError = (diagnostic: Diagnostic): boolean =>
   diagnostic.severity === DiagnosticSeverity.Error;
 
@@ -39,6 +43,9 @@ function useDiagnosticsMessages(): State {
 
     if (isNotificationMessage(msg) && isDiagnosticMessage(msg)) {
       const diagnosticParams = msg.params as PublishDiagnosticsParams;
+
+      if (isAssembly(diagnosticParams.uri)) return;
+
       const diagnosticErrors =
         diagnosticParams.diagnostics.filter(diagnosticIsError);
 

@@ -1,5 +1,5 @@
 import * as React from "react";
-import { CircularProgress, Grid, Toolbar, Typography } from "@material-ui/core";
+import { Grid, Toolbar, Typography } from "@material-ui/core";
 import useQuickStartBar from "@app/components/QuickStartBar/hooks";
 import StatusChip from "@app/components/QuickStartBar/components/status-chip";
 import ActionButton from "@app/components/QuickStartBar/components/action-button";
@@ -12,11 +12,10 @@ import PanToolIcon from "@material-ui/icons/PanTool";
 import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import { SimulationStates } from "@shared/types/SimulationStates";
+import CircularProgressWithLabel from "./components/CircularProgressWithLabel";
 
 function getElBySimState(simState: SimulationStates) {
   switch (simState) {
-    case SimulationStates.RUNNING:
-      return <CircularProgress color="secondary" size={20} />;
     case SimulationStates.SUCCESS:
       return <CheckCircleOutlineIcon color="secondary" />;
     case SimulationStates.FAILED:
@@ -44,6 +43,8 @@ function QuickStartBar() {
     showStopLoading,
     disableStop,
     simState,
+    progress,
+    showProgress,
     handleStart,
     handleStop,
   } = useQuickStartBar();
@@ -78,7 +79,15 @@ function QuickStartBar() {
       >
         Stop
       </ActionButton>
-      {getElBySimState(simState)}
+      <div style={{ display: "flex" }}>
+        {!showProgress && getElBySimState(simState)}
+        {showProgress && (
+          <CircularProgressWithLabel
+            hasStarted={simState === SimulationStates.RUNNING}
+            value={progress}
+          />
+        )}
+      </div>
     </Grid>
   );
 }

@@ -5,21 +5,30 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 
 type State = {
   simState: SimulationStates;
+  progress: number;
   runSimulation: (path: string) => void;
   cancelSimulation: () => void;
 };
 
 function useSimulation(): State {
   const [simState, setSimState] = useState(SimulationStates.NONE);
+  const [progress, setProgress] = useState(0);
 
   function runSimulation(path: string) {
-    setSimState(SimulationStates.RUNNING);
+    setSimState(SimulationStates.STARTED);
     window.api.send(Channel.RUN_SIMULATION, path);
   }
 
   function cancelSimulation() {
     window.api.send(Channel.CANCEL_SIMULATION);
   }
+
+  useEffectOnce(() =>
+    window.api.on<number>(Channel.SIMULATION_PROGRESS, (msg: number) => {
+      setSimState(SimulationStates.RUNNING);
+      setProgress(msg);
+    })
+  );
 
   // TODO handle err
   useEffectOnce(() =>
@@ -33,7 +42,14 @@ function useSimulation(): State {
   );
 
   useEffect(() => {
+    if (simState !== SimulationStates.RUNNING) {
+      setProgress(0);
+    }
+
     switch (simState) {
+      case SimulationStates.STARTED:
+        window.api.logger.info(`Simulation started.`);
+        break;
       case SimulationStates.RUNNING:
         window.api.logger.info(`Simulation is running.`);
         break;
@@ -61,6 +77,7 @@ function useSimulation(): State {
 
   return {
     simState,
+    progress,
     runSimulation,
     cancelSimulation,
   };

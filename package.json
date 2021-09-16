@@ -43,7 +43,7 @@
     "react-router-dom": "^5.2.0",
     "react-swipeable-views": "^0.14.0",
     "react-use": "^17.2.4",
-    "reconnecting-websocket": "^3.2.2",
+    "reconnecting-websocket": "^4.4.0",
     "reflect-metadata": "^0.1.13",
     "vscode-jsonrpc": "^6.0.0",
     "vscode-languageserver": "7.0.0",
