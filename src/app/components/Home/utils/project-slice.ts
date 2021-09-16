@@ -5,24 +5,11 @@ import LocalStorageService, {
   CacheKey,
 } from "../../../utils/local-storage-service";
 
-export enum LoadingSteps {
-  DOTNET_INSTALLED = "DOTNET_INSTALLED",
-  MONACO_SERVICES_INSTALLED = "MONACO_SERVICES_INSTALLED",
-  LANGUAGE_CLIENT_STARTED = "LANGUAGE_CLIENT_STARTED",
-  PROJECT_INITIALIZED = "PROJECT_INITIALIZED",
-}
-
 // Define a type for the slice state
-type ProjectState = Partial<ModelRef> & {
-  finishedSteps: LoadingSteps[];
-  maxSteps: number;
-};
+type ProjectState = Partial<ModelRef>;
 
 // Define the initial state using that type
-const initialState: ProjectState = {
-  finishedSteps: [],
-  maxSteps: Object.keys(LoadingSteps).length,
-};
+const initialState: ProjectState = {};
 
 export const projectSlice = createSlice({
   name: "project",
@@ -32,45 +19,15 @@ export const projectSlice = createSlice({
     setProject: (state, action: PayloadAction<ModelRef>) => {
       LocalStorageService.setItem(CacheKey.LAST_PATH, action.payload.path);
 
-      const isSameProject = action.payload.path === state.path;
-
       state.name = action.payload.name;
       state.path = action.payload.path;
-      state.finishedSteps = isSameProject ? state.finishedSteps : [];
-    },
-    finishLoadingStep: (state, { payload }: PayloadAction<LoadingSteps>) => {
-      const foundStep = state.finishedSteps.find((step) => step === payload);
-
-      if (foundStep) return;
-
-      state.finishedSteps = [...state.finishedSteps, payload];
-    },
-    resetLoadingStep: (state, { payload }: PayloadAction<LoadingSteps>) => {
-      state.finishedSteps = state.finishedSteps.filter(
-        (step) => step !== payload
-      );
-    },
-    resetLoadingSteps: (state) => {
-      state.finishedSteps = [];
     },
   },
 });
 
-export const {
-  setProject,
-  resetLoadingStep,
-  resetLoadingSteps,
-  finishLoadingStep,
-} = projectSlice.actions;
+export const { setProject } = projectSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectProject = (state: RootState) => state.project;
-export const selectProjectInitializationStatus = (state: RootState): boolean =>
-  state.project.finishedSteps.length === state.project.maxSteps;
-
-export const selectProgress = (state: RootState) =>
-  Math.floor(
-    (state.project.finishedSteps.length / state.project.maxSteps) * 100
-  );
 
 export default projectSlice.reducer;

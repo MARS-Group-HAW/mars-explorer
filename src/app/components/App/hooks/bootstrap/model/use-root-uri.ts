@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import monaco from "../../../standalone/monaco-editor/monaco";
+import monaco from "../../../../../standalone/monaco-editor/monaco";
 
 type State = {
   rootUri: string;

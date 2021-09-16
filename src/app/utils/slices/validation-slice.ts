@@ -1,4 +1,4 @@
-import ValidationState from "./types/validation-state";
+import ValidationState from "../types/validation-state";
 
 export type State = {
   validationState: ValidationState;
@@ -18,5 +18,11 @@ export const reducers = {
   },
   setInvalidState: (state: State) => {
     state.validationState = ValidationState.INVALID;
+  },
+  setLoadingState: (state: State) => {
+    state.validationState = ValidationState.LOADING;
+  },
+  setErrorState: (state: State) => {
+    state.validationState = ValidationState.ERROR;
   },
 };

@@ -3,13 +3,16 @@ import { Message, NotificationMessage } from "vscode-jsonrpc";
 import { isNotificationMessage } from "vscode-jsonrpc/lib/common/messages";
 import { Diagnostic, PublishDiagnosticsParams } from "monaco-languageclient";
 import { DiagnosticSeverity } from "vscode-languageserver";
-import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
-import { selectProject } from "../../Home/utils/project-slice";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../utils/hooks/use-store";
+import { selectProject } from "../../../../Home/utils/project-slice";
 import {
   removeErrorsInPath,
   resetErrors,
   setErrorsInPath,
-} from "../../Model/utils/model-slice";
+} from "../../../../Model/utils/model-slice";
 import useProjectInitializationStatus from "./use-project-initialization-status";
 
 type State = {
