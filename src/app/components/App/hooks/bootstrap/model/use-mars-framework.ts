@@ -1,5 +1,6 @@
 import { Channel } from "@shared/types/Channel";
-import { useAsync } from "react-use";
+import { useBoolean, useEffectOnce } from "react-use";
+import { useEffect } from "react";
 import useLoadingStep from "../../../../../utils/hooks/use-loading-step";
 import LoadingSteps from "../../../../Model/utils/LoadingSteps";
 import { useAppDispatch } from "../../../../../utils/hooks/use-store";
@@ -9,24 +10,32 @@ import {
 } from "../../../../Model/utils/model-slice";
 
 function useMarsFramework(path?: string) {
+  const [isLoading, setIsLoading] = useBoolean(true);
+
   const dispatch = useAppDispatch();
 
-  const { loading } = useAsync(async () => {
-    if (!path) return;
-
-    try {
-      await window.api.invoke<string, void>(Channel.INSTALL_MARS, path);
-    } catch (e) {
-      window.api.logger.error(e);
-      throw e;
+  const installMars = () => {
+    if (path) {
+      setIsLoading(true);
+      window.api.send(Channel.INSTALL_MARS, path);
     }
-  }, [path]);
+  };
+
+  const handleMarsInstallation = () => setIsLoading(false);
+
+  useEffect(installMars, [path]);
+
+  useEffectOnce(() =>
+    window.api.on(Channel.MARS_INSTALLED, handleMarsInstallation)
+  );
 
   useLoadingStep<LoadingSteps>({
-    step: LoadingSteps.DOTNET_ADDED,
-    isLoading: loading,
-    resetLoading: () => dispatch(resetLoadingStep(LoadingSteps.DOTNET_ADDED)),
-    finishLoading: () => dispatch(finishLoadingStep(LoadingSteps.DOTNET_ADDED)),
+    step: LoadingSteps.MARS_FRAMEWORK_ADDED,
+    isLoading,
+    resetLoading: () =>
+      dispatch(resetLoadingStep(LoadingSteps.MARS_FRAMEWORK_ADDED)),
+    finishLoading: () =>
+      dispatch(finishLoadingStep(LoadingSteps.MARS_FRAMEWORK_ADDED)),
   });
 }
 
