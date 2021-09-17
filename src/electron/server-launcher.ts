@@ -39,7 +39,7 @@ type Test = {
 const Labels: (keyof Test)[] = ["msgType", "method", "classpath"];
 
 const launcherLogger = new Logger("launcher");
-const lspLogger = new Logger("lsp", {
+const lspLogger = new Logger("lsp-server", {
   newFile: true,
   printToConsole: false,
   labels: Labels,
