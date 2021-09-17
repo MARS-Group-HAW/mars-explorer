@@ -8,11 +8,19 @@ const PreloadLogger = new Logger("ipc", {
   labels: ["method", "channel"],
 });
 
+const LspClientLogger = new Logger("lsp-client", {
+  newFile: true,
+  printToConsole: false,
+  labels: ["method"],
+});
+
 type Methods = "invoke" | "send" | "on";
 
 type UnknownListener = (...param: unknown[]) => unknown;
 
 const channelsAsArray = Object.keys(Channel);
+
+const isLSPChannel = (channelName: string) => channelName.startsWith("LSP");
 
 function callIpcRenderer(
   method: Methods,
@@ -21,24 +29,35 @@ function callIpcRenderer(
 ) {
   if (
     typeof channel !== "string" ||
-    (!channelsAsArray.includes(channel) && !channel.startsWith("LSP"))
+    (!channelsAsArray.includes(channel) && !isLSPChannel(channel))
   ) {
     PreloadLogger.warn(
       `Channel "${channel}" not a string or not part of the defined channels.`
     );
     throw "Error: IPC channel name not allowed";
   }
-  PreloadLogger.labels = [
-    {
-      key: "method",
-      value: method,
-    },
-    {
-      key: "channel",
-      value: channel,
-    },
-  ];
-  PreloadLogger.info(args);
+
+  if (!isLSPChannel(channel)) {
+    PreloadLogger.labels = [
+      {
+        key: "method",
+        value: method,
+      },
+      {
+        key: "channel",
+        value: channel,
+      },
+    ];
+    PreloadLogger.info(args);
+  } else {
+    LspClientLogger.labels = [
+      {
+        key: "method",
+        value: method,
+      },
+    ];
+    LspClientLogger.info(args);
+  }
 
   if (method === "invoke" || method === "send") {
     return ipcRenderer[method](channel, ...args);
