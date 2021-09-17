@@ -2,6 +2,7 @@ import { selectProject } from "@app/components/Home/utils/project-slice";
 import ValidationState from "@app/utils/types/validation-state";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import { useEffect, useState } from "react";
+import { useBoolean } from "react-use";
 import { useAppSelector } from "../../../utils/hooks/use-store";
 import useSimulation from "./use-simulation";
 import { selectModel } from "../../Model/utils/model-slice";
@@ -12,6 +13,10 @@ type State = {
   simState: SimulationStates;
   progress: number;
   showProgress: boolean;
+  showErrorDialog: boolean;
+  openErrorDialog: () => void;
+  closeErrorDialog: () => void;
+  errorMsg: string;
   modelState: ValidationState;
   modelErrorFiles?: string[];
   configState: ValidationState;
@@ -24,12 +29,14 @@ type State = {
 function useQuickStartBar(): State {
   const { isProjectFullyInitialized } = useProjectInitializationStatus();
   const { path, name } = useAppSelector(selectProject);
-  const { simState, progress, runSimulation, cancelSimulation } =
+  const { simState, progress, errorMsg, runSimulation, cancelSimulation } =
     useSimulation();
 
   const isProjectDefined = Boolean(path);
 
   const { hasErrorsIn } = useAppSelector(selectModel);
+
+  const [showErrorDialog, setShowErrorDialog] = useBoolean(false);
 
   const [modelValidationState, setModelValidationState] = useState(
     ValidationState.UNKNOWN
@@ -59,6 +66,10 @@ function useQuickStartBar(): State {
     handleValidation(setConfigValidationState, false);
   }, [path, hasErrorsIn, isProjectFullyInitialized]);
 
+  useEffect(() => {
+    setShowErrorDialog(Boolean(errorMsg));
+  }, [errorMsg]);
+
   const handleStart = () => runSimulation(path);
   const handleStop = () => cancelSimulation();
 
@@ -79,6 +90,10 @@ function useQuickStartBar(): State {
     simState,
     progress,
     showProgress: isRunning,
+    errorMsg,
+    showErrorDialog,
+    openErrorDialog: () => setShowErrorDialog(true),
+    closeErrorDialog: () => setShowErrorDialog(false),
     modelErrorFiles:
       modelValidationState === ValidationState.INVALID && hasErrorsIn,
     disableStart,

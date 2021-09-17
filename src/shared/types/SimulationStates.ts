@@ -2,7 +2,7 @@ export enum SimulationStates {
   RUNNING,
   SUCCESS,
   PAUSED,
-  CANCELED,
+  TERMINATED,
   FAILED,
   NONE,
   UNKNOWN,

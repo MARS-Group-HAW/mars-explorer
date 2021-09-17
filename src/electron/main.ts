@@ -16,10 +16,8 @@ import installExtension, {
 import FileRef from "./types/FileRef";
 import ModelFile from "./types/ModelFile";
 import * as child_process from "child_process";
-import { ExecException } from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
-import ReconnectingWebSocket from "reconnecting-websocket";
-import WS from "ws";
+import { handleSimulationProgress } from "./handle-simulation-progress";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -281,35 +279,11 @@ ipcMain.handle(
 
 enum ProcessExitCode {
   SUCCESS = 0,
-  CANCELED = 143,
+  ERROR = 134,
+  TERMINATED = 143,
 }
 
-enum WebSocketCloseCodes {
-  RETRYING = 1000,
-  EXITING = 4000,
-}
-
-type ProgressMessage = {
-  currentDateTime: string;
-  currentStep: number;
-  maxTicks: number;
-  currentTick: number;
-  progressInPercentage: number;
-  isTimeReferenced: boolean;
-  oneTickTimeSpan: string;
-  startTimePoint: string;
-  endTimePoint: string;
-  isFinished: boolean;
-  isInitialized: boolean;
-  isPaused: boolean;
-  isAborted: boolean;
-  iterations: number;
-  lastSuccessfullyDateTime: string;
-  lastSuccessfullyStep: number;
-  lastSuccessfullyTick: number;
-};
-
-ipcMain.on(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
+ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
   if (!fs.pathExistsSync(projectPath)) {
     throw new Error(
       `Error while starting the simulation: Path (${projectPath}) does not exist.`
@@ -317,85 +291,51 @@ ipcMain.on(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
   }
 
   log.info(`Starting simulation in ${projectPath} ...`);
-  const simulationProcess = child_process.exec("dotnet run", {
-    cwd: projectPath,
-  });
+  const simulationProcess = child_process.exec(
+    "dotnet run",
+    {
+      cwd: projectPath,
+    },
+    (error) => {
+      if (!error || error.code === ProcessExitCode.TERMINATED) return;
 
-  ipcMain.once(Channel.CANCEL_SIMULATION, () => {
+      log.error("Error while simulating: ", error.name, error.message);
+      mainWindow.webContents.send(Channel.SIMULATION_FAILED, error);
+    }
+  );
+
+  ipcMain.once(Channel.TERMINATE_SIMULATION, () => {
     log.info(`Canceling simulation of ${projectPath}`);
     simulationProcess.kill();
   });
 
-  const options = {
-    WebSocket: WS, // custom WebSocket constructor
-    maxRetries: 50,
-  };
-  const rws = new ReconnectingWebSocket(
-    "ws://127.0.0.1:4567/progress",
-    [],
-    options
+  const closeWs = handleSimulationProgress(
+    log,
+    (progress) =>
+      mainWindow.webContents.send(Channel.SIMULATION_PROGRESS, progress),
+    () => simulationProcess.kill()
   );
 
-  rws.onopen = () => log.info("WebSocket for Simulation opened.");
-
-  let lastProgress: number;
-
-  rws.onmessage = (msg: MessageEvent<string>) => {
-    const { currentTick, maxTicks } = JSON.parse(msg.data) as ProgressMessage;
-    const progress = Math.floor((currentTick / maxTicks) * 100);
-
-    if (lastProgress === undefined || lastProgress < progress) {
-      log.debug(
-        `Simulation-Progress: ${currentTick} von ${maxTicks} (${progress}%)`
-      );
-      mainWindow.webContents.send(Channel.SIMULATION_PROGRESS, progress);
-      lastProgress = progress;
-    }
-  };
-  rws.onclose = (msg) => {
-    if (rws.retryCount === options.maxRetries) {
-      log.warn(
-        "Could not connect to the simulation process. Exiting the simulation. Is the 'console' flag set in the config.json?"
-      );
-      simulationProcess.kill();
-      return;
-    }
-
-    // see codes at https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
-    switch (msg.code) {
-      case WebSocketCloseCodes.RETRYING:
-        log.info("Could not connect to WebSocket. Retrying ...");
-        break;
-      case WebSocketCloseCodes.EXITING:
-        log.info("WebSocket closed by simulation end.");
-        break;
-    }
-  };
-
   const cleanupHandler = () => {
-    ipcMain.removeHandler(Channel.CANCEL_SIMULATION);
-    rws.close(WebSocketCloseCodes.EXITING);
+    ipcMain.removeHandler(Channel.TERMINATE_SIMULATION);
+    closeWs();
   };
-
-  simulationProcess.on("error", (error: ExecException | null) => {
-    if (error) {
-      log.error(`Simulation failed: ${error.message}`);
-      mainWindow.webContents.send(Channel.SIMULATION_FAILED);
-    }
-    cleanupHandler();
-  });
 
   simulationProcess.on("exit", (code) => {
-    log.info(`Simulation exited with code ${code}.`);
-
     let exitState: SimulationStates;
 
     switch (code) {
       case ProcessExitCode.SUCCESS:
+        log.info(`Simulation exited successfully (${code}).`);
         exitState = SimulationStates.SUCCESS;
         break;
-      case ProcessExitCode.CANCELED:
-        exitState = SimulationStates.CANCELED;
+      case ProcessExitCode.TERMINATED:
+        log.info(`Simulation was terminated (${code}).`);
+        exitState = SimulationStates.TERMINATED;
+        break;
+      case ProcessExitCode.ERROR:
+        log.error(`Simulation errored (${code}).`);
+        exitState = SimulationStates.FAILED;
         break;
       default:
         exitState = SimulationStates.UNKNOWN;

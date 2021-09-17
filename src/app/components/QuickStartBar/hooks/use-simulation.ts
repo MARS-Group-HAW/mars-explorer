@@ -6,6 +6,7 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 type State = {
   simState: SimulationStates;
   progress: number;
+  errorMsg: string;
   runSimulation: (path: string) => void;
   cancelSimulation: () => void;
 };
@@ -13,14 +14,15 @@ type State = {
 function useSimulation(): State {
   const [simState, setSimState] = useState(SimulationStates.NONE);
   const [progress, setProgress] = useState(0);
+  const [error, setError] = useState<string>();
 
   function runSimulation(path: string) {
     setSimState(SimulationStates.STARTED);
-    window.api.send(Channel.RUN_SIMULATION, path);
+    window.api.invoke(Channel.RUN_SIMULATION, path);
   }
 
   function cancelSimulation() {
-    window.api.send(Channel.CANCEL_SIMULATION);
+    window.api.send(Channel.TERMINATE_SIMULATION);
   }
 
   useEffectOnce(() =>
@@ -30,11 +32,12 @@ function useSimulation(): State {
     })
   );
 
-  // TODO handle err
   useEffectOnce(() =>
-    window.api.on(Channel.SIMULATION_FAILED, () =>
-      setSimState(SimulationStates.FAILED)
-    )
+    window.api.on(Channel.SIMULATION_FAILED, (e: Error) => {
+      const errMsg = e.toString();
+      window.api.logger.error("Simulation Error: ", errMsg);
+      setError(errMsg);
+    })
   );
 
   useEffectOnce(() =>
@@ -44,6 +47,10 @@ function useSimulation(): State {
   useEffect(() => {
     if (simState !== SimulationStates.RUNNING) {
       setProgress(0);
+    }
+
+    if (simState !== SimulationStates.FAILED) {
+      setError(undefined);
     }
 
     switch (simState) {
@@ -56,7 +63,7 @@ function useSimulation(): State {
       case SimulationStates.SUCCESS:
         window.api.logger.info(`Simulation finished successfully.`);
         break;
-      case SimulationStates.CANCELED:
+      case SimulationStates.TERMINATED:
         window.api.logger.info(`Simulation canceled by user.`);
         break;
       case SimulationStates.FAILED:
@@ -78,6 +85,7 @@ function useSimulation(): State {
   return {
     simState,
     progress,
+    errorMsg: error,
     runSimulation,
     cancelSimulation,
   };
