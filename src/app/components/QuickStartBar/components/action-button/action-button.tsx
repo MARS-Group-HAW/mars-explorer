@@ -13,6 +13,7 @@ function ActionButton({ children, isLoading, icon, ...props }: Props) {
       size="small"
       color="default"
       endIcon={!isLoading && icon}
+      style={{ height: 28 }}
       {...props}
     >
       {children}

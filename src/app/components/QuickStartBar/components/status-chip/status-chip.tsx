@@ -1,5 +1,11 @@
 import * as React from "react";
-import { Chip, Tooltip, Typography } from "@material-ui/core";
+import {
+  Chip,
+  ChipProps,
+  CircularProgress,
+  Tooltip,
+  Typography,
+} from "@material-ui/core";
 import DoneIcon from "@material-ui/icons/Done";
 import ErrorIcon from "@material-ui/icons/Error";
 import HelpIcon from "@material-ui/icons/Help";
@@ -31,6 +37,8 @@ const getIconByStatus = (status: ValidationState) => {
       return <DoneIcon style={style} />;
     case ValidationState.INVALID:
       return <ErrorIcon style={style} />;
+    case ValidationState.LOADING:
+      return <CircularProgress size={18} />;
     case ValidationState.UNKNOWN:
     default:
       return <HelpIcon />;
@@ -47,15 +55,29 @@ function StatusChip({ label, status, errors }: Props) {
       case ValidationState.INVALID:
         return classes.invalid;
       case ValidationState.UNKNOWN:
+      case ValidationState.LOADING:
       default:
         return "";
     }
   };
 
+  const variantByState = (): ChipProps["variant"] => {
+    switch (status) {
+      case ValidationState.VALID:
+      case ValidationState.INVALID:
+        return "outlined";
+      case ValidationState.UNKNOWN:
+      case ValidationState.LOADING:
+      default:
+        return "default";
+    }
+  };
+
   const chip = (
     <Chip
+      style={{ height: 30 }}
       className={classNameByStatus()}
-      variant={status === ValidationState.UNKNOWN ? "default" : "outlined"}
+      variant={variantByState()}
       label={label}
       icon={getIconByStatus(status)}
     />
