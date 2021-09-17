@@ -11,13 +11,16 @@ import { ModelsJson } from "./types/ModelsJson";
 import { ModelRef, WorkingModel } from "@shared/types/Model";
 import installExtension, {
   REACT_DEVELOPER_TOOLS,
-  REDUX_DEVTOOLS,
 } from "electron-devtools-installer";
 import FileRef from "./types/FileRef";
 import ModelFile from "./types/ModelFile";
 import * as child_process from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import { handleSimulationProgress } from "./handle-simulation-progress";
+import { IFileRef } from "@shared/types/File";
+import { Tail } from "tail";
+import Papa, { ParseConfig, Parser, ParseResult } from "papaparse";
+import { ParseCompleteNotification } from "@shared/types/ParseCompleteNotification";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -89,10 +92,12 @@ function createWindow() {
     installExtension(REACT_DEVELOPER_TOOLS, {
       loadExtensionOptions: { allowFileAccess: true },
     }),
+    /* disable because of errors
     installExtension(
       REDUX_DEVTOOLS,
       { loadExtensionOptions: { allowFileAccess: true } } //this is the key line
     ),
+     */
   ])
     .then((names) => console.log(`Added Extensions: ${names.join(", ")}`))
     .catch((err) => console.log("An error occurred: ", err));
@@ -190,20 +195,38 @@ ipcMain.on(Channel.INSTALL_MARS, (_, path: string) => {
   });
 });
 
-const MODEL_FILE_EXTENSION = ".cs";
+enum FileExtensions {
+  CSHARP = ".cs",
+  CSV = ".csv",
+}
+
+function getFilesInDirWithExtension(
+  dir: string,
+  ext: FileExtensions
+): string[] {
+  return fs
+    .readdirSync(dir)
+    .filter(
+      (fileName) =>
+        path.extname(fileName).toLowerCase() === ext.toLocaleLowerCase()
+    )
+    .map((fileName) => path.resolve(dir, fileName));
+}
 
 ipcMain.handle(
   Channel.GET_USER_PROJECT,
   (_, modelRef: ModelRef): WorkingModel => {
-    return fs
-      .readdirSync(modelRef.path)
-      .filter(
-        (file) => path.extname(file).toLowerCase() === MODEL_FILE_EXTENSION
-      )
-      .map((file) => path.resolve(modelRef.path, file))
-      .map((file) => new ModelFile(file));
+    return getFilesInDirWithExtension(modelRef.path, FileExtensions.CSHARP).map(
+      (file) => new ModelFile(file)
+    );
   }
 );
+
+ipcMain.handle(Channel.GET_CSV_RESULTS, (_, path: string): IFileRef[] => {
+  return getFilesInDirWithExtension(path, FileExtensions.CSV).map(
+    (file) => new FileRef(file)
+  );
+});
 
 ipcMain.handle(Channel.GET_DEFAULT_CONFIG_PATH, (_, rootPath: string): string =>
   path.resolve(rootPath, "config.json")
@@ -343,5 +366,89 @@ ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
 
     mainWindow.webContents.send(Channel.EXITED, exitState);
     cleanupHandler();
+  });
+});
+
+const generalPapaConfig: ParseConfig = {
+  delimiter: ",", // auto-detect
+  quoteChar: '"',
+  escapeChar: '"',
+  dynamicTyping: true,
+  header: false,
+};
+
+const watchPapaConfig: ParseConfig = {
+  ...generalPapaConfig,
+  header: false,
+};
+
+ipcMain.on(Channel.ANALYSIS_WATCH_RESULT, (_, filePath: string): void => {
+  const tail: Tail = new Tail(filePath, { fromBeginning: true });
+
+  let sentHeader = false;
+  tail.on("line", (data: string) => {
+    const results = Papa.parse(data, watchPapaConfig);
+    const resultData = results.data[0];
+
+    if (!sentHeader) {
+      mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_HEADER, resultData);
+      sentHeader = true;
+    } else {
+      mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_ROW, resultData);
+    }
+  });
+
+  tail.on("error", function (error) {
+    console.log("ERROR: ", error); // TODO
+  });
+});
+
+const lastResultPapaConfig: ParseConfig = {
+  ...generalPapaConfig,
+  header: true,
+  transformHeader: (headerStr) => headerStr.trim(),
+  worker: true,
+};
+
+ipcMain.on(Channel.ANALYSIS_GET_LAST_RESULT, (_, filePath: string): void => {
+  const file = fs.createReadStream(filePath);
+
+  let parserInstance: Parser;
+
+  log.info(`Parsing results in ${filePath}`);
+
+  const handleAbort = () => {
+    parserInstance.abort();
+    log.info(`Parsing of ${filePath} has been aborted by the user.`);
+  };
+
+  ipcMain.on(Channel.ANALYSIS_ABORT_GET_LAST_RESULT, handleAbort);
+
+  const handleChunk = (results: ParseResult<unknown>, parser: Parser) => {
+    if (!parserInstance) parserInstance = parser;
+
+    mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_ROW, results.data);
+  };
+
+  const handleCompletion = (results: ParseResult<unknown>, file?: File) => {
+    const hasBeenAborted = Boolean(results?.meta?.aborted);
+    log.info(`Parsing completed (aborted: ${hasBeenAborted.toString()})`);
+
+    const notification: ParseCompleteNotification = {
+      aborted: hasBeenAborted,
+      name: path.basename(file?.path),
+      path: file?.path,
+    };
+
+    mainWindow.webContents.send(Channel.ANALYSIS_RESULT_END, notification);
+    console.timeEnd(Channel.ANALYSIS_GET_LAST_RESULT);
+    ipcMain.removeListener(Channel.ANALYSIS_ABORT_GET_LAST_RESULT, handleAbort);
+  };
+
+  console.time(Channel.ANALYSIS_GET_LAST_RESULT);
+  Papa.parse(file, {
+    ...lastResultPapaConfig,
+    chunk: handleChunk,
+    complete: handleCompletion,
   });
 });

@@ -20,6 +20,7 @@ module.exports = {
     "import/no-named-as-default": "off",
     "no-plusplus": "off",
     "no-param-reassign": "off",
+    "no-case-declarations": "off",
   },
   plugins: ["react"],
   settings: {
