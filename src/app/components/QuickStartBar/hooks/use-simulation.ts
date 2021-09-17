@@ -2,6 +2,11 @@ import { Channel } from "@shared/types/Channel";
 import { useEffectOnce } from "react-use";
 import { useEffect, useState } from "react";
 import { SimulationStates } from "@shared/types/SimulationStates";
+import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
+import {
+  selectSimulationState,
+  setSimulationState,
+} from "../utils/simulation-slice";
 
 type State = {
   simState: SimulationStates;
@@ -12,7 +17,11 @@ type State = {
 };
 
 function useSimulation(): State {
-  const [simState, setSimState] = useState(SimulationStates.NONE);
+  const dispatch = useAppDispatch();
+  const simState = useAppSelector(selectSimulationState);
+  const setSimState = (newState: SimulationStates) =>
+    dispatch(setSimulationState(newState));
+
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string>();
 
