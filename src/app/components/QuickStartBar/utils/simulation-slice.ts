@@ -28,7 +28,9 @@ export const { setSimulationState } = simulationSlice.actions;
 // Other code such as selectors can use the imported `RootState` type
 export const selectSimulationState = (state: RootState) =>
   state.simulation.simulationState;
-export const selectHasSimulationFinished = (state: RootState) =>
+export const selectSimulationRunningStatus = (state: RootState) =>
+  state.simulation.simulationState === SimulationStates.RUNNING;
+export const selectSimulationFinishedStatus = (state: RootState) =>
   state.simulation.simulationState === SimulationStates.SUCCESS;
 
 export default simulationSlice.reducer;

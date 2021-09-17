@@ -1,5 +1,60 @@
-type State = void;
+import { IFileRef } from "@shared/types/File";
+import { useEffect, useMemo } from "react";
+import _ from "lodash";
+import useCsvList from "./use-csv-list";
+import { ResultDataPerObject } from "../utils/ResultData";
+import useResultDataPerObject from "./use-result-data-per-object";
+import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
+import {
+  resetAll,
+  selectAnalyzeData,
+  setResultFiles,
+} from "../utils/analyze-slice";
 
-function useAnalyze(): State {}
+type State = {
+  files: IFileRef[];
+  selectedFiles: IFileRef[];
+  toggleFile: (file: IFileRef) => void;
+  showListLoading: boolean;
+  data: ResultDataPerObject;
+};
+
+function useAnalyze(): State {
+  const dispatch = useAppDispatch();
+
+  const data = useAppSelector(selectAnalyzeData);
+
+  const { loading, files, selectedFiles, toggleFile, isFileSelected } =
+    useCsvList();
+
+  useEffect(() => {
+    dispatch(resetAll());
+    dispatch(setResultFiles({ files }));
+  }, [files]);
+
+  const { fetchData } = useResultDataPerObject();
+
+  const handleToggle = (file: IFileRef) => {
+    const isSelected = isFileSelected(file);
+
+    if (!isSelected && data[file.name]?.data.length === 0) {
+      fetchData(file);
+    }
+    toggleFile(file);
+  };
+
+  const filteredData = useMemo(() => {
+    const selectedKeys = selectedFiles.map((file) => file.name);
+    return _.pickBy(data, (value, key) => selectedKeys.includes(key));
+  }, [selectedFiles, data]);
+
+  return {
+    data: filteredData,
+    files,
+    selectedFiles,
+    toggleFile: handleToggle,
+    showListLoading: loading,
+  };
+}
 
 export default useAnalyze;

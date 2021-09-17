@@ -1,5 +1,4 @@
 import { Channel } from "@shared/types/Channel";
-import { useEffectOnce } from "react-use";
 import { useEffect, useState } from "react";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
@@ -7,6 +6,7 @@ import {
   selectSimulationState,
   setSimulationState,
 } from "../utils/simulation-slice";
+import useChannelSubscription from "../../../utils/hooks/use-channel-subscription";
 
 type State = {
   simState: SimulationStates;
@@ -34,24 +34,18 @@ function useSimulation(): State {
     window.api.send(Channel.TERMINATE_SIMULATION);
   }
 
-  useEffectOnce(() =>
-    window.api.on<number>(Channel.SIMULATION_PROGRESS, (msg: number) => {
-      setSimState(SimulationStates.RUNNING);
-      setProgress(msg);
-    })
-  );
+  useChannelSubscription(Channel.SIMULATION_PROGRESS, (msg: number) => {
+    setSimState(SimulationStates.RUNNING);
+    setProgress(msg);
+  });
 
-  useEffectOnce(() =>
-    window.api.on(Channel.SIMULATION_FAILED, (e: Error) => {
-      const errMsg = e.toString();
-      window.api.logger.error("Simulation Error: ", errMsg);
-      setError(errMsg);
-    })
-  );
+  useChannelSubscription(Channel.SIMULATION_FAILED, (e: Error) => {
+    const errMsg = e.toString();
+    window.api.logger.error("Simulation Error: ", errMsg);
+    setError(errMsg);
+  });
 
-  useEffectOnce(() =>
-    window.api.on<SimulationStates>(Channel.EXITED, setSimState)
-  );
+  useChannelSubscription(Channel.EXITED, setSimState);
 
   useEffect(() => {
     if (simState !== SimulationStates.RUNNING) {

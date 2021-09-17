@@ -3,12 +3,17 @@ import { DataCallback, Message, MessageReader } from "vscode-jsonrpc";
 import { Disposable } from "monaco-languageclient";
 import dummyDisposable from "./DummyDisposable";
 
+// TODO: dispose
 export default class RendererIpcMessageReader implements MessageReader {
   private subscribers: DataCallback[] = [];
 
+  private unsubscribeFn: () => void;
+
   constructor(private channel: string) {
     // listen to incoming language server notifications and messages from the backend
-    window.api.on<Message>(this.channel, (msg) => this.notifySubscribers(msg));
+    this.unsubscribeFn = window.api.on<Message>(this.channel, (msg) =>
+      this.notifySubscribers(msg)
+    );
   }
 
   // events are not implemented for this example
@@ -23,8 +28,9 @@ export default class RendererIpcMessageReader implements MessageReader {
     return dummyDisposable();
   }
 
-  // eslint-disable-next-line class-methods-use-this
-  public dispose(): void {}
+  public dispose(): void {
+    this.unsubscribeFn();
+  }
 
   private notifySubscribers = (msg: Message) => {
     this.subscribers.forEach((s) => s(msg));

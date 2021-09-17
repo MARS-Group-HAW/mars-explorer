@@ -1,0 +1,71 @@
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { IFileRef } from "@shared/types/File";
+import type { RootState } from "../../../utils/store";
+import ResultData, { ResultDataPerObject } from "./ResultData";
+
+type State = ResultDataPerObject;
+
+// Define the initial state using that type
+const initialState: State = {};
+
+export const analyzeSlice = createSlice({
+  name: "analyze",
+  // `createSlice` will infer the state type from the `initialState` argument
+  initialState,
+  reducers: {
+    setResultFiles: (state, action: PayloadAction<{ files: IFileRef[] }>) => {
+      action.payload.files.forEach((file) => {
+        state[file.name] = {
+          file: file.path,
+          data: [],
+          isLoading: false,
+        };
+      });
+    },
+    setData: (
+      state,
+      action: PayloadAction<{ name: string; data: ResultData }>
+    ) => {
+      const { name, data } = action.payload;
+      state[name].data = data;
+    },
+    addData: (
+      state,
+      action: PayloadAction<{ name: string; data: ResultData }>
+    ) => {
+      const { name, data } = action.payload;
+      state[name].isLoading = true;
+      state[name].data = state[name].data.concat(data);
+    },
+    setDataLoadingCompleted: (
+      state,
+      action: PayloadAction<{ name: string }>
+    ) => {
+      const { name } = action.payload;
+      state[name].isLoading = false;
+    },
+    resetAll: (state) => {
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      state = initialState;
+    },
+    resetData: (state, action: PayloadAction<{ name: string }>) => {
+      state[action.payload.name].data = [];
+    },
+  },
+});
+
+export const {
+  setResultFiles,
+  setData,
+  addData,
+  setDataLoadingCompleted,
+  resetAll,
+  resetData,
+} = analyzeSlice.actions;
+
+// Other code such as selectors can use the imported `RootState` type
+export const selectAnalyzeData = (state: RootState) => state.analyze;
+export const selectAnalyzeAnyFileFetching = (state: RootState) =>
+  Object.values(state.analyze).some((file) => file.isLoading);
+
+export default analyzeSlice.reducer;

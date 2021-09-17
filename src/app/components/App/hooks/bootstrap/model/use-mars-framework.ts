@@ -1,5 +1,5 @@
 import { Channel } from "@shared/types/Channel";
-import { useBoolean, useEffectOnce } from "react-use";
+import { useBoolean } from "react-use";
 import { useEffect } from "react";
 import useLoadingStep from "../../../../../utils/hooks/use-loading-step";
 import LoadingSteps from "../../../../Model/utils/LoadingSteps";
@@ -8,6 +8,7 @@ import {
   finishLoadingStep,
   resetLoadingStep,
 } from "../../../../Model/utils/model-slice";
+import useChannelSubscription from "../../../../../utils/hooks/use-channel-subscription";
 
 function useMarsFramework(path?: string) {
   const [isLoading, setIsLoading] = useBoolean(true);
@@ -25,9 +26,7 @@ function useMarsFramework(path?: string) {
 
   useEffect(installMars, [path]);
 
-  useEffectOnce(() =>
-    window.api.on(Channel.MARS_INSTALLED, handleMarsInstallation)
-  );
+  useChannelSubscription(Channel.MARS_INSTALLED, handleMarsInstallation);
 
   useLoadingStep<LoadingSteps>({
     step: LoadingSteps.MARS_FRAMEWORK_ADDED,

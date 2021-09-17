@@ -1,5 +1,5 @@
-import { useEffect } from "react";
 import { Channel } from "@shared/types/Channel";
+import useChannelSubscription from "../../../utils/hooks/use-channel-subscription";
 
 function useCheckForDotNet() {
   const onDotnetNotFound = () => {
@@ -10,9 +10,7 @@ function useCheckForDotNet() {
     );
   };
 
-  useEffect(() => {
-    window.api.on(Channel.DOTNET_NOT_FOUND, onDotnetNotFound);
-  }, []);
+  useChannelSubscription(Channel.DOTNET_NOT_FOUND, onDotnetNotFound);
 }
 
 export default useCheckForDotNet;
