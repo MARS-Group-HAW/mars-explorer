@@ -35,52 +35,52 @@ function useQuickStartBar(): State {
     ValidationState.UNKNOWN
   );
 
-  useEffect(() => {
-    if (!isProjectFullyInitialized) {
-      setModelValidationState(ValidationState.UNKNOWN);
-      return;
-    }
+  const [configValidationState, setConfigValidationState] = useState(
+    ValidationState.UNKNOWN
+  );
 
-    if (hasErrorsIn.length === 0) {
-      setModelValidationState(ValidationState.VALID);
+  const handleValidation = (
+    setStateFn: (valState: ValidationState) => void,
+    hasErrors: boolean
+  ) => {
+    if (!isProjectDefined) {
+      setStateFn(ValidationState.UNKNOWN);
+    } else if (!isProjectFullyInitialized) {
+      setStateFn(ValidationState.LOADING);
+    } else if (hasErrors) {
+      setStateFn(ValidationState.INVALID);
     } else {
-      setModelValidationState(ValidationState.INVALID);
+      setStateFn(ValidationState.VALID);
     }
-  }, [hasErrorsIn, isProjectFullyInitialized]);
-
-  const isConfigValid = true; // TODO
-
-  const determineValidationState = (isValid: boolean): ValidationState => {
-    if (!isProjectDefined) return ValidationState.UNKNOWN;
-
-    return isValid ? ValidationState.VALID : ValidationState.INVALID;
   };
+
+  useEffect(() => {
+    handleValidation(setModelValidationState, hasErrorsIn.length > 0);
+    handleValidation(setConfigValidationState, false);
+  }, [path, hasErrorsIn, isProjectFullyInitialized]);
 
   const handleStart = () => runSimulation(path);
   const handleStop = () => cancelSimulation();
 
-  const configState = determineValidationState(isConfigValid);
-
   const isAllValid =
     modelValidationState === ValidationState.VALID &&
-    configState === ValidationState.VALID &&
-    isConfigValid;
+    configValidationState === ValidationState.VALID;
 
-  const isRunning = simState === SimulationStates.RUNNING;
+  const isRunning =
+    simState === SimulationStates.RUNNING ||
+    simState === SimulationStates.STARTED;
   const disableStart = !isAllValid || isRunning;
   const disableStop = !isAllValid || !isRunning;
 
   return {
     projectName: name || "No project selected",
     modelState: modelValidationState,
+    configState: configValidationState,
+    simState,
     progress,
-    showProgress:
-      simState === SimulationStates.STARTED ||
-      simState === SimulationStates.RUNNING,
+    showProgress: isRunning,
     modelErrorFiles:
       modelValidationState === ValidationState.INVALID && hasErrorsIn,
-    configState,
-    simState,
     disableStart,
     disableStop,
     handleStart,

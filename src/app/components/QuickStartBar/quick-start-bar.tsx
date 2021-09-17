@@ -75,7 +75,7 @@ function QuickStartBar() {
       >
         Stop
       </ActionButton>
-      <div style={{ display: "flex" }}>
+      <div style={{ display: "flex", width: 40 }}>
         {!showProgress && getElBySimState(simState)}
         {showProgress && (
           <CircularProgressWithLabel
