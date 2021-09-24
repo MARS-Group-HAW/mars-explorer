@@ -10,14 +10,17 @@ export type ResultDatum = {
   [key: string]: string | number;
 };
 
-type ResultData = ResultDatum[];
+export type ResultData = ResultDatum[];
+
+export type ResultDataWithMeta = {
+  file: string;
+  data: ResultData;
+  isLoading: boolean;
+  hasCompleted: boolean;
+};
 
 export type ResultDataPerObject = {
-  [key: string]: {
-    file: string;
-    data: ResultData;
-    isLoading: boolean;
-  };
+  [key: string]: ResultDataWithMeta;
 };
 
 export default ResultData;

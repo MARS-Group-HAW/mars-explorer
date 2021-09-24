@@ -10,7 +10,16 @@ type Props = {
 function LineChart({ rawData }: Props) {
   const { data } = useLineChart(rawData);
 
-  return <Line data={data} />;
+  return (
+    <Line
+      data={data}
+      options={{
+        // Turn off animations and data parsing for performance
+        // animation: false,
+        parsing: false,
+      }}
+    />
+  );
 }
 
 export default LineChart;
