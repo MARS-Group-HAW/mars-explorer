@@ -14,7 +14,10 @@ const store = configureStore({
     simulation: simulationReducer,
     analyze: analyzeReducer,
   },
-  // middleware: (getDefaultMiddleware) => getDefaultMiddleware().concat(logger),
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

@@ -1,4 +1,4 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice, freeze, PayloadAction } from "@reduxjs/toolkit";
 import { IFileRef } from "@shared/types/File";
 import type { RootState } from "../../../utils/store";
 import ResultData, { ResultDataPerObject } from "./ResultData";
@@ -19,6 +19,7 @@ export const analyzeSlice = createSlice({
           file: file.path,
           data: [],
           isLoading: false,
+          hasCompleted: false,
         };
       });
     },
@@ -34,8 +35,10 @@ export const analyzeSlice = createSlice({
       action: PayloadAction<{ name: string; data: ResultData }>
     ) => {
       const { name, data } = action.payload;
+      const freezedObjg = freeze(data);
       state[name].isLoading = true;
-      state[name].data = state[name].data.concat(data);
+      state[name].hasCompleted = false;
+      state[name].data.push(...freezedObjg);
     },
     setDataLoadingCompleted: (
       state,
@@ -43,6 +46,7 @@ export const analyzeSlice = createSlice({
     ) => {
       const { name } = action.payload;
       state[name].isLoading = false;
+      state[name].hasCompleted = true;
     },
     resetAll: (state) => {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -50,6 +54,7 @@ export const analyzeSlice = createSlice({
     },
     resetData: (state, action: PayloadAction<{ name: string }>) => {
       state[action.payload.name].data = [];
+      state[action.payload.name].hasCompleted = false;
     },
   },
 });

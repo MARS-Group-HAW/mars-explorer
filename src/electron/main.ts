@@ -426,8 +426,12 @@ ipcMain.on(Channel.ANALYSIS_GET_LAST_RESULT, (_, filePath: string): void => {
 
   const handleChunk = (results: ParseResult<unknown>, parser: Parser) => {
     if (!parserInstance) parserInstance = parser;
-
-    mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_ROW, results.data);
+    parser.pause();
+    setTimeout(() => {
+      log.debug("Sending now!", (results.data[0] as any).Step);
+      mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_ROW, results.data);
+      parser.resume();
+    }, 100);
   };
 
   const handleCompletion = (results: ParseResult<unknown>, file?: File) => {
@@ -436,7 +440,7 @@ ipcMain.on(Channel.ANALYSIS_GET_LAST_RESULT, (_, filePath: string): void => {
 
     const notification: ParseCompleteNotification = {
       aborted: hasBeenAborted,
-      name: path.basename(file?.path),
+      name: file && path.basename(file.path),
       path: file?.path,
     };
 

@@ -16,6 +16,7 @@ import {
 
 type State = {
   fetchData: (file: IFileRef) => void;
+  abortFetching: (file: IFileRef) => void;
 };
 
 function useResultDataPerObject(): State {
@@ -42,6 +43,7 @@ function useResultDataPerObject(): State {
     const disposeFn = window.api.on<unknown[]>(
       Channel.ANALYSIS_SEND_CSV_ROW,
       (rawData) => {
+        window.api.logger.debug("receiving ...");
         dispatch(
           addDataToStore({
             name,
@@ -51,6 +53,11 @@ function useResultDataPerObject(): State {
       }
     );
     set(file.name, () => disposeFn());
+  };
+
+  const abortFetching = (file: IFileRef) => {
+    window.api.logger.info("Sending abort request for ", file.name);
+    window.api.send(Channel.ANALYSIS_ABORT_GET_LAST_RESULT);
   };
 
   const onFetchCompletion = (file: IFileRef, aborted: boolean) => {
@@ -82,6 +89,7 @@ function useResultDataPerObject(): State {
 
   return {
     fetchData,
+    abortFetching,
   };
 }
 

@@ -32,14 +32,18 @@ function useAnalyze(): State {
     dispatch(setResultFiles({ files }));
   }, [files]);
 
-  const { fetchData } = useResultDataPerObject();
+  const { fetchData, abortFetching } = useResultDataPerObject();
 
   const handleToggle = (file: IFileRef) => {
     const isSelected = isFileSelected(file);
+    const currentData = data[file.name];
 
-    if (!isSelected && data[file.name]?.data.length === 0) {
+    if (!isSelected && currentData?.data.length === 0) {
       fetchData(file);
+    } else if (isSelected && currentData?.isLoading) {
+      abortFetching(file);
     }
+
     toggleFile(file);
   };
 
