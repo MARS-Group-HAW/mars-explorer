@@ -1,6 +1,9 @@
 import { IFileRef } from "@shared/types/File";
 import { Channel } from "@shared/types/Channel";
-import { ParseCompleteNotification } from "@shared/types/ParseCompleteNotification";
+import {
+  ParseCompleteNotification,
+  ParseResultMessage,
+} from "@shared/types/ParseCompleteNotification";
 import { useMap, useUnmount } from "react-use";
 import { useRef } from "react";
 import ResultData from "../utils/ResultData";
@@ -32,6 +35,14 @@ function useResultDataPerObject(): State {
   const getReference = useRef<(name: string) => DisposableFn>();
   getReference.current = get;
 
+  const handleResultMessage = ({ name, data }: ParseResultMessage) =>
+    dispatch(
+      addDataToStore({
+        name,
+        data: data as ResultData,
+      })
+    );
+
   const fetchData = (file: IFileRef) => {
     const { name, path } = file;
 
@@ -41,16 +52,9 @@ function useResultDataPerObject(): State {
     }
 
     // FIXME window.api.send(Channel.ANALYSIS_WATCH_RESULT, path);
-    const disposeFn = window.api.on<unknown[]>(
+    const disposeFn = window.api.on<ParseResultMessage>(
       Channel.ANALYSIS_SEND_CSV_ROW,
-      (rawData) => {
-        dispatch(
-          addDataToStore({
-            name,
-            data: rawData as ResultData,
-          })
-        );
-      }
+      handleResultMessage
     );
     set(file.name, () => disposeFn());
   };
@@ -60,26 +64,22 @@ function useResultDataPerObject(): State {
     window.api.send(Channel.ANALYSIS_ABORT_GET_LAST_RESULT);
   };
 
-  const onFetchCompletion = (file: IFileRef, aborted: boolean) => {
+  const handleCompletion = ({ name, aborted }: ParseCompleteNotification) => {
     window.api.logger.info(
-      `Fetching of ${file.name} completed (aborted: ${aborted}).`
+      `Fetching of ${name} completed (aborted: ${aborted}).`
     );
-    dispatch(setDataLoadingCompleted({ name: file.name }));
+    dispatch(setDataLoadingCompleted({ name }));
 
-    const disposeFn = getReference.current(file.name);
+    const disposeFn = getReference.current(name);
 
     if (disposeFn) {
       disposeFn();
     } else {
-      window.api.logger.warn(`No dispose function for ${file.name} found.`);
+      window.api.logger.warn(`No dispose function for ${name} found.`);
     }
   };
 
-  useChannelSubscription(
-    Channel.ANALYSIS_RESULT_END,
-    ({ name, path, aborted }: ParseCompleteNotification) =>
-      onFetchCompletion({ path, name }, aborted)
-  );
+  useChannelSubscription(Channel.ANALYSIS_RESULT_END, handleCompletion);
 
   useUnmount(
     () =>

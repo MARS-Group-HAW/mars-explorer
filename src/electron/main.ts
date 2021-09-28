@@ -20,7 +20,10 @@ import { handleSimulationProgress } from "./handle-simulation-progress";
 import { IFileRef } from "@shared/types/File";
 import { Tail } from "tail";
 import Papa, { ParseConfig, Parser, ParseResult } from "papaparse";
-import { ParseCompleteNotification } from "@shared/types/ParseCompleteNotification";
+import {
+  ParseCompleteNotification,
+  ParseResultMessage,
+} from "@shared/types/ParseCompleteNotification";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -411,7 +414,22 @@ const lastResultPapaConfig: ParseConfig = {
 };
 
 ipcMain.on(Channel.ANALYSIS_GET_LAST_RESULT, (_, filePath: string): void => {
-  const file = fs.createReadStream(filePath);
+  const fileName = path.basename(filePath);
+  const fileStream = fs.createReadStream(filePath);
+
+  const sendResults = (data: Omit<ParseResultMessage, "name">) =>
+    mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_ROW, {
+      ...data,
+      name: fileName,
+    } as ParseResultMessage);
+
+  const sendCompletion = (
+    notification: Omit<ParseCompleteNotification, "name" | "path">
+  ) =>
+    mainWindow.webContents.send(Channel.ANALYSIS_RESULT_END, {
+      ...notification,
+      name: fileName,
+    } as ParseCompleteNotification);
 
   let parserInstance: Parser;
 
@@ -425,32 +443,29 @@ ipcMain.on(Channel.ANALYSIS_GET_LAST_RESULT, (_, filePath: string): void => {
   ipcMain.on(Channel.ANALYSIS_ABORT_GET_LAST_RESULT, handleAbort);
 
   const handleChunk = (results: ParseResult<unknown>, parser: Parser) => {
+    log.info("Results from: ", filePath);
     if (!parserInstance) parserInstance = parser;
     parser.pause();
     setTimeout(() => {
-      log.debug("Sending now!", (results.data[0] as any).Step);
-      mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_ROW, results.data);
+      sendResults({ data: results.data });
       parser.resume();
     }, 100);
   };
 
-  const handleCompletion = (results: ParseResult<unknown>, file?: File) => {
+  const handleCompletion = (results: ParseResult<unknown>) => {
+    log.info("Results from: ", filePath);
     const hasBeenAborted = Boolean(results?.meta?.aborted);
     log.info(`Parsing completed (aborted: ${hasBeenAborted.toString()})`);
 
-    const notification: ParseCompleteNotification = {
+    sendCompletion({
       aborted: hasBeenAborted,
-      name: file && path.basename(file.path),
-      path: file?.path,
-    };
-
-    mainWindow.webContents.send(Channel.ANALYSIS_RESULT_END, notification);
+    });
     console.timeEnd(Channel.ANALYSIS_GET_LAST_RESULT);
     ipcMain.removeListener(Channel.ANALYSIS_ABORT_GET_LAST_RESULT, handleAbort);
   };
 
   console.time(Channel.ANALYSIS_GET_LAST_RESULT);
-  Papa.parse(file, {
+  Papa.parse(fileStream, {
     ...lastResultPapaConfig,
     chunk: handleChunk,
     complete: handleCompletion,
