@@ -1,5 +1,11 @@
-export type ParseCompleteNotification = {
+type ParseMessage = {
   name: string;
-  path: string;
+};
+
+export type ParseCompleteNotification = ParseMessage & {
   aborted: boolean;
+};
+
+export type ParseResultMessage = ParseMessage & {
+  data: unknown[];
 };
