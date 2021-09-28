@@ -1,13 +1,13 @@
 import { IFileRef } from "@shared/types/File";
-import { useEffect, useMemo } from "react";
-import _ from "lodash";
+import { useEffect } from "react";
+import { useDeepCompareEffect } from "react-use";
 import useCsvList from "./use-csv-list";
-import { ResultDataPerObject } from "../utils/ResultData";
 import useResultDataPerObject from "./use-result-data-per-object";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
   resetAll,
   selectAnalyzeData,
+  selectLoadingFiles,
   setResultFiles,
 } from "../utils/analyze-slice";
 
@@ -16,13 +16,20 @@ type State = {
   selectedFiles: IFileRef[];
   toggleFile: (file: IFileRef) => void;
   showListLoading: boolean;
-  data: ResultDataPerObject;
+  isFileChecked: (fileName: string) => boolean;
+  isFileLoading: (fileName: string) => boolean;
 };
 
 function useAnalyze(): State {
   const dispatch = useAppDispatch();
 
   const data = useAppSelector(selectAnalyzeData);
+  const loadingFiles = useAppSelector(selectLoadingFiles);
+
+  useDeepCompareEffect(
+    () => window.api.logger.info(loadingFiles),
+    [loadingFiles]
+  );
 
   const { loading, files, selectedFiles, toggleFile, isFileSelected } =
     useCsvList();
@@ -47,16 +54,16 @@ function useAnalyze(): State {
     toggleFile(file);
   };
 
-  const filteredData = useMemo(() => {
-    const selectedKeys = selectedFiles.map((file) => file.name);
-    return _.pickBy(data, (value, key) => selectedKeys.includes(key));
-  }, [selectedFiles, data]);
+  const isFileChecked = (fileName: string) =>
+    Boolean(selectedFiles.find((file) => file.name === fileName));
+  const isFileLoading = (fileName: string) => loadingFiles.includes(fileName);
 
   return {
-    data: filteredData,
     files,
     selectedFiles,
     toggleFile: handleToggle,
+    isFileLoading,
+    isFileChecked,
     showListLoading: loading,
   };
 }

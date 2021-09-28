@@ -1,0 +1,26 @@
+@startuml
+scale 600 width
+[*] --> NotShooting
+
+state PageOpenning {
+  [*] --> ResultDataPerObject
+  ResultDataPerObject: {}
+}
+
+state FileSelecting {
+  [*] -->
+
+}
+
+state FetchingData {
+  [*] --> NewValueSelection
+  NewValueSelection --> NewValuePreview : EvNewValue
+  NewValuePreview --> NewValueSelection : EvNewValueRejected
+  NewValuePreview --> NewValueSelection : EvNewValueSaved
+
+  state NewValuePreview {
+     State1 -> State2
+  }
+
+}
+@enduml
