@@ -1,25 +1,15 @@
 import * as React from "react";
 import { Line } from "react-chartjs-2";
 import useLineChart from "./line-chart.hook";
-import { ResultDataPerObject } from "../../utils/ResultData";
 
 type Props = {
-  rawData: ResultDataPerObject;
+  files: string[];
 };
 
-function LineChart({ rawData }: Props) {
-  const { data } = useLineChart(rawData);
+function LineChart({ files }: Props) {
+  const { data } = useLineChart(files);
 
-  return (
-    <Line
-      data={data}
-      options={{
-        // Turn off animations and data parsing for performance
-        // animation: false,
-        parsing: false,
-      }}
-    />
-  );
+  return <Line data={data} />;
 }
 
 export default LineChart;

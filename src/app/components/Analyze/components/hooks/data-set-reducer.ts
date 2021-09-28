@@ -1,8 +1,8 @@
-import { createAction, createReducer } from "@reduxjs/toolkit";
+import { createAction, createReducer, current } from "@reduxjs/toolkit";
 import _ from "lodash";
 import ResultData from "../../utils/ResultData";
 
-type State = {
+type SingleState = {
   currentStep: number;
   indexOfPrevStepEnd: number;
   data: number[];
@@ -13,15 +13,26 @@ type State = {
   };
 };
 
-export const initialState: State = {
+type State = {
+  [key: string]: SingleState;
+};
+
+export const initialState: State = {};
+const initialSingleState: SingleState = {
   currentStep: 0,
   indexOfPrevStepEnd: 0,
   data: [],
   lastResult: {},
 };
 
-const addLiveData = createAction<ResultData, "addLiveData">("addLiveData");
-const addLastData = createAction<void, "addLastData">("addLastData");
+const initFile = createAction<{ name: string }, "initFile">("initFile");
+const addLiveData = createAction<
+  { name: string; data: ResultData },
+  "addLiveData"
+>("addLiveData");
+const addLastData = createAction<{ name: string }, "addLastData">(
+  "addLastData"
+);
 
 function getIndices(
   steps: number[],
@@ -39,14 +50,21 @@ const getStepsOnly = (data: ResultData) => data.map((datum) => datum.Step);
 
 const reducer = createReducer(initialState, (builder) =>
   builder
+    .addCase(initFile, (state, { payload }) => {
+      const { name } = payload;
+
+      if (state[name]) return;
+
+      state[name] = initialSingleState;
+    })
     .addCase(addLiveData, (state, { payload }) => {
-      if (payload.length === 0) return;
+      const { name, data } = payload;
 
-      state.lastResult = {}; // reset last result
+      if (data.length === 0) return;
 
-      const lastStepInData = getLastStep(payload); // 2
-      const steps = getStepsOnly(payload); // [0,0,0,1,1,1,2,2,2]
-      const { indexOfPrevStepEnd, currentStep } = state; // 0
+      const lastStepInData = getLastStep(data); // 2
+      const steps = getStepsOnly(data); // [0,0,0,1,1,1,2,2,2]
+      const { indexOfPrevStepEnd, currentStep } = state[name]; // 0
 
       for (
         let i = currentStep, newIndexOfPrevStepEnd = indexOfPrevStepEnd;
@@ -59,28 +77,32 @@ const reducer = createReducer(initialState, (builder) =>
           newIndexOfPrevStepEnd
         );
 
+        state[name].currentStep = i;
+
         // we cannot be sure if these are the last steps
         if (i < lastStepInData) {
-          state.currentStep = i + 1;
-          state.indexOfPrevStepEnd = end;
-          state.data.push(allCurrentStepsLength);
+          state[name].indexOfPrevStepEnd = end;
+          state[name].data.push(allCurrentStepsLength);
         } else {
           // preserve last result in case it's the last
-          state.lastResult.currentStep = i;
-          state.lastResult.indexOfPrevStepEnd = end;
-          state.lastResult.data = allCurrentStepsLength;
+          state[name].lastResult.currentStep = i;
+          state[name].lastResult.indexOfPrevStepEnd = end;
+          state[name].lastResult.data = allCurrentStepsLength;
         }
         newIndexOfPrevStepEnd = end;
       }
     })
-    .addCase(addLastData, (state) => {
-      const { currentStep, indexOfPrevStepEnd, data } = state.lastResult;
-      state.currentStep = currentStep;
-      state.indexOfPrevStepEnd = indexOfPrevStepEnd;
-      state.data.push(data);
+    .addCase(addLastData, (state, { payload }) => {
+      const { name } = payload;
+
+      const { currentStep, indexOfPrevStepEnd, data } = state[name].lastResult;
+      state[name].currentStep = currentStep;
+      state[name].indexOfPrevStepEnd = indexOfPrevStepEnd;
+      state[name].data.push(data);
+      state[name].lastResult = {};
     })
 );
 
-export { addLiveData, addLastData };
+export { addLiveData, addLastData, initFile };
 
 export default reducer;

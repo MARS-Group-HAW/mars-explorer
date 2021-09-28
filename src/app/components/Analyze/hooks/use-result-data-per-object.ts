@@ -14,21 +14,22 @@ import {
   setDataLoadingCompleted,
 } from "../utils/analyze-slice";
 
+type DisposableFn = () => void;
+type DisposableFnMap = { [key: string]: DisposableFn };
+
 type State = {
   fetchData: (file: IFileRef) => void;
   abortFetching: (file: IFileRef) => void;
 };
 
 function useResultDataPerObject(): State {
+  const dispatch = useAppDispatch();
   const isSimulationRunning = useAppSelector(selectSimulationRunningStatus);
   const isAnyFileFetching = useAppSelector(selectAnalyzeAnyFileFetching);
-  const dispatch = useAppDispatch();
 
-  const [, { set, get }] = useMap<{
-    [key: string]: () => void;
-  }>({});
+  const [, { set, get }] = useMap<DisposableFnMap>({});
 
-  const getReference = useRef<(name: string) => () => void>();
+  const getReference = useRef<(name: string) => DisposableFn>();
   getReference.current = get;
 
   const fetchData = (file: IFileRef) => {
@@ -43,7 +44,6 @@ function useResultDataPerObject(): State {
     const disposeFn = window.api.on<unknown[]>(
       Channel.ANALYSIS_SEND_CSV_ROW,
       (rawData) => {
-        window.api.logger.debug("receiving ...");
         dispatch(
           addDataToStore({
             name,

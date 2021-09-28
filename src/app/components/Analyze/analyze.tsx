@@ -13,8 +13,14 @@ import useAnalyze from "./hooks";
 import LineChart from "./components/line-chart";
 
 const Analyze = () => {
-  const { data, files, selectedFiles, toggleFile, showListLoading } =
-    useAnalyze();
+  const {
+    files,
+    selectedFiles,
+    toggleFile,
+    isFileLoading,
+    isFileChecked,
+    showListLoading,
+  } = useAnalyze();
 
   return (
     <Grid container style={{ height: "100%" }}>
@@ -22,7 +28,6 @@ const Analyze = () => {
         <List>
           {files.map((value) => {
             const labelId = `checkbox-list-secondary-label-${value.name}`;
-            const isLoading = data[value.name]?.isLoading;
             return (
               <ListItem
                 key={value.name}
@@ -30,7 +35,7 @@ const Analyze = () => {
                 onClick={() => toggleFile(value)}
               >
                 <ListItemIcon>
-                  {isLoading && (
+                  {isFileLoading(value.name) && (
                     <CircularProgress variant="indeterminate" size={15} />
                   )}
                 </ListItemIcon>
@@ -38,7 +43,7 @@ const Analyze = () => {
                 <ListItemSecondaryAction>
                   <Checkbox
                     edge="end"
-                    checked={selectedFiles.indexOf(value) !== -1}
+                    checked={isFileChecked(value.name)}
                     onChange={() => toggleFile(value)}
                     inputProps={{ "aria-labelledby": labelId }}
                   />
@@ -49,7 +54,7 @@ const Analyze = () => {
         </List>
       </Grid>
       <Grid item xs={9}>
-        <LineChart rawData={data} />
+        <LineChart files={selectedFiles.map((file) => file.name)} />
       </Grid>
     </Grid>
   );

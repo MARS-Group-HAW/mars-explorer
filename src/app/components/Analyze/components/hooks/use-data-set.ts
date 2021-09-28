@@ -1,41 +1,72 @@
 import _ from "lodash";
-import { useEffect, useReducer } from "react";
-import { useUpdateEffect } from "react-use";
-import ResultData, { ResultDataWithMeta } from "../../utils/ResultData";
+import { useEffect, useReducer, useState } from "react";
+import { useDeepCompareEffect, usePrevious } from "react-use";
+import { ChartData } from "chart.js";
 import reducer, {
   addLastData,
   addLiveData,
+  initFile,
   initialState,
 } from "./data-set-reducer";
+import {
+  selectAnalyzeData,
+  selectCompletedData,
+  selectKeys,
+} from "../../utils/analyze-slice";
+import { useAppSelector } from "../../../../utils/hooks/use-store";
 
 type State = {
-  xData: number[];
-  yData: number[];
+  data: ChartData;
 };
 
-function getYdata(data: ResultData): number[] {
-  const groupedByStep = _.groupBy(data, (rawDatum) => rawDatum.Step);
-  return Object.values(groupedByStep).map((arr) => arr.length);
-}
-
-function useDataSet(resultData: ResultDataWithMeta): State {
+function useDataSet(names: string[]): State {
   const [state, dispatch] = useReducer(reducer, initialState);
+  const dataByFileName = useAppSelector(selectAnalyzeData);
+  const allFiles = useAppSelector(selectKeys);
+  const completedFiles = useAppSelector(selectCompletedData);
+  const alreadyCompletedFiles = usePrevious(completedFiles);
+  const [xData, setXData] = useState([]);
 
   useEffect(() => {
-    if (!resultData) return;
+    if (!dataByFileName) return;
 
-    dispatch(addLiveData(resultData.data));
-    window.api.logger.info(state);
-  }, [resultData]);
+    names
+      .filter(
+        (name) =>
+          dataByFileName[name] &&
+          !dataByFileName[name].hasCompleted &&
+          dataByFileName[name].data
+      )
+      .forEach((name) => {
+        dispatch(addLiveData({ name, data: dataByFileName[name].data }));
+      });
+  }, [dataByFileName]);
 
-  // watch for loading changes
-  useUpdateEffect(() => {
-    console.log("loading changed to: ", resultData.isLoading); // will only show 1 and beyond
-  }, [resultData?.isLoading]);
+  useEffect(() => {
+    const lengths = Object.values(state).map((data) => data.data.length);
+    const maxSteps = _.max(lengths);
+    setXData(Array.from({ length: maxSteps }, (v, k) => k + 1));
+  }, [state]);
+
+  useDeepCompareEffect(() => {
+    const newlyCompleted = _.difference(completedFiles, alreadyCompletedFiles);
+    newlyCompleted.forEach((name) => dispatch(addLastData({ name })));
+  }, [completedFiles]);
+
+  useDeepCompareEffect(
+    () => allFiles.forEach((file) => dispatch(initFile({ name: file }))),
+    [allFiles]
+  );
 
   return {
-    xData: state.data,
-    yData: resultData ? getYdata(resultData.data) : [],
+    data: {
+      labels: xData,
+      datasets: Object.keys(state).map((key) => ({
+        label: `# of ${key}`,
+        data: state[key].data,
+        hidden: !names.includes(key),
+      })),
+    },
   };
 }
 

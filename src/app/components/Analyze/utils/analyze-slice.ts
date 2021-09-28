@@ -44,6 +44,9 @@ export const analyzeSlice = createSlice({
       state,
       action: PayloadAction<{ name: string }>
     ) => {
+      console.log({
+        action,
+      });
       const { name } = action.payload;
       state[name].isLoading = false;
       state[name].hasCompleted = true;
@@ -70,7 +73,13 @@ export const {
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectAnalyzeData = (state: RootState) => state.analyze;
+export const selectKeys = (state: RootState) => Object.keys(state.analyze);
+export const selectLoadingFiles = (state: RootState) =>
+  Object.keys(state.analyze).filter((file) => state.analyze[file].isLoading);
 export const selectAnalyzeAnyFileFetching = (state: RootState) =>
   Object.values(state.analyze).some((file) => file.isLoading);
+export const selectCompletedData = (state: RootState) =>
+  Object.keys(state.analyze).filter((key) => state.analyze[key].hasCompleted) ||
+  [];
 
 export default analyzeSlice.reducer;
