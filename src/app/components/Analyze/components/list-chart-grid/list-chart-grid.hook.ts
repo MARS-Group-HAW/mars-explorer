@@ -1,21 +1,24 @@
 import { useDeepCompareEffect } from "react-use";
-import _ from "lodash";
+import { useState } from "react";
 import {
   add,
   useSharedObjectsWithStatus,
 } from "../../hooks/use-objects-selection-context";
 import { useAppSelector } from "../../../../utils/hooks/use-store";
 import { selectResultKeys } from "../../../QuickStartBar/utils/simulation-slice";
+import ChartType from "../../utils/chart-type";
 
 type State = {
+  chartType: ChartType;
+  handleChartTypeChange: (type: ChartType) => void;
   showEmptyMessage: boolean;
   showGridAndCharts: boolean;
 };
 
 function useListChartGrid(): State {
   const [objectListWithMetaData, dispatch] = useSharedObjectsWithStatus();
-
   const keys = useAppSelector(selectResultKeys);
+  const [chartType, setChartType] = useState(ChartType.LINE);
 
   useDeepCompareEffect(() => {
     keys.forEach((key) => dispatch(add({ name: key })));
@@ -26,6 +29,8 @@ function useListChartGrid(): State {
   return {
     showEmptyMessage: isEmpty,
     showGridAndCharts: !isEmpty,
+    chartType,
+    handleChartTypeChange: setChartType,
   };
 }
 
