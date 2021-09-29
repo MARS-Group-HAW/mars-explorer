@@ -1,23 +1,17 @@
 import _ from "lodash";
 import { useState } from "react";
 import { useCustomCompareEffect } from "react-use";
-import { SingleDataState } from "./data-set-reducer";
-import lengthReduce from "../../utils/utils-fn";
-
-type SingleDataStateData = SingleDataState["data"];
+import lengthReduce from "../utils/utils-fn";
 
 type State = {
   xData: number[];
 };
 
-const isEqual = (
-  prevDeps: SingleDataStateData[],
-  nextDeps: SingleDataStateData[]
-) =>
+const isEqual = (prevDeps: unknown[][], nextDeps: unknown[][]) =>
   prevDeps.length === nextDeps.length &&
   lengthReduce(prevDeps) === lengthReduce(nextDeps);
 
-function useXData(values: SingleDataStateData[]): State {
+function useXData(values: unknown[][]): State {
   const [xData, setXData] = useState([]);
 
   useCustomCompareEffect(

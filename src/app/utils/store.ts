@@ -1,18 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import { createLogger } from "redux-logger";
 import projectReducer from "../components/Home/utils/project-slice";
 import modelReducer from "../components/Model/utils/model-slice";
 import simulationReducer from "../components/QuickStartBar/utils/simulation-slice";
-import analyzeReducer from "../components/Analyze/utils/analyze-slice";
-
-const logger = createLogger();
 
 const store = configureStore({
   reducer: {
     project: projectReducer,
     model: modelReducer,
     simulation: simulationReducer,
-    analyze: analyzeReducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({

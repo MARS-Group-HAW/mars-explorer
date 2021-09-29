@@ -1,26 +1,21 @@
+import { ObjectCoordinate, ObjectCount } from "@shared/types/ObjectData";
+
 export type ResultDatum = {
-  Step: number;
-  DateTime: string;
-  Type: string;
-  Xpos: number;
-  Ypos: number;
-  X: number;
-  Y: number;
-  ID: string;
-  [key: string]: string | number;
+  count: ObjectCount;
+  coords: ObjectCoordinate;
 };
 
-export type ResultData = ResultDatum[];
+export type ResultDataPerTick = ResultDatum[];
 
 export type ResultDataWithMeta = {
-  file: string;
-  data: ResultData;
+  data: ResultDataPerTick;
   isLoading: boolean;
   hasCompleted: boolean;
+  hasBeenRestored: boolean;
 };
 
-export type ResultDataPerObject = {
+export type ResultDataMap = {
   [key: string]: ResultDataWithMeta;
 };
 
-export default ResultData;
+export default ResultDataPerTick;

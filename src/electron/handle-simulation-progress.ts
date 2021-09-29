@@ -1,6 +1,12 @@
 import WS from "ws";
 import ReconnectingWebSocket, { Options } from "reconnecting-websocket";
 import { Logger } from "./logger";
+import {
+  ObjectCoordinates,
+  ObjectCounts,
+  ObjectResultsMap,
+} from "@shared/types/ObjectData";
+import { SimulationProgressMessage } from "@shared/types/SimulationMessages";
 
 export enum WebSocketCloseCodes {
   RETRYING = 1000,
@@ -25,11 +31,13 @@ type ProgressMessage = {
   lastSuccessfullyDateTime: string;
   lastSuccessfullyStep: number;
   lastSuccessfullyTick: number;
+  objectCounts: ObjectCounts;
+  objectCoordinates: ObjectCoordinates;
 };
 
 export function handleSimulationProgress(
   log: Logger,
-  onProgress: (progress: number) => void,
+  onProgress: (progress: SimulationProgressMessage) => void,
   onMaxRetries: () => void
 ): () => void {
   const options: Options = {
@@ -48,14 +56,28 @@ export function handleSimulationProgress(
   let lastProgress: number;
 
   rws.onmessage = (msg: MessageEvent<string>) => {
-    const { currentTick, maxTicks } = JSON.parse(msg.data) as ProgressMessage;
+    const { currentTick, maxTicks, objectCounts, objectCoordinates } =
+      JSON.parse(msg.data) as ProgressMessage;
     const progress = Math.floor((currentTick / maxTicks) * 100);
 
     if (lastProgress === undefined || lastProgress < progress) {
       log.debug(
         `Simulation-Progress: ${currentTick} von ${maxTicks} (${progress}%)`
       );
-      onProgress(progress);
+
+      const results: ObjectResultsMap = {};
+      const objCountKeys = Object.keys(objectCounts);
+      objCountKeys.forEach((key) => {
+        results[key] = {
+          coords: objectCoordinates[key],
+          count: objectCounts[key],
+        };
+      });
+
+      onProgress({
+        progress,
+        results,
+      });
       lastProgress = progress;
     }
   };
