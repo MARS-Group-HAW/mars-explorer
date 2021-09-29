@@ -22,7 +22,6 @@ function useXData(values: SingleDataStateData[]): State {
 
   useCustomCompareEffect(
     () => {
-      console.log("recalc x", values);
       const lengths = values.map((data) => data.length);
       const maxSteps = _.max(lengths) || 0;
       setXData(Array.from({ length: maxSteps }, (v, k) => k + 1));

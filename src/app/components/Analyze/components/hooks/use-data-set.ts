@@ -48,6 +48,8 @@ const isEqual = (prev: ResultDataPerObject, next: ResultDataPerObject) => {
   return true;
 };
 
+const colors = ["green", "blue", "red", "orange"];
+
 function useDataSet(names: string[]): State {
   const [state, dispatch] = useReducer(reducer, initialState);
   const dataRef = useRef(state);
@@ -108,6 +110,7 @@ function useDataSet(names: string[]): State {
         label: `# of ${key}`,
         data: state[key].data,
         hidden: !names.includes(key),
+        backgroundColor: colors[allFiles.indexOf(key)],
       })),
     },
   };
