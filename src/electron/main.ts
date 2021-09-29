@@ -18,13 +18,6 @@ import * as child_process from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import { handleSimulationProgress } from "./handle-simulation-progress";
 import { IFileRef } from "@shared/types/File";
-import { Tail } from "tail";
-import Papa, { ParseConfig, Parser, ParseResult } from "papaparse";
-import {
-  ParseAbortRequest,
-  ParseCompleteNotification,
-  ParseResultMessage,
-} from "@shared/types/ParseCompleteNotification";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -368,112 +361,7 @@ ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
         exitState = SimulationStates.UNKNOWN;
     }
 
-    mainWindow.webContents.send(Channel.EXITED, exitState);
+    mainWindow.webContents.send(Channel.SIMULATION_EXITED, exitState);
     cleanupHandler();
-  });
-});
-
-const generalPapaConfig: ParseConfig = {
-  delimiter: ",", // auto-detect
-  quoteChar: '"',
-  escapeChar: '"',
-  dynamicTyping: true,
-  header: false,
-};
-
-const watchPapaConfig: ParseConfig = {
-  ...generalPapaConfig,
-  header: false,
-};
-
-ipcMain.on(Channel.ANALYSIS_WATCH_RESULT, (_, filePath: string): void => {
-  const tail: Tail = new Tail(filePath, { fromBeginning: true });
-
-  let sentHeader = false;
-  tail.on("line", (data: string) => {
-    const results = Papa.parse(data, watchPapaConfig);
-    const resultData = results.data[0];
-
-    if (!sentHeader) {
-      mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_HEADER, resultData);
-      sentHeader = true;
-    } else {
-      mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_ROW, resultData);
-    }
-  });
-
-  tail.on("error", function (error) {
-    console.log("ERROR: ", error); // TODO
-  });
-});
-
-const lastResultPapaConfig: ParseConfig = {
-  ...generalPapaConfig,
-  header: true,
-  transformHeader: (headerStr) => headerStr.trim(),
-  worker: true,
-};
-
-ipcMain.on(Channel.ANALYSIS_GET_LAST_RESULT, (_, filePath: string): void => {
-  const fileName = path.basename(filePath);
-  const fileStream = fs.createReadStream(filePath);
-
-  const sendResults = (data: Omit<ParseResultMessage, "name">) =>
-    mainWindow.webContents.send(Channel.ANALYSIS_SEND_CSV_ROW, {
-      ...data,
-      name: fileName,
-    } as ParseResultMessage);
-
-  const sendCompletion = (
-    notification: Omit<ParseCompleteNotification, "name" | "path">
-  ) =>
-    mainWindow.webContents.send(Channel.ANALYSIS_RESULT_END, {
-      ...notification,
-      name: fileName,
-    } as ParseCompleteNotification);
-
-  let parserInstance: Parser;
-
-  log.info(`Parsing results in ${filePath}`);
-
-  const handleAbort = (abortRequest: ParseAbortRequest) => {
-    if (abortRequest.name === fileName) {
-      parserInstance.abort();
-      log.info(`Parsing of ${filePath} has been aborted by the user.`);
-    }
-  };
-
-  ipcMain.on(
-    Channel.ANALYSIS_ABORT_GET_LAST_RESULT,
-    (_, data: ParseAbortRequest) => handleAbort(data)
-  );
-
-  const handleChunk = (results: ParseResult<unknown>, parser: Parser) => {
-    log.info("Results from: ", filePath);
-    if (!parserInstance) parserInstance = parser;
-    parser.pause();
-    setTimeout(() => {
-      sendResults({ data: results.data });
-      parser.resume();
-    }, 100);
-  };
-
-  const handleCompletion = (results: ParseResult<unknown>) => {
-    log.info("Results from: ", filePath);
-    const hasBeenAborted = Boolean(results?.meta?.aborted);
-    log.info(`Parsing completed (aborted: ${hasBeenAborted.toString()})`);
-
-    sendCompletion({
-      aborted: hasBeenAborted,
-    });
-    console.timeEnd(Channel.ANALYSIS_GET_LAST_RESULT);
-    ipcMain.removeListener(Channel.ANALYSIS_ABORT_GET_LAST_RESULT, handleAbort);
-  };
-
-  console.time(Channel.ANALYSIS_GET_LAST_RESULT);
-  Papa.parse(fileStream, {
-    ...lastResultPapaConfig,
-    chunk: handleChunk,
-    complete: handleCompletion,
   });
 });

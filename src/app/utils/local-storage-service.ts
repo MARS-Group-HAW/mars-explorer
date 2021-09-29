@@ -1,9 +1,13 @@
+import { ResultDataMap } from "../components/Analyze/utils/ResultData";
+
 export enum CacheKey {
   LAST_PATH = "LAST_PATH",
+  RESULTS_BY_KEY = "RESULTS_BY_KEY",
 }
 
 interface CacheValues {
   [CacheKey.LAST_PATH]: string;
+  [CacheKey.RESULTS_BY_KEY]: ResultDataMap;
 }
 
 class LocalStorageService {

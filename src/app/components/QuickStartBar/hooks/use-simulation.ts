@@ -1,8 +1,12 @@
 import { Channel } from "@shared/types/Channel";
 import { useEffect, useState } from "react";
 import { SimulationStates } from "@shared/types/SimulationStates";
+import { SimulationProgressMessage } from "@shared/types/SimulationMessages";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
+  addResults,
+  finishResults,
+  initObject,
   selectSimulationState,
   setSimulationState,
 } from "../utils/simulation-slice";
@@ -34,10 +38,28 @@ function useSimulation(): State {
     window.api.send(Channel.TERMINATE_SIMULATION);
   }
 
-  useChannelSubscription(Channel.SIMULATION_PROGRESS, (msg: number) => {
+  function handleSimulationProgress({
+    progress: simProgress,
+    results,
+  }: SimulationProgressMessage) {
     setSimState(SimulationStates.RUNNING);
-    setProgress(msg);
-  });
+    setProgress(simProgress);
+    Object.keys(results).forEach((objectName) => {
+      initObject({ name: objectName });
+      try {
+        addResults({ name: objectName, data: results[objectName] });
+      } catch (e: unknown) {
+        if (e === "QUOTA_EXCEEDED_ERR") {
+          // TODO
+          alert(
+            "The result could no be saved because it was too large. The results will not be available after a restart."
+          ); // data wasn't successfully saved due to quota exceed so throw an error
+        }
+      }
+    });
+  }
+
+  useChannelSubscription(Channel.SIMULATION_PROGRESS, handleSimulationProgress);
 
   useChannelSubscription(Channel.SIMULATION_FAILED, (e: Error) => {
     const errMsg = e.toString();
@@ -45,13 +67,9 @@ function useSimulation(): State {
     setError(errMsg);
   });
 
-  useChannelSubscription(Channel.EXITED, setSimState);
+  useChannelSubscription(Channel.SIMULATION_EXITED, setSimState);
 
   useEffect(() => {
-    if (simState !== SimulationStates.RUNNING) {
-      setProgress(0);
-    }
-
     if (simState !== SimulationStates.FAILED) {
       setError(undefined);
     }
@@ -64,6 +82,7 @@ function useSimulation(): State {
         window.api.logger.info(`Simulation is running.`);
         break;
       case SimulationStates.SUCCESS:
+        dispatch(finishResults);
         window.api.logger.info(`Simulation finished successfully.`);
         break;
       case SimulationStates.TERMINATED:
