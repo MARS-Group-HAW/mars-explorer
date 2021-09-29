@@ -21,6 +21,7 @@ import { IFileRef } from "@shared/types/File";
 import { Tail } from "tail";
 import Papa, { ParseConfig, Parser, ParseResult } from "papaparse";
 import {
+  ParseAbortRequest,
   ParseCompleteNotification,
   ParseResultMessage,
 } from "@shared/types/ParseCompleteNotification";
@@ -435,12 +436,17 @@ ipcMain.on(Channel.ANALYSIS_GET_LAST_RESULT, (_, filePath: string): void => {
 
   log.info(`Parsing results in ${filePath}`);
 
-  const handleAbort = () => {
-    parserInstance.abort();
-    log.info(`Parsing of ${filePath} has been aborted by the user.`);
+  const handleAbort = (abortRequest: ParseAbortRequest) => {
+    if (abortRequest.name === fileName) {
+      parserInstance.abort();
+      log.info(`Parsing of ${filePath} has been aborted by the user.`);
+    }
   };
 
-  ipcMain.on(Channel.ANALYSIS_ABORT_GET_LAST_RESULT, handleAbort);
+  ipcMain.on(
+    Channel.ANALYSIS_ABORT_GET_LAST_RESULT,
+    (_, data: ParseAbortRequest) => handleAbort(data)
+  );
 
   const handleChunk = (results: ParseResult<unknown>, parser: Parser) => {
     log.info("Results from: ", filePath);

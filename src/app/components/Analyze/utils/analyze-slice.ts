@@ -1,9 +1,18 @@
 import { createSlice, freeze, PayloadAction } from "@reduxjs/toolkit";
 import { IFileRef } from "@shared/types/File";
 import type { RootState } from "../../../utils/store";
-import ResultData, { ResultDataPerObject } from "./ResultData";
+import ResultData, {
+  ResultDataPerObject,
+  ResultDataWithMeta,
+} from "./ResultData";
 
 type State = ResultDataPerObject;
+
+const initialResultDataWithMeta: Omit<ResultDataWithMeta, "file"> = {
+  data: [],
+  isLoading: false,
+  hasCompleted: false,
+};
 
 // Define the initial state using that type
 const initialState: State = {};
@@ -35,29 +44,32 @@ export const analyzeSlice = createSlice({
       action: PayloadAction<{ name: string; data: ResultData }>
     ) => {
       const { name, data } = action.payload;
-      const freezedObjg = freeze(data);
+      const frozeObj = freeze(data);
       state[name].isLoading = true;
       state[name].hasCompleted = false;
-      state[name].data.push(...freezedObjg);
+      state[name].data.push(...frozeObj);
     },
     setDataLoadingCompleted: (
       state,
       action: PayloadAction<{ name: string }>
     ) => {
-      console.log({
-        action,
-      });
       const { name } = action.payload;
       state[name].isLoading = false;
       state[name].hasCompleted = true;
     },
-    resetAll: (state) => {
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      state = initialState;
-    },
+    resetAll: () => initialState,
     resetData: (state, action: PayloadAction<{ name: string }>) => {
-      state[action.payload.name].data = [];
-      state[action.payload.name].hasCompleted = false;
+      const { name } = action.payload;
+      const { file } = state[name];
+      const newState = {
+        ...state,
+        [name]: {
+          file,
+          ...initialResultDataWithMeta,
+        },
+      };
+
+      return newState;
     },
   },
 });
