@@ -13,38 +13,34 @@ import useAnalyze from "./hooks";
 import LineChart from "./components/line-chart";
 
 const Analyze = () => {
-  const {
-    files,
-    selectedFiles,
-    toggleFile,
-    isFileLoading,
-    isFileChecked,
-    showListLoading,
-  } = useAnalyze();
+  const { files, toggleFile, selectedFileNames, showListLoading } =
+    useAnalyze();
 
   return (
     <Grid container style={{ height: "100%" }}>
       <Grid item xs={3}>
         <List>
-          {files.map((value) => {
-            const labelId = `checkbox-list-secondary-label-${value.name}`;
+          {files.map(({ name, isLoading, isDisabled, isChecked }) => {
+            const labelId = `checkbox-list-secondary-label-${name}`;
             return (
               <ListItem
-                key={value.name}
+                key={name}
                 button
-                onClick={() => toggleFile(value)}
+                onClick={() => toggleFile(name)}
+                disabled={isDisabled}
               >
                 <ListItemIcon>
-                  {isFileLoading(value.name) && (
+                  {isLoading && (
                     <CircularProgress variant="indeterminate" size={15} />
                   )}
                 </ListItemIcon>
-                <ListItemText id={labelId} primary={value.name} />
+                <ListItemText id={labelId} primary={name} />
                 <ListItemSecondaryAction>
                   <Checkbox
                     edge="end"
-                    checked={isFileChecked(value.name)}
-                    onChange={() => toggleFile(value)}
+                    disabled={isDisabled}
+                    checked={isChecked}
+                    onChange={() => toggleFile(name)}
                     inputProps={{ "aria-labelledby": labelId }}
                   />
                 </ListItemSecondaryAction>
@@ -54,7 +50,7 @@ const Analyze = () => {
         </List>
       </Grid>
       <Grid item xs={9}>
-        <LineChart files={selectedFiles.map((file) => file.name)} />
+        <LineChart files={selectedFileNames} />
       </Grid>
     </Grid>
   );

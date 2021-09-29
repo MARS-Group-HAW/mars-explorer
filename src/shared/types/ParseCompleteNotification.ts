@@ -9,3 +9,5 @@ export type ParseCompleteNotification = ParseMessage & {
 export type ParseResultMessage = ParseMessage & {
   data: unknown[];
 };
+
+export type ParseAbortRequest = ParseMessage;

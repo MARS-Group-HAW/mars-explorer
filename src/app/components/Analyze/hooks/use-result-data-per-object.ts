@@ -1,6 +1,7 @@
 import { IFileRef } from "@shared/types/File";
 import { Channel } from "@shared/types/Channel";
 import {
+  ParseAbortRequest,
   ParseCompleteNotification,
   ParseResultMessage,
 } from "@shared/types/ParseCompleteNotification";
@@ -13,7 +14,7 @@ import { selectSimulationRunningStatus } from "../../QuickStartBar/utils/simulat
 import {
   addData as addDataToStore,
   resetData,
-  selectAnalyzeAnyFileFetching,
+  selectLoadingFiles,
   setDataLoadingCompleted,
 } from "../utils/analyze-slice";
 
@@ -22,13 +23,13 @@ type DisposableFnMap = { [key: string]: DisposableFn };
 
 type State = {
   fetchData: (file: IFileRef) => void;
-  abortFetching: (file: IFileRef) => void;
+  abortFetching: (fileName: string) => void;
 };
 
 function useResultDataPerObject(): State {
   const dispatch = useAppDispatch();
   const isSimulationRunning = useAppSelector(selectSimulationRunningStatus);
-  const isAnyFileFetching = useAppSelector(selectAnalyzeAnyFileFetching);
+  const loadingFiles = useAppSelector(selectLoadingFiles);
 
   const [, { set, get }] = useMap<DisposableFnMap>({});
 
@@ -59,16 +60,23 @@ function useResultDataPerObject(): State {
     set(file.name, () => disposeFn());
   };
 
-  const abortFetching = (file: IFileRef) => {
-    window.api.logger.info("Sending abort request for ", file.name);
-    window.api.send(Channel.ANALYSIS_ABORT_GET_LAST_RESULT);
+  const abortFetching = (name: string) => {
+    window.api.logger.info("Sending abort request for ", name);
+    window.api.send<ParseAbortRequest>(Channel.ANALYSIS_ABORT_GET_LAST_RESULT, {
+      name,
+    });
   };
 
   const handleCompletion = ({ name, aborted }: ParseCompleteNotification) => {
     window.api.logger.info(
       `Fetching of ${name} completed (aborted: ${aborted}).`
     );
-    dispatch(setDataLoadingCompleted({ name }));
+
+    if (aborted) {
+      dispatch(resetData({ name }));
+    } else {
+      dispatch(setDataLoadingCompleted({ name }));
+    }
 
     const disposeFn = getReference.current(name);
 
@@ -81,11 +89,7 @@ function useResultDataPerObject(): State {
 
   useChannelSubscription(Channel.ANALYSIS_RESULT_END, handleCompletion);
 
-  useUnmount(
-    () =>
-      isAnyFileFetching &&
-      window.api.send(Channel.ANALYSIS_ABORT_GET_LAST_RESULT)
-  );
+  useUnmount(() => loadingFiles.forEach(abortFetching));
 
   return {
     fetchData,

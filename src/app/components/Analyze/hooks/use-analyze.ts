@@ -1,23 +1,28 @@
-import { IFileRef } from "@shared/types/File";
-import { useEffect } from "react";
-import { useDeepCompareEffect } from "react-use";
+import { useEffect, useMemo } from "react";
+import { useUnmount } from "react-use";
 import useCsvList from "./use-csv-list";
 import useResultDataPerObject from "./use-result-data-per-object";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
   resetAll,
+  resetData,
   selectAnalyzeData,
   selectLoadingFiles,
   setResultFiles,
 } from "../utils/analyze-slice";
 
+type SelectableFiles = {
+  name: string;
+  isChecked: boolean;
+  isLoading: boolean;
+  isDisabled: boolean;
+}[];
+
 type State = {
-  files: IFileRef[];
-  selectedFiles: IFileRef[];
-  toggleFile: (file: IFileRef) => void;
+  files: SelectableFiles;
+  selectedFileNames: string[];
+  toggleFile: (fileName: string) => void;
   showListLoading: boolean;
-  isFileChecked: (fileName: string) => boolean;
-  isFileLoading: (fileName: string) => boolean;
 };
 
 function useAnalyze(): State {
@@ -25,14 +30,16 @@ function useAnalyze(): State {
 
   const data = useAppSelector(selectAnalyzeData);
   const loadingFiles = useAppSelector(selectLoadingFiles);
-
-  useDeepCompareEffect(
-    () => window.api.logger.info(loadingFiles),
+  const isAnyFileLoading = useMemo(
+    () => loadingFiles.length > 0,
     [loadingFiles]
   );
 
-  const { loading, files, selectedFiles, toggleFile, isFileSelected } =
-    useCsvList();
+  const { loading, files, selectedFiles, toggleFile } = useCsvList();
+
+  useUnmount(() =>
+    loadingFiles.forEach((name) => dispatch(resetData({ name })))
+  );
 
   useEffect(() => {
     dispatch(resetAll());
@@ -41,29 +48,42 @@ function useAnalyze(): State {
 
   const { fetchData, abortFetching } = useResultDataPerObject();
 
-  const handleToggle = (file: IFileRef) => {
-    const isSelected = isFileSelected(file);
-    const currentData = data[file.name];
+  const isFileSelected = (fileName: string) =>
+    Boolean(selectedFiles.find((file) => file.name === fileName));
+
+  const handleToggle = (fileName: string) => {
+    const isSelected = isFileSelected(fileName);
+    const fileRef = files.find((file) => file.name === fileName);
+    const currentData = data[fileName];
 
     if (!isSelected && currentData?.data.length === 0) {
-      fetchData(file);
+      fetchData(fileRef);
     } else if (isSelected && currentData?.isLoading) {
-      abortFetching(file);
+      abortFetching(fileName);
     }
 
-    toggleFile(file);
+    toggleFile(fileRef);
   };
 
-  const isFileChecked = (fileName: string) =>
-    Boolean(selectedFiles.find((file) => file.name === fileName));
-  const isFileLoading = (fileName: string) => loadingFiles.includes(fileName);
+  const fileWithMeta = files.map(({ name }) => {
+    const isLoading = loadingFiles.includes(name);
+
+    return {
+      name,
+      isLoading,
+      isDisabled: isAnyFileLoading && !isLoading,
+      isChecked: isFileSelected(name),
+    };
+  });
+
+  const selectedFileNames = fileWithMeta
+    .filter((file) => file.isChecked)
+    .map((file) => file.name);
 
   return {
-    files,
-    selectedFiles,
+    files: fileWithMeta,
+    selectedFileNames,
     toggleFile: handleToggle,
-    isFileLoading,
-    isFileChecked,
     showListLoading: loading,
   };
 }

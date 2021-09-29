@@ -1,8 +1,8 @@
-import { createAction, createReducer, current } from "@reduxjs/toolkit";
+import { createAction, createReducer } from "@reduxjs/toolkit";
 import _ from "lodash";
 import ResultData from "../../utils/ResultData";
 
-type SingleState = {
+export type SingleDataState = {
   currentStep: number;
   indexOfPrevStepEnd: number;
   data: number[];
@@ -13,19 +13,23 @@ type SingleState = {
   };
 };
 
-type State = {
-  [key: string]: SingleState;
+export type DataState = {
+  [key: string]: SingleDataState;
 };
 
-export const initialState: State = {};
-const initialSingleState: SingleState = {
+export const initialState: DataState = {};
+const initialSingleState: SingleDataState = {
   currentStep: 0,
   indexOfPrevStepEnd: 0,
   data: [],
   lastResult: {},
 };
 
-const initFile = createAction<{ name: string }, "initFile">("initFile");
+const initFileIfNotExists = createAction<
+  { name: string },
+  "initFileIfNotExists"
+>("initFileIfNotExists");
+const resetFile = createAction<{ name: string }, "resetFile">("resetFile");
 const addLiveData = createAction<
   { name: string; data: ResultData },
   "addLiveData"
@@ -50,11 +54,15 @@ const getStepsOnly = (data: ResultData) => data.map((datum) => datum.Step);
 
 const reducer = createReducer(initialState, (builder) =>
   builder
-    .addCase(initFile, (state, { payload }) => {
+    .addCase(initFileIfNotExists, (state, { payload }) => {
       const { name } = payload;
 
       if (state[name]) return;
 
+      state[name] = initialSingleState;
+    })
+    .addCase(resetFile, (state, { payload }) => {
+      const { name } = payload;
       state[name] = initialSingleState;
     })
     .addCase(addLiveData, (state, { payload }) => {
@@ -95,6 +103,13 @@ const reducer = createReducer(initialState, (builder) =>
     .addCase(addLastData, (state, { payload }) => {
       const { name } = payload;
 
+      if (!state[name]) {
+        window.api.logger.warn(
+          `data-set-reducer: No last result found for ${name}.`
+        );
+        return;
+      }
+
       const { currentStep, indexOfPrevStepEnd, data } = state[name].lastResult;
       state[name].currentStep = currentStep;
       state[name].indexOfPrevStepEnd = indexOfPrevStepEnd;
@@ -103,6 +118,6 @@ const reducer = createReducer(initialState, (builder) =>
     })
 );
 
-export { addLiveData, addLastData, initFile };
+export { addLiveData, addLastData, initFileIfNotExists };
 
 export default reducer;
