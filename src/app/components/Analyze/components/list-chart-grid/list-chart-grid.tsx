@@ -6,7 +6,7 @@ import useListChartGrid from "./list-chart-grid.hook";
 import EmptyMessage from "../empty-message";
 import ChartSelector from "../chart-selector";
 import ChartType from "../../utils/chart-type";
-import ScatterChart from "../scatter-chart";
+import BubbleChart from "../scatter-chart";
 
 const useStyles = makeStyles((theme) => ({
   container: {
@@ -91,7 +91,7 @@ function ListChartGrid() {
             component={Paper}
           >
             {chartType === ChartType.LINE && <LineChart />}
-            {chartType === ChartType.SCATTER && <ScatterChart />}
+            {chartType === ChartType.BUBBLE && <BubbleChart />}
           </Grid>
         </Grid>
       )}
