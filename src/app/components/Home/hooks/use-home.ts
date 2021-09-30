@@ -1,5 +1,5 @@
 import { ModelRef } from "@shared/types/Model";
-import { useBoolean, useMount } from "react-use";
+import { useBoolean, useCustomCompareEffect, useMount } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
@@ -10,18 +10,26 @@ import {
 
 type State = {
   projects: ModelRef[];
+  processingModel?: ModelRef;
   isModelSelected: (project: ModelRef) => boolean;
-  openDialog: boolean;
+  openCreateDialog: boolean;
+  openDeleteDialog: boolean;
   handleProjectClick: (project: ModelRef) => void;
   handleNewProjectClick: () => void;
   handleNewProjectClose: () => void;
+  handleDeleteProjectClick: (ref: ModelRef) => void;
+  handleDeleteProjectClose: () => void;
 };
+
+const didAnyDialogClose = (prev: boolean, next: boolean) => prev && !next;
 
 function useHome(): State {
   const dispatch = useAppDispatch();
   const { path } = useAppSelector(selectProject);
   const [modelRefs, setModelRefs] = useState<ModelRef[]>([]);
+  const [modelRef, setModelRef] = useState<ModelRef>();
   const [newProjectDialogOpen, setNewProjectDialogOpen] = useBoolean(false);
+  const [deleteProjectDialogOpen, setDeleteDialogOpen] = useBoolean(false);
 
   const fetchProjects = async () =>
     window.api
@@ -32,8 +40,8 @@ function useHome(): State {
 
   const isModelSelected = (project: ModelRef) => project.path === path;
 
-  const handleProjectClick = (modelRef: ModelRef) =>
-    dispatch(setGlobalProject(modelRef));
+  const handleProjectClick = (model: ModelRef) =>
+    dispatch(setGlobalProject(model));
 
   const handleNewProjectClick = () => setNewProjectDialogOpen(true);
   const handleNewProjectClose = () => {
@@ -41,13 +49,26 @@ function useHome(): State {
     setNewProjectDialogOpen(false);
   };
 
+  const handleDeleteProjectClick = (model: ModelRef) => {
+    setModelRef(model);
+    setDeleteDialogOpen(true);
+  };
+  const handleDeleteProjectClose = () => {
+    fetchProjects();
+    setDeleteDialogOpen(false);
+  };
+
   return {
     projects: modelRefs,
+    processingModel: modelRef,
     isModelSelected,
-    openDialog: newProjectDialogOpen,
+    openCreateDialog: newProjectDialogOpen,
+    openDeleteDialog: deleteProjectDialogOpen,
     handleProjectClick,
     handleNewProjectClick,
     handleNewProjectClose,
+    handleDeleteProjectClick,
+    handleDeleteProjectClose,
   };
 }
 

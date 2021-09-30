@@ -33,11 +33,14 @@ function NewProjectDialog({ open, onClose }: Props) {
         <DialogContentText>
           To create a new project, please enter a suitable name.
         </DialogContentText>
+        <DialogContentText color="secondary">
+          Keep in mind that the project cannot be renamed within this
+          application.
+        </DialogContentText>
         <TextField
           autoFocus
           margin="dense"
           id="project-name"
-          label="Project Name"
           type="text"
           fullWidth
           value={newProjectName}
