@@ -9,7 +9,7 @@ import {
 } from "@material-ui/core";
 import ChartType from "../../utils/chart-type";
 
-const useStyles = makeStyles((theme) => ({
+const useStyles = makeStyles(() => ({
   fieldSet: {
     height: "100%",
   },
@@ -28,8 +28,8 @@ const chartTypeToLabel = (type: ChartType) => {
   switch (type) {
     case ChartType.LINE:
       return "Number of agents per tick (Line-Chart)";
-    case ChartType.SCATTER:
-      return "Positions of agent at tick (Scatter-Chart)";
+    case ChartType.BUBBLE:
+      return "Positions of agent at tick (Bubble-Chart)";
     default:
       return "No Label";
   }

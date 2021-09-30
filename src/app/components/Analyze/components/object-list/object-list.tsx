@@ -36,48 +36,6 @@ function ObjectList() {
             </ListItem>
           );
         })}
-        <ListItem button>
-          <ListItemText id="test" primary="test" />
-          <ListItemSecondaryAction>
-            <Checkbox edge="end" />
-          </ListItemSecondaryAction>
-        </ListItem>
-        <ListItem button>
-          <ListItemText id="test" primary="test" />
-          <ListItemSecondaryAction>
-            <Checkbox edge="end" />
-          </ListItemSecondaryAction>
-        </ListItem>
-        <ListItem button>
-          <ListItemText id="test" primary="test" />
-          <ListItemSecondaryAction>
-            <Checkbox edge="end" />
-          </ListItemSecondaryAction>
-        </ListItem>
-        <ListItem button>
-          <ListItemText id="test" primary="test" />
-          <ListItemSecondaryAction>
-            <Checkbox edge="end" />
-          </ListItemSecondaryAction>
-        </ListItem>
-        <ListItem button>
-          <ListItemText id="test" primary="test" />
-          <ListItemSecondaryAction>
-            <Checkbox edge="end" />
-          </ListItemSecondaryAction>
-        </ListItem>
-        <ListItem button>
-          <ListItemText id="test" primary="test" />
-          <ListItemSecondaryAction>
-            <Checkbox edge="end" />
-          </ListItemSecondaryAction>
-        </ListItem>
-        <ListItem button>
-          <ListItemText id="test" primary="test" />
-          <ListItemSecondaryAction>
-            <Checkbox edge="end" />
-          </ListItemSecondaryAction>
-        </ListItem>
       </List>
     </div>
   );

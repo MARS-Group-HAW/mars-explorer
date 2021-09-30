@@ -1,14 +1,18 @@
 export type ObjectCount = number;
 
-export type ObjectCounts = {
+export type InputObjectCounts = {
   [key: string]: ObjectCount;
 };
 
-export type ObjectCoordinate = [number, number][];
-
-export type ObjectCoordinates = {
+export type InputObjectCoordinates = {
   [key: string]: ObjectCoordinate;
 };
+
+export type ObjectCoordinate = {
+  x: number;
+  y: number;
+  count: number;
+}[];
 
 export type ObjectResultsMap = {
   [key: string]: {

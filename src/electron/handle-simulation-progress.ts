@@ -2,8 +2,8 @@ import WS from "ws";
 import ReconnectingWebSocket, { Options } from "reconnecting-websocket";
 import { Logger } from "./logger";
 import {
-  ObjectCoordinates,
-  ObjectCounts,
+  InputObjectCoordinates,
+  InputObjectCounts,
   ObjectResultsMap,
 } from "@shared/types/ObjectData";
 import { SimulationProgressMessage } from "@shared/types/SimulationMessages";
@@ -31,8 +31,8 @@ type ProgressMessage = {
   lastSuccessfullyDateTime: string;
   lastSuccessfullyStep: number;
   lastSuccessfullyTick: number;
-  objectCounts: ObjectCounts;
-  objectCoordinates: ObjectCoordinates;
+  objectCounts: InputObjectCounts;
+  objectCoordinates: InputObjectCoordinates;
 };
 
 export function handleSimulationProgress(

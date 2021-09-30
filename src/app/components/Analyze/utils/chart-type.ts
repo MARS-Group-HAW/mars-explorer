@@ -1,6 +1,6 @@
 enum ChartType {
   LINE = "LINE",
-  SCATTER = "SCATTER",
+  BUBBLE = "BUBBLE",
 }
 
 export default ChartType;

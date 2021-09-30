@@ -1,1 +1,1 @@
-export { default } from "./scatter-chart";
+export { default } from "./bubble-chart";
