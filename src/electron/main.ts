@@ -169,6 +169,33 @@ ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
   }
 });
 
+ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
+  const args = [];
+  args.push('--language "C#"');
+  args.push("--framework netcoreapp3.1");
+  args.push(`--name ${name}`);
+
+  log.info(
+    `Started "dotnet new" with the following arguments: ${args.toString()}`
+  );
+
+  const installProcess = child_process.exec(
+    `dotnet new console ${args.join(" ")}`,
+    {
+      cwd: WORKSPACE_PATH,
+    }
+  );
+
+  installProcess.on("message", (msg: MessageEvent) => log.info(msg.data));
+
+  installProcess.on("error", (msg: MessageEvent) => log.error(msg.data));
+
+  installProcess.on("exit", (code) => {
+    log.info(`"dotnet new" exited with code ${code}.`);
+    mainWindow.webContents.send(Channel.PROJECT_CREATED, code === 0);
+  });
+});
+
 ipcMain.on(Channel.INSTALL_MARS, (_, path: string) => {
   if (!fs.pathExistsSync(path)) {
     throw new Error(
