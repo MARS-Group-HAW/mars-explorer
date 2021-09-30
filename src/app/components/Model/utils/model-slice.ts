@@ -51,6 +51,13 @@ export const {
 export const selectModel = (state: RootState) => state.model;
 export const selectMonacoServicesInstalled = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MONACO_SERVICES_INSTALLED);
+export const selectStepWithStatus = (
+  state: RootState
+): { step: LoadingSteps; isLoading: boolean }[] =>
+  Object.keys(LoadingSteps).map((step) => ({
+    step: step as LoadingSteps,
+    isLoading: !state.model.finishedSteps.includes(step as LoadingSteps),
+  }));
 export const selectModelFullyInitialized = (state: RootState): boolean =>
   state.model.finishedSteps.length === state.model.maxSteps;
 

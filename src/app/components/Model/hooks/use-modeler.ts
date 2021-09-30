@@ -4,14 +4,21 @@ import useEditor from "./use-editor";
 import { useAppSelector } from "../../../utils/hooks/use-store";
 import useModels from "./use-models";
 import useProjectInitializationStatus from "../../App/hooks/bootstrap/model/use-project-initialization-status";
-import { selectModelLoadingProgress } from "../utils/model-slice";
+import {
+  selectModelLoadingProgress,
+  selectStepWithStatus,
+} from "../utils/model-slice";
+import LoadingSteps from "../utils/LoadingSteps";
 
 type Props = {
   containerRef: RefObject<HTMLDivElement>;
 };
 
 type State = {
-  loadingMsg: string;
+  stepWithStatus: {
+    step: LoadingSteps;
+    isLoading: boolean;
+  }[];
   showLoading: boolean;
   showModelListLoading: boolean;
   models: WorkingModel;
@@ -21,6 +28,7 @@ type State = {
 
 function useModeler({ containerRef }: Props): State {
   const progress = useAppSelector(selectModelLoadingProgress);
+  const steps = useAppSelector(selectStepWithStatus);
 
   const [selectedModelIndex, setSelectedModelIndex] = useState<number>(0);
 
@@ -59,7 +67,7 @@ function useModeler({ containerRef }: Props): State {
   }, [isProjectFullyInitialized, models]);
 
   return {
-    loadingMsg: `Loading ... (${progress}%)`,
+    stepWithStatus: steps,
     showLoading: progress < 100,
     showModelListLoading: areModelsLoading,
     models,

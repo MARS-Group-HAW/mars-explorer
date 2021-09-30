@@ -8,8 +8,10 @@ import {
   makeStyles,
   Typography,
 } from "@material-ui/core";
+import DoneIcon from "@material-ui/icons/Done";
 import ModelList from "./components/model-list/model-list";
 import useModeler from "./hooks";
+import LoadingSteps from "./utils/LoadingSteps";
 
 const useStyles = makeStyles((theme) => ({
   backdropContainer: {
@@ -32,15 +34,33 @@ const useStyles = makeStyles((theme) => ({
   loadingText: {
     fontWeight: 600,
   },
+  doneIcon: {
+    color: theme.palette.success.light,
+  },
 }));
+
+function stepToLabel(step: LoadingSteps) {
+  switch (step) {
+    case LoadingSteps.LANGUAGE_CLIENT_STARTED:
+      return "Starting Language Client";
+    case LoadingSteps.MONACO_SERVICES_INSTALLED:
+      return "Installing Monaco Services";
+    case LoadingSteps.LANGUAGE_SERVER_INITIALIZED:
+      return "Initializing Language Server";
+    case LoadingSteps.MARS_FRAMEWORK_ADDED:
+      return "Installing MARS-Framework";
+    default:
+      return "Unknown loading step";
+  }
+}
 
 function Modeler() {
   const classes = useStyles();
   const ref = useRef();
   const {
-    loadingMsg,
     showLoading,
     models,
+    stepWithStatus,
     selectedModelIndex,
     selectModelAtIndex,
     showModelListLoading,
@@ -52,10 +72,34 @@ function Modeler() {
     <Grid className={classes.backdropContainer} container>
       <Backdrop className={classes.backdrop} open={showLoading}>
         <Box className={classes.spinnerContainer}>
-          <CircularProgress color="secondary" />
-          <Typography className={classes.loadingText} variant="h6">
-            {`${loadingMsg}`}
-          </Typography>
+          <Grid container direction="column">
+            {stepWithStatus.map(({ step, isLoading }) => (
+              <Grid
+                key={step}
+                container
+                justifyContent="space-between"
+                alignItems="center"
+                style={{ marginTop: 2 }}
+              >
+                <Grid item xs={8}>
+                  <Typography style={{ fontWeight: 500 }}>
+                    {stepToLabel(step)}
+                  </Typography>
+                </Grid>
+                <Grid item xs={1}>
+                  {isLoading ? (
+                    <CircularProgress
+                      color="secondary"
+                      size={19}
+                      variant="indeterminate"
+                    />
+                  ) : (
+                    <DoneIcon className={classes.doneIcon} />
+                  )}
+                </Grid>
+              </Grid>
+            ))}
+          </Grid>
         </Box>
       </Backdrop>
       <Grid item xs={2}>
