@@ -9,26 +9,29 @@ import Home from "../Home";
 import Configure from "../Configure";
 import Analyze from "../Analyze";
 import useApp from "./hooks";
+import SnackBarProvider from "../shared/snackbar";
 
 function App() {
   useApp();
 
   return (
     <CssBaseline>
-      <Drawer>
-        <Route path={Path.HOME} exact>
-          <Home />
-        </Route>
-        <Route path={Path.MODEL}>
-          <Modeler />
-        </Route>
-        <Route path={Path.CONFIGURE}>
-          <Configure />
-        </Route>
-        <Route path={Path.ANALYZE}>
-          <Analyze />
-        </Route>
-      </Drawer>
+      <SnackBarProvider>
+        <Drawer>
+          <Route path={Path.HOME} exact>
+            <Home />
+          </Route>
+          <Route path={Path.MODEL}>
+            <Modeler />
+          </Route>
+          <Route path={Path.CONFIGURE}>
+            <Configure />
+          </Route>
+          <Route path={Path.ANALYZE}>
+            <Analyze />
+          </Route>
+        </Drawer>
+      </SnackBarProvider>
     </CssBaseline>
   );
 }

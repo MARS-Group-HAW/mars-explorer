@@ -1,6 +1,7 @@
 import { ModelRef } from "@shared/types/Model";
-import { useAsync } from "react-use";
+import { useBoolean, useMount } from "react-use";
 import { Channel } from "@shared/types/Channel";
+import { useState } from "react";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
   selectProject,
@@ -10,24 +11,44 @@ import {
 type State = {
   projects: ModelRef[];
   isModelSelected: (project: ModelRef) => boolean;
-  handleProjectClick: (model: ModelRef) => void;
+  openDialog: boolean;
+  handleProjectClick: (project: ModelRef) => void;
+  handleNewProjectClick: () => void;
+  handleNewProjectClose: () => void;
 };
 
 function useHome(): State {
   const dispatch = useAppDispatch();
   const { path } = useAppSelector(selectProject);
+  const [modelRefs, setModelRefs] = useState<ModelRef[]>([]);
+  const [newProjectDialogOpen, setNewProjectDialogOpen] = useBoolean(false);
 
-  const { value = [] } = useAsync(
-    async () => window.api.invoke<void, ModelRef[]>(Channel.GET_USER_PROJECTS),
-    []
-  );
+  const fetchProjects = async () =>
+    window.api
+      .invoke<void, ModelRef[]>(Channel.GET_USER_PROJECTS)
+      .then((refs) => setModelRefs(refs));
+
+  useMount(fetchProjects);
 
   const isModelSelected = (project: ModelRef) => project.path === path;
 
   const handleProjectClick = (modelRef: ModelRef) =>
     dispatch(setGlobalProject(modelRef));
 
-  return { projects: value, isModelSelected, handleProjectClick };
+  const handleNewProjectClick = () => setNewProjectDialogOpen(true);
+  const handleNewProjectClose = () => {
+    fetchProjects();
+    setNewProjectDialogOpen(false);
+  };
+
+  return {
+    projects: modelRefs,
+    isModelSelected,
+    openDialog: newProjectDialogOpen,
+    handleProjectClick,
+    handleNewProjectClick,
+    handleNewProjectClose,
+  };
 }
 
 export default useHome;
