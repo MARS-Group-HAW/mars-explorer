@@ -169,6 +169,20 @@ ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
   }
 });
 
+ipcMain.handle(
+  Channel.DELETE_PROJECT,
+  async (_, path: string): Promise<boolean> => {
+    try {
+      await fs.remove(path);
+      log.info("Deleted project: ", path);
+      return true;
+    } catch (e: unknown) {
+      log.error("Could not delete project", path, e);
+      return false;
+    }
+  }
+);
+
 ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
   const args = [];
   args.push('--language "C#"');
