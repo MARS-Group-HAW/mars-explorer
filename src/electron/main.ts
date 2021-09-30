@@ -36,6 +36,7 @@ export const PATHS = {
   workspaceExamples: path.join(WORKSPACE_PATH, EXAMPLES_DIR_NAME),
   modelsJson: path.resolve(RESOURCES_PATH, EXAMPLES_DIR_NAME, "models.json"),
   resources: RESOURCES_PATH,
+  templates: path.resolve(RESOURCES_PATH, "templates"),
 };
 
 // IMPORTANT: fixes $PATH variable for macos, see https://stackoverflow.com/questions/62067127/path-variables-empty-in-electron
@@ -156,7 +157,13 @@ ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
     .filter((file) => file !== EXAMPLES_DIR_NAME) // no example dir
     .filter((item) => !/(^|\/)\.[^/.]/g.test(item)) // remove hidden dirs
     .map((file) => path.join(PATHS.workspace, file)) // to full path
-    .filter((file) => fs.lstatSync(file).isDirectory());
+    .filter((file) => fs.lstatSync(file).isDirectory())
+    .map((file) => ({
+      file,
+      time: fs.statSync(file).mtime.getTime(),
+    }))
+    .sort((a, b) => b.time - a.time)
+    .map((file) => file.file);
 
   return userProjects.map((file) => new FileRef(file));
 });
@@ -169,19 +176,31 @@ ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
   }
 });
 
+async function deleteDir(path: string): Promise<boolean> {
+  try {
+    await fs.remove(path);
+    log.info("Deleted project: ", path);
+    return true;
+  } catch (e: unknown) {
+    log.error("Could not delete project", path, e);
+    return false;
+  }
+}
+
 ipcMain.handle(
   Channel.DELETE_PROJECT,
-  async (_, path: string): Promise<boolean> => {
-    try {
-      await fs.remove(path);
-      log.info("Deleted project: ", path);
-      return true;
-    } catch (e: unknown) {
-      log.error("Could not delete project", path, e);
-      return false;
-    }
-  }
+  async (_, path: string): Promise<boolean> => deleteDir(path)
 );
+
+async function replaceWithName(dir: string, name: string) {
+  const filePath = path.resolve(PATHS.templates, "Program.cs");
+  const content = await fs.readFile(filePath, "utf8");
+  const result = content.replace(/\$NAME/g, name);
+
+  const programmcsInProj = path.resolve(dir, "Program.cs");
+
+  await fs.writeFile(programmcsInProj, result, "utf8");
+}
 
 ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
   const args = [];
@@ -204,9 +223,29 @@ ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
 
   installProcess.on("error", (msg: MessageEvent) => log.error(msg.data));
 
+  const sendSuccessMsg = () =>
+    mainWindow.webContents.send(Channel.PROJECT_CREATED, true);
+  const sendErrorMsg = () =>
+    mainWindow.webContents.send(Channel.PROJECT_CREATED, false);
+
   installProcess.on("exit", (code) => {
     log.info(`"dotnet new" exited with code ${code}.`);
-    mainWindow.webContents.send(Channel.PROJECT_CREATED, code === 0);
+
+    if (code === 0) {
+      const newDirPath = path.resolve(WORKSPACE_PATH, name);
+      replaceWithName(newDirPath, name)
+        .then(sendSuccessMsg)
+        .catch((e: unknown) => {
+          log.error("Error while replacing contents in new project: ", e);
+          deleteDir(newDirPath)
+            .then(sendErrorMsg)
+            .catch((e) =>
+              log.error("Error cleaning up after replacing failure: ", e)
+            );
+        });
+    } else {
+      sendErrorMsg();
+    }
   });
 });
 

@@ -4,6 +4,8 @@ import {
   CircularProgress,
   Dialog,
   DialogActions,
+  DialogContent,
+  DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
 import { IFileRef } from "@shared/types/File";
@@ -25,6 +27,10 @@ function DeleteProjectDialog({ fileRef, open, onClose }: Props) {
   return (
     <Dialog open={open} onClose={handleNewProjectDialogClose}>
       <DialogTitle id="form-dialog-title">Delete this project?</DialogTitle>
+      <DialogContent>
+        {/* eslint-disable-next-line react/no-unescaped-entities */}
+        <DialogContentText>You won't be able to restore it.</DialogContentText>
+      </DialogContent>
       <DialogActions>
         <Button onClick={handleNewProjectDialogClose} color="primary">
           Cancel

@@ -44,7 +44,7 @@ function NewProjectDialog({ open, onClose }: Props) {
           type="text"
           fullWidth
           value={newProjectName}
-          helperText="This name should be unique"
+          helperText="The name should be unique and contain only letters"
           onChange={(ev) => setNewProjectName(ev.target.value)}
         />
       </DialogContent>
