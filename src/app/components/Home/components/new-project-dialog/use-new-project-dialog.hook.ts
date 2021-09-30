@@ -28,7 +28,7 @@ function useNewProjectDialogHook(onClose: () => void): State {
     window.api.send<string>(Channel.CREATE_PROJECT, newProjectName);
     window.api.on<boolean>(Channel.PROJECT_CREATED, (success) => {
       if (success) {
-        addSuccessAlert({ msg: `Project ${newProjectName} created!` });
+        addSuccessAlert({ msg: `Project "${newProjectName}" created!` });
       } else {
         addErrorAlert({
           msg: `Project "${newProjectName}" could not be created. Make sure that this app has access to your document folder and that your project name is unique.`,
@@ -39,14 +39,20 @@ function useNewProjectDialogHook(onClose: () => void): State {
     });
   };
 
-  const disableConfirmButton = newProjectName.length === 0;
+  const disableConfirmButton =
+    newProjectName.length === 0 || !/^[a-zA-Z]+$/.test(newProjectName);
   const loadConfirmButton = isCreating;
+
+  const setNewProjectNameCapitalized = (value: string) =>
+    setNewProjectName(
+      value.length === 1 ? value.charAt(0).toUpperCase() : value
+    );
 
   return {
     disableConfirmButton,
     loadConfirmButton,
     newProjectName,
-    setNewProjectName,
+    setNewProjectName: setNewProjectNameCapitalized,
     handleNewProjectDialogClose,
     handleNewProjectDialogConfirm,
   };

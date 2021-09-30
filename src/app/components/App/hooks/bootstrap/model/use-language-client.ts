@@ -43,7 +43,7 @@ function useLanguageClient(path: string) {
     const client = new CSharpLanguageClient(connection);
     client.start();
     return client;
-  }, [areServicesInstalled]);
+  }, [areServicesInstalled, rootUri]);
 
   useLoadingStep<LoadingSteps>({
     step: LoadingSteps.LANGUAGE_CLIENT_STARTED,

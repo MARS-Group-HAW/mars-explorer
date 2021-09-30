@@ -121,7 +121,8 @@
       "packagerConfig": {
         "extraResource": [
           "./resources/examples",
-          "./resources/omnisharp"
+          "./resources/omnisharp",
+          "./resources/templates"
         ]
       },
       "makers": [
