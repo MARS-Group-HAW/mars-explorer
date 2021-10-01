@@ -3,7 +3,7 @@ const path = require("path");
 const os = require("os");
 const download = require("download");
 
-const OMNISHARP_VERSION = "1.37.12";
+const OMNISHARP_VERSION = "1.37.15";
 
 const pathToResources = path.join(__dirname, "..", "resources");
 const pathToOmnisharp = path.join(pathToResources, "omnisharp");

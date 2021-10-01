@@ -1,4 +1,5 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { IModelFile, WorkingModel } from "@shared/types/Model";
 import type { RootState } from "../../../utils/store";
 import {
   initialLoadingState,
@@ -9,11 +10,13 @@ import LoadingSteps from "./LoadingSteps";
 
 // Define a type for the slice state
 type ModelState = LoadingState<LoadingSteps> & {
+  models: WorkingModel;
   hasErrorsIn: string[];
 };
 
 // Define the initial state using that type
 const initialState: ModelState = {
+  models: [],
   hasErrorsIn: [],
   ...initialLoadingState,
   maxSteps: Object.keys(LoadingSteps).length,
@@ -23,6 +26,17 @@ export const modelSlice = createSlice({
   name: "model",
   initialState,
   reducers: {
+    addModel: (state, { payload }: PayloadAction<IModelFile>) => {
+      state.models.push(payload);
+    },
+    removeModel: (state, { payload }: PayloadAction<IModelFile>) => {
+      state.models = state.models.filter(
+        (model) => model.path !== payload.path
+      );
+    },
+    setModel: (state, { payload }: PayloadAction<WorkingModel>) => {
+      state.models = payload;
+    },
     resetErrors: (state) => {
       state.hasErrorsIn = initialState.hasErrorsIn;
     },
@@ -45,10 +59,14 @@ export const {
   finishLoadingStep,
   resetLoadingStep,
   resetLoadingSteps,
+  addModel,
+  removeModel,
+  setModel,
 } = modelSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectModel = (state: RootState) => state.model;
+export const selectModels = (state: RootState) => state.model.models;
 export const selectMonacoServicesInstalled = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MONACO_SERVICES_INSTALLED);
 export const selectStepWithStatus = (
