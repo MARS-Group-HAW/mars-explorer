@@ -23,10 +23,6 @@ function useMonacoServices(path: string) {
     setMonacoService(MonacoServices.install(monaco, { rootUri }));
   }, [rootUri]);
 
-  useEffect(() => {
-    console.log("services changed");
-  }, [monacoServices]);
-
   useLoadingStep<LoadingSteps>({
     step: LoadingSteps.MONACO_SERVICES_INSTALLED,
     isLoading: !monacoServices,

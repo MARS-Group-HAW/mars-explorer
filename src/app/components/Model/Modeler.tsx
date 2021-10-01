@@ -13,12 +13,15 @@ import ModelList from "./components/model-list/model-list";
 import useModeler from "./hooks";
 import LoadingSteps from "./utils/LoadingSteps";
 
+const listContainerWidth = 200;
+
 const useStyles = makeStyles((theme) => ({
   backdropContainer: {
     position: "relative",
     width: "100%",
     height: "100%",
     backgroundColor: "transparent",
+    overflow: "hidden",
   },
   backdrop: {
     zIndex: theme.zIndex.drawer + 1,
@@ -36,6 +39,14 @@ const useStyles = makeStyles((theme) => ({
   },
   doneIcon: {
     color: theme.palette.success.light,
+  },
+  listContainer: {
+    position: "relative",
+    width: listContainerWidth,
+    height: "100%",
+  },
+  monacoContainer: {
+    width: `calc(100% - ${listContainerWidth}px)`,
   },
 }));
 
@@ -102,15 +113,19 @@ function Modeler() {
           </Grid>
         </Box>
       </Backdrop>
-      <Grid item xs={2}>
+      <div className={classes.listContainer}>
         <ModelList
           models={models}
           showLoading={showModelListLoading}
           selectedModelIndex={selectedModelIndex}
           selectModelAtIndex={selectModelAtIndex}
         />
-      </Grid>
-      <Grid id="monaco-container" component="div" innerRef={ref} item xs={10} />
+      </div>
+      <div
+        className={classes.monacoContainer}
+        id="monaco-container"
+        ref={ref}
+      />
     </Grid>
   );
 }

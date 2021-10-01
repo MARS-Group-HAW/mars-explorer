@@ -1,16 +1,21 @@
 import React, { useState } from "react";
-import { editor } from "monaco-editor";
+import { editor, languages } from "monaco-editor";
 import monaco from "@app/standalone/monaco-editor/monaco";
 import { useMount } from "react-use";
 import CSHARP from "../../../standalone/monaco-editor/types";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import ITextModel = editor.ITextModel;
+import IStandaloneEditorConstructionOptions = editor.IStandaloneEditorConstructionOptions;
 
 monaco.languages.register(CSHARP);
 
 // eslint-disable-next-line no-restricted-globals
 (self as any).MonacoEnvironment = {
   getWorkerUrl: () => "editor.worker.js",
+};
+
+const monacoOptions: IStandaloneEditorConstructionOptions = {
+  automaticLayout: true,
 };
 
 type State = {
@@ -23,7 +28,7 @@ function useEditor(containerRef: React.RefObject<HTMLDivElement>): State {
   useMount(
     () =>
       containerRef.current &&
-      setMonacoEditor(monaco.editor.create(containerRef.current))
+      setMonacoEditor(monaco.editor.create(containerRef.current, monacoOptions))
   );
 
   function createOrGetModel(path: string, content: string): ITextModel {
@@ -40,7 +45,7 @@ function useEditor(containerRef: React.RefObject<HTMLDivElement>): State {
 
   function setModel(path: string, content: string) {
     const newModel = createOrGetModel(path, content);
-    monacoEditor.setModel(newModel);
+    monacoEditor?.setModel(newModel);
   }
 
   return {

@@ -2,8 +2,9 @@ import { useState } from "react";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import { useAsync } from "react-use";
 import { Channel } from "@shared/types/Channel";
-import { useAppSelector } from "../../../utils/hooks/use-store";
+import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import { selectProject } from "../../Home/utils/project-slice";
+import { selectModels, setModel } from "../utils/model-slice";
 
 type State = {
   areModelsLoading: boolean;
@@ -13,10 +14,11 @@ type State = {
 };
 
 function useModels(): State {
+  const dispatch = useAppDispatch();
   const { path, name } = useAppSelector(selectProject);
+  const models = useAppSelector(selectModels);
 
   const [selectedModel, setSelectedModel] = useState<IModelFile>();
-  const [models, setModels] = useState<WorkingModel>([]);
 
   const { loading } = useAsync(async () => {
     if (path) {
@@ -24,7 +26,7 @@ function useModels(): State {
         Channel.GET_USER_PROJECT,
         { path, name }
       );
-      setModels(workingModel);
+      dispatch(setModel(workingModel));
     }
   }, [path]);
 

@@ -8,7 +8,7 @@ import { Logger } from "./logger";
 import { launchLanguageServer } from "./server-launcher";
 import fixPath from "fix-path";
 import { ModelsJson } from "./types/ModelsJson";
-import { ModelRef, WorkingModel } from "@shared/types/Model";
+import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import installExtension, {
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
@@ -18,6 +18,8 @@ import * as child_process from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import { handleSimulationProgress } from "./handle-simulation-progress";
 import { IFileRef } from "@shared/types/File";
+import { ObjectCreationMessage } from "@shared/types/object-creation-message";
+import SimObjects from "@shared/types/sim-objects";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -248,6 +250,61 @@ ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
     }
   });
 });
+
+const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
+const OBJECT_NAME_PLACEHOLDER = /\$OBJECT_NAME/g;
+
+type Replaceable = {
+  placeholder: RegExp;
+  value: string;
+};
+
+async function copyAndReplaceTemplate(
+  templateName: string,
+  filePath: string,
+  replaceables: Replaceable[]
+): Promise<string> {
+  const templatePath = path.resolve(PATHS.templates, templateName);
+  let content = await fs.readFile(templatePath, "utf8");
+
+  replaceables.forEach(({ placeholder, value }) => {
+    content = content.replace(placeholder, value);
+  });
+
+  await fs.writeFile(filePath, content, "utf8");
+  return content;
+}
+
+ipcMain.handle(
+  Channel.CREATE_OBJECT,
+  async (
+    _,
+    { projectPath, projectName, objectType, objectName }: ObjectCreationMessage
+  ): Promise<IModelFile> => {
+    if (objectType !== SimObjects.AGENT)
+      throw new Error("Type not supported yet.");
+
+    const objectFile = `${objectName}.cs`; // TODO other templates
+    const filePath = path.resolve(projectPath, objectFile);
+
+    const content = await copyAndReplaceTemplate("Agent.cs", filePath, [
+      {
+        placeholder: PROJECT_NAME_PLACEHOLDER,
+        value: projectName,
+      },
+      {
+        placeholder: OBJECT_NAME_PLACEHOLDER,
+        value: objectName,
+      },
+    ]);
+
+    return {
+      name: objectFile,
+      path: filePath,
+      content: content,
+    };
+  }
+);
 
 ipcMain.on(Channel.INSTALL_MARS, (_, path: string) => {
   if (!fs.pathExistsSync(path)) {
