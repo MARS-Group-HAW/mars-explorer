@@ -1,5 +1,6 @@
 import * as React from "react";
 import { Grid, makeStyles, Paper } from "@material-ui/core";
+import { Skeleton } from "@material-ui/lab";
 import ObjectList from "../object-list";
 import LineChart from "../line-chart";
 import useListChartGrid from "./list-chart-grid.hook";
@@ -44,6 +45,7 @@ function ListChartGrid() {
     handleChartTypeChange,
     showEmptyMessage,
     showGridAndCharts,
+    showChartSkeleton,
   } = useListChartGrid();
 
   return (
@@ -90,8 +92,13 @@ function ListChartGrid() {
             xs={7}
             component={Paper}
           >
-            {chartType === ChartType.LINE && <LineChart />}
-            {chartType === ChartType.BUBBLE && <BubbleChart />}
+            {showChartSkeleton && <Skeleton style={{ height: "100%" }} />}
+            {!showChartSkeleton && chartType === ChartType.LINE && (
+              <LineChart />
+            )}
+            {!showChartSkeleton && chartType === ChartType.BUBBLE && (
+              <BubbleChart />
+            )}
           </Grid>
         </Grid>
       )}
