@@ -1,4 +1,4 @@
-import { ResultDataMap } from "../components/Analyze/utils/ResultData";
+import { ResultData } from "../components/Analyze/utils/ResultData";
 
 export enum CacheKey {
   LAST_PATH = "LAST_PATH",
@@ -7,7 +7,7 @@ export enum CacheKey {
 
 interface CacheValues {
   [CacheKey.LAST_PATH]: string;
-  [CacheKey.RESULTS_BY_KEY]: ResultDataMap;
+  [CacheKey.RESULTS_BY_KEY]: ResultData;
 }
 
 class LocalStorageService {
@@ -18,6 +18,7 @@ class LocalStorageService {
   }
 
   setItem<T extends CacheKey>(key: T, value: CacheValues[T]): void {
+    console.log("Setting item", key, value);
     this.localStorage.setItem(key, JSON.stringify(value));
   }
 

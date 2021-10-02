@@ -20,11 +20,12 @@ function useLineChart(): State {
   return {
     data: {
       labels: xData,
-      datasets: Object.keys(dataMap).map((key, index) => ({
-        label: `# of ${key}`,
-        data: dataMap[key].data.map((datum) => datum.count),
-        hidden: !isCheckedByName(objectListWithMetaData, key),
+      datasets: dataMap.map(({ name, data }, index) => ({
+        label: `# of ${name}`,
+        data: data.map((datum) => datum.count),
+        hidden: !isCheckedByName(objectListWithMetaData, name),
         backgroundColor: getColorByIndex(index),
+        borderColor: getColorByIndex(index),
       })),
     },
   };

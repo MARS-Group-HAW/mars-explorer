@@ -4,25 +4,25 @@ import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import { Channel } from "@shared/types/Channel";
 import { ExampleProject } from "@shared/types/ExampleProject";
 import { Project } from "@shared/types/Project";
-import { Logger } from "./logger";
-import { launchLanguageServer } from "./server-launcher";
 import fixPath from "fix-path";
-import { ModelsJson } from "./types/ModelsJson";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import installExtension, {
   REACT_DEVELOPER_TOOLS,
 } from "electron-devtools-installer";
-import FileRef from "./types/FileRef";
-import ModelFile from "./types/ModelFile";
 import * as child_process from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
-import { handleSimulationProgress } from "./handle-simulation-progress";
 import { IFileRef } from "@shared/types/File";
 import { ObjectCreationMessage } from "@shared/types/object-creation-message";
 import SimObjects from "@shared/types/sim-objects";
 // @ts-ignore - no types available
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
+import { handleSimulationProgress } from "./handle-simulation-progress";
+import ModelFile from "./types/ModelFile";
+import FileRef from "./types/FileRef";
+import { ModelsJson } from "./types/ModelsJson";
+import { launchLanguageServer } from "./server-launcher";
+import { Logger } from "./logger";
 
 const log = new Logger("main");
 
@@ -119,12 +119,12 @@ app
     enforceMacOSAppLocation();
     log.info("Starting setup");
     setupApp();
-    //log.info("Starting server");
-    //webSocketPort = startServer();
+    // log.info("Starting server");
+    // webSocketPort = startServer();
     log.info("Creating window");
     createWindow();
 
-    app.on("activate", function () {
+    app.on("activate", () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
       if (BrowserWindow.getAllWindows().length === 0) createWindow();
@@ -137,7 +137,7 @@ app.on("before-quit", () => log.info("Quitting app"));
 // Quit when all windows are closed, except on macOS. There, it's common
 // for applications and their menu bar to stay active until the user quits
 // explicitly with Cmd + Q.
-app.on("window-all-closed", function () {
+app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
 
@@ -173,9 +173,8 @@ ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
 ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
   if (fs.pathExistsSync(path)) {
     return new FileRef(path);
-  } else {
-    return null;
   }
+  return null;
 });
 
 async function deleteDir(path: string): Promise<boolean> {
@@ -301,7 +300,7 @@ ipcMain.handle(
     return {
       name: objectFile,
       path: filePath,
-      content: content,
+      content,
     };
   }
 );
@@ -313,7 +312,7 @@ ipcMain.on(Channel.INSTALL_MARS, (_, path: string) => {
     );
   }
 
-  const versionFlag = " --version 4.3.0";
+  const versionFlag = " --version 4.3.1"; // FIXME
 
   const installProcess = child_process.exec(
     `dotnet add package Mars.Life.Simulations${versionFlag}`,
@@ -350,18 +349,17 @@ function getFilesInDirWithExtension(
 
 ipcMain.handle(
   Channel.GET_USER_PROJECT,
-  (_, modelRef: ModelRef): WorkingModel => {
-    return getFilesInDirWithExtension(modelRef.path, FileExtensions.CSHARP).map(
+  (_, modelRef: ModelRef): WorkingModel =>
+    getFilesInDirWithExtension(modelRef.path, FileExtensions.CSHARP).map(
       (file) => new ModelFile(file)
-    );
-  }
+    )
 );
 
-ipcMain.handle(Channel.GET_CSV_RESULTS, (_, path: string): IFileRef[] => {
-  return getFilesInDirWithExtension(path, FileExtensions.CSV).map(
+ipcMain.handle(Channel.GET_CSV_RESULTS, (_, path: string): IFileRef[] =>
+  getFilesInDirWithExtension(path, FileExtensions.CSV).map(
     (file) => new FileRef(file)
-  );
-});
+  )
+);
 
 ipcMain.handle(Channel.GET_DEFAULT_CONFIG_PATH, (_, rootPath: string): string =>
   path.resolve(rootPath, "config.json")
@@ -380,9 +378,8 @@ ipcMain.handle(
 
     if (fs.existsSync(pathToDefaultConfig)) {
       return fs.readJsonSync(pathToDefaultConfig);
-    } else {
-      return null;
     }
+    return null;
   }
 );
 
@@ -417,9 +414,8 @@ ipcMain.handle(
 
 ipcMain.handle(
   Channel.READ_FILE,
-  (ev: IpcMainInvokeEvent, path: string): string => {
-    return fs.readFileSync(path, "utf-8");
-  }
+  (ev: IpcMainInvokeEvent, path: string): string =>
+    fs.readFileSync(path, "utf-8")
 );
 
 let languageServerChannel: string;

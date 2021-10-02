@@ -6,7 +6,6 @@ import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
   addResults,
   finishResults,
-  initObject,
   selectSimulationState,
   setSimulationState,
 } from "../utils/simulation-slice";
@@ -23,14 +22,14 @@ type State = {
 function useSimulation(): State {
   const dispatch = useAppDispatch();
   const simState = useAppSelector(selectSimulationState);
-  const setSimState = (newState: SimulationStates) =>
+  const dispatchSimState = (newState: SimulationStates) =>
     dispatch(setSimulationState(newState));
 
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState<string>();
 
   function runSimulation(path: string) {
-    setSimState(SimulationStates.STARTED);
+    dispatchSimState(SimulationStates.STARTED);
     window.api.invoke(Channel.RUN_SIMULATION, path);
   }
 
@@ -42,12 +41,21 @@ function useSimulation(): State {
     progress: simProgress,
     results,
   }: SimulationProgressMessage) {
-    setSimState(SimulationStates.RUNNING);
+    dispatchSimState(SimulationStates.RUNNING);
     setProgress(simProgress);
-    Object.keys(results).forEach((objectName) => {
-      initObject({ name: objectName });
+    results.forEach(({ name, count, coords }) => {
+      dispatch(addResults({ name, data: { count, coords } }));
+    });
+  }
+
+  function handleSimulationEnd(endState: SimulationStates) {
+    dispatchSimState(endState);
+    window.api.logger.info(`Finishing results (Code: ${endState}).`);
+
+    if (endState === SimulationStates.SUCCESS) {
+      console.log("with success");
       try {
-        addResults({ name: objectName, data: results[objectName] });
+        dispatch(finishResults());
       } catch (e: unknown) {
         if (e === "QUOTA_EXCEEDED_ERR") {
           // TODO
@@ -56,7 +64,7 @@ function useSimulation(): State {
           ); // data wasn't successfully saved due to quota exceed so throw an error
         }
       }
-    });
+    }
   }
 
   useChannelSubscription(Channel.SIMULATION_PROGRESS, handleSimulationProgress);
@@ -67,7 +75,7 @@ function useSimulation(): State {
     setError(errMsg);
   });
 
-  useChannelSubscription(Channel.SIMULATION_EXITED, setSimState);
+  useChannelSubscription(Channel.SIMULATION_EXITED, handleSimulationEnd);
 
   useEffect(() => {
     if (simState !== SimulationStates.FAILED) {
@@ -82,7 +90,6 @@ function useSimulation(): State {
         window.api.logger.info(`Simulation is running.`);
         break;
       case SimulationStates.SUCCESS:
-        dispatch(finishResults);
         window.api.logger.info(`Simulation finished successfully.`);
         break;
       case SimulationStates.TERMINATED:

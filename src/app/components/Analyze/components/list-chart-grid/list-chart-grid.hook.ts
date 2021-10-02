@@ -17,12 +17,12 @@ type State = {
 
 function useListChartGrid(): State {
   const [objectListWithMetaData, dispatch] = useSharedObjectsWithStatus();
-  const keys = useAppSelector(selectResultKeys);
+  const names = useAppSelector(selectResultKeys);
   const [chartType, setChartType] = useState(ChartType.LINE);
 
   useDeepCompareEffect(() => {
-    keys.forEach((key) => dispatch(add({ name: key })));
-  }, [keys]);
+    names.forEach((name) => dispatch(add({ name })));
+  }, [names]);
 
   const isEmpty = objectListWithMetaData.length === 0;
 

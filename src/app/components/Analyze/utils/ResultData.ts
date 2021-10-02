@@ -1,21 +1,17 @@
-import { ObjectCoordinate, ObjectCount } from "@shared/types/ObjectData";
+import { ObjectProgressResult } from "@shared/types/ObjectData";
 
-export type ResultDatum = {
-  count: ObjectCount;
-  coords: ObjectCoordinate;
-};
+export type ResultDatum = Omit<ObjectProgressResult, "name">;
 
 export type ResultDataPerTick = ResultDatum[];
 
 export type ResultDataWithMeta = {
+  name: string;
   data: ResultDataPerTick;
   isLoading: boolean;
   hasCompleted: boolean;
   hasBeenRestored: boolean;
 };
 
-export type ResultDataMap = {
-  [key: string]: ResultDataWithMeta;
-};
+export type ResultData = ResultDataWithMeta[];
 
 export default ResultDataPerTick;

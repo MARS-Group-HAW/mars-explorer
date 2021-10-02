@@ -1,6 +1,6 @@
-import { ObjectResultsMap } from "./ObjectData";
+import { ObjectProgressResults } from "./ObjectData";
 
 export type SimulationProgressMessage = {
   progress: number;
-  results: ObjectResultsMap;
+  results: ObjectProgressResults;
 };
