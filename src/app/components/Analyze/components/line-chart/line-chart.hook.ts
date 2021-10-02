@@ -4,7 +4,10 @@ import {
   useSharedObjectsWithStatus,
 } from "../../hooks/use-objects-selection-context";
 import { useAppSelector } from "../../../../utils/hooks/use-store";
-import { selectResultData } from "../../../QuickStartBar/utils/simulation-slice";
+import {
+  selectResultData,
+  selectSimulationRunningStatus,
+} from "../../../QuickStartBar/utils/simulation-slice";
 import getColorByIndex from "../../utils/colors";
 
 type State = {
@@ -15,6 +18,7 @@ const xData = [...Array(101).keys()];
 
 function useLineChart(): State {
   const dataMap = useAppSelector(selectResultData);
+  const isRunning = useAppSelector(selectSimulationRunningStatus);
   const [objectListWithMetaData] = useSharedObjectsWithStatus();
 
   return {
@@ -26,6 +30,7 @@ function useLineChart(): State {
         hidden: !isCheckedByName(objectListWithMetaData, name),
         backgroundColor: getColorByIndex(index),
         borderColor: getColorByIndex(index),
+        animation: !isRunning,
       })),
     },
   };
