@@ -6,6 +6,7 @@ import {
   makeStyles,
   Radio,
   RadioGroup,
+  Tooltip,
 } from "@material-ui/core";
 import ChartType from "../../utils/chart-type";
 
@@ -46,14 +47,33 @@ function ChartSelector({ currentChartType, onChartTypeChange }: Props) {
         value={currentChartType}
         onChange={(ev, value) => onChartTypeChange(value as ChartType)}
       >
-        {Object.values(ChartType).map((type) => (
-          <FormControlLabel
-            key={type}
-            value={type}
-            control={<Radio />}
-            label={chartTypeToLabel(type)}
-          />
-        ))}
+        {Object.values(ChartType).map((type) => {
+          if (type === ChartType.BUBBLE) {
+            return (
+              <Tooltip
+                key={type}
+                title="Not supported yet"
+                placement="bottom"
+                open
+              >
+                <FormControlLabel
+                  value={type}
+                  control={<Radio />}
+                  label={chartTypeToLabel(type)}
+                  disabled
+                />
+              </Tooltip>
+            );
+          }
+          return (
+            <FormControlLabel
+              key={type}
+              value={type}
+              control={<Radio />}
+              label={chartTypeToLabel(type)}
+            />
+          );
+        })}
       </RadioGroup>
     </FormControl>
   );
