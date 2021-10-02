@@ -1,7 +1,8 @@
 import { useDeepCompareEffect } from "react-use";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   add,
+  unselectAll,
   useSharedObjectsWithStatus,
 } from "../../hooks/use-objects-selection-context";
 import { useAppSelector } from "../../../../utils/hooks/use-store";
@@ -26,6 +27,10 @@ function useListChartGrid(): State {
   const hasStarted = useAppSelector(selectSimulationHasStarted);
   const isStarting = useAppSelector(selectSimulationStartingStatus);
   const [chartType, setChartType] = useState(ChartType.LINE);
+
+  useEffect(() => {
+    dispatch(unselectAll);
+  }, [isStarting]);
 
   useDeepCompareEffect(() => {
     names.forEach((name) => dispatch(add({ name })));

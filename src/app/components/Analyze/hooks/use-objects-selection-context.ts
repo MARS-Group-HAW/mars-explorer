@@ -1,8 +1,9 @@
-import { createAction, createReducer, current } from "@reduxjs/toolkit";
+import { createAction, createReducer } from "@reduxjs/toolkit";
 import { createReducerContext } from "react-use";
 
 export const add = createAction<{ name: string }, "add">("add");
 export const toggle = createAction<{ name: string }, "toggle">("toggle");
+export const unselectAll = createAction<void, "unselectAll">("unselectAll");
 
 type ObjectWithCheckedStatus = {
   name: string;
@@ -37,6 +38,12 @@ const reducer = createReducer(initialState, (builder) =>
 
       state[indexOfObject].isChecked = !state[indexOfObject].isChecked;
     })
+    .addCase(unselectAll, (state) =>
+      state.map((item) => ({
+        ...item,
+        isChecked: false,
+      }))
+    )
 );
 
 export const isCheckedByName = (state: State, name: string) =>
