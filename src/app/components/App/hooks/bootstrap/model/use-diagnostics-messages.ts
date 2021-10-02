@@ -36,7 +36,7 @@ function useDiagnosticsMessages(): State {
   const dispatch = useAppDispatch();
 
   const resetDiagnostics = () => {
-    dispatch(resetErrors);
+    dispatch(resetErrors());
   };
 
   useEffect(resetDiagnostics, [path]);

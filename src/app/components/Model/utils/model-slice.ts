@@ -1,11 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IModelFile, WorkingModel } from "@shared/types/Model";
 import type { RootState } from "../../../utils/store";
-import {
-  initialLoadingState,
-  loadingReducers,
-  LoadingState,
-} from "../../../utils/slices/loading-slice";
+import { initialLoadingState, loadingReducers, LoadingState } from "../../../utils/slices/loading-slice";
 import LoadingSteps from "./LoadingSteps";
 
 // Define a type for the slice state
