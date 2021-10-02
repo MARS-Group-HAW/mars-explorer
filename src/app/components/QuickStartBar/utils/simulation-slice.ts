@@ -5,7 +5,7 @@ import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import type { RootState } from "../../../utils/store";
 import {
-  ResultDataMap,
+  ResultData,
   ResultDataWithMeta,
   ResultDatum,
 } from "../../Analyze/utils/ResultData";
@@ -13,25 +13,25 @@ import {
 // Define a type for the slice state
 type SimulationState = {
   simulationState: SimulationStates;
-  resultDataMap: ResultDataMap;
+  resultData: ResultData;
 };
 
-const initialResultDataWithMeta: ResultDataWithMeta = {
+const initialResultDataWithMeta: Omit<ResultDataWithMeta, "name"> = {
   data: [],
   isLoading: false,
   hasBeenRestored: false,
   hasCompleted: false,
 };
 
-function restoreResults(): ResultDataMap {
+function restoreResults(): ResultData {
   const restoredData = localStorageService.getItem(CacheKey.RESULTS_BY_KEY);
 
   if (!restoredData) {
     window.api.logger.info("Could not restore old result data.");
-    return {};
+    return [];
   }
 
-  Object.values(restoredData).forEach((result) => {
+  restoredData.forEach((result) => {
     result.hasBeenRestored = true;
   });
 
@@ -43,8 +43,13 @@ function restoreResults(): ResultDataMap {
 // Define the initial state using that type
 const initialState: SimulationState = {
   simulationState: SimulationStates.NONE,
-  resultDataMap: restoreResults(),
+  resultData: restoreResults(),
 };
+
+const findIndexOfResultDataByName = (
+  state: SimulationState,
+  name: string
+): number => state.resultData.findIndex((results) => results.name === name);
 
 export const simulationSlice = createSlice({
   name: "simulation",
@@ -53,12 +58,12 @@ export const simulationSlice = createSlice({
   reducers: {
     setSimulationState: (state, action: PayloadAction<SimulationStates>) => {
       state.simulationState = action.payload;
-    },
-    initObject: (state, action: PayloadAction<{ name: string }>) => {
-      const { name } = action.payload;
 
-      if (!state.resultDataMap[name]) {
-        state.resultDataMap[name] = initialResultDataWithMeta;
+      if (action.payload === SimulationStates.STARTED) {
+        state.resultData = state.resultData.map(({ name }) => ({
+          name,
+          ...initialResultDataWithMeta,
+        }));
       }
     },
     addResults: (
@@ -67,26 +72,49 @@ export const simulationSlice = createSlice({
     ) => {
       const { name, data } = action.payload;
       state.simulationState = SimulationStates.RUNNING;
-      state.resultDataMap[name].isLoading = true;
-      state.resultDataMap[name].hasCompleted = false;
-      state.resultDataMap[name].data.push(data);
+
+      const indexOfResults = findIndexOfResultDataByName(state, name);
+
+      if (indexOfResults === -1) {
+        state.resultData.push({
+          name,
+          isLoading: true,
+          hasCompleted: false,
+          hasBeenRestored: false,
+          data: [data],
+        });
+      } else {
+        state.resultData[indexOfResults].isLoading = true;
+        state.resultData[indexOfResults].hasCompleted = false;
+        state.resultData[indexOfResults].data.push(data);
+      }
     },
     finishResults: (state) => {
-      Object.keys(state.resultDataMap).forEach((name) => {
-        state.simulationState = SimulationStates.SUCCESS;
-        state.resultDataMap[name].isLoading = false;
-        state.resultDataMap[name].hasCompleted = true;
+      console.log("IN FINISH RESULTS");
+      state.simulationState = SimulationStates.SUCCESS;
+      state.resultData.forEach(({ name }) => {
+        const indexOfResults = findIndexOfResultDataByName(state, name);
+
+        if (indexOfResults === -1) {
+          window.api.logger.warn(
+            `Tried to finalize results of ${name} but it has not even been initialized yet.`
+          );
+          return;
+        }
+
+        state.resultData[indexOfResults].isLoading = false;
+        state.resultData[indexOfResults].hasCompleted = true;
       });
 
       localStorageService.setItem(
         CacheKey.RESULTS_BY_KEY,
-        current(state.resultDataMap)
+        current(state.resultData)
       );
     },
   },
 });
 
-export const { setSimulationState, initObject, addResults, finishResults } =
+export const { setSimulationState, addResults, finishResults } =
   simulationSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
@@ -97,8 +125,8 @@ export const selectSimulationRunningStatus = (state: RootState) =>
 export const selectSimulationFinishedStatus = (state: RootState) =>
   state.simulation.simulationState === SimulationStates.SUCCESS;
 export const selectResultKeys = (state: RootState) =>
-  Object.keys(state.simulation.resultDataMap);
+  state.simulation.resultData.map((data) => data.name);
 export const selectResultData = (state: RootState) =>
-  state.simulation.resultDataMap;
+  state.simulation.resultData;
 
 export default simulationSlice.reducer;

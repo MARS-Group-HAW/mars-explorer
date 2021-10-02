@@ -1,8 +1,9 @@
-export type ObjectCount = number;
-
-export type InputObjectCounts = {
-  [key: string]: ObjectCount;
+export type ObjectCount = {
+  name: string;
+  count: number;
 };
+
+export type TypedMetaData = ObjectCount[];
 
 export type InputObjectCoordinates = {
   [key: string]: ObjectCoordinate;
@@ -14,9 +15,10 @@ export type ObjectCoordinate = {
   count: number;
 }[];
 
-export type ObjectResultsMap = {
-  [key: string]: {
-    count: ObjectCount;
-    coords: ObjectCoordinate;
-  };
+export type ObjectProgressResult = {
+  name: string;
+  count: number;
+  coords: ObjectCoordinate;
 };
+
+export type ObjectProgressResults = ObjectProgressResult[];

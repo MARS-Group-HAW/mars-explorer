@@ -1,12 +1,12 @@
 import WS from "ws";
 import ReconnectingWebSocket, { Options } from "reconnecting-websocket";
-import { Logger } from "./logger";
 import {
   InputObjectCoordinates,
-  InputObjectCounts,
-  ObjectResultsMap,
+  ObjectProgressResults,
+  TypedMetaData,
 } from "@shared/types/ObjectData";
 import { SimulationProgressMessage } from "@shared/types/SimulationMessages";
+import { Logger } from "./logger";
 
 export enum WebSocketCloseCodes {
   RETRYING = 1000,
@@ -31,7 +31,7 @@ type ProgressMessage = {
   lastSuccessfullyDateTime: string;
   lastSuccessfullyStep: number;
   lastSuccessfullyTick: number;
-  objectCounts: InputObjectCounts;
+  typeMetadata?: TypedMetaData;
   objectCoordinates: InputObjectCoordinates;
 };
 
@@ -43,7 +43,7 @@ export function handleSimulationProgress(
   const options: Options = {
     WebSocket: WS, // custom WebSocket constructor
     maxRetries: 50,
-    connectionTimeout: 1000,
+    connectionTimeout: 100,
   };
   const rws = new ReconnectingWebSocket(
     "ws://127.0.0.1:4567/progress",
@@ -54,25 +54,42 @@ export function handleSimulationProgress(
   rws.onopen = () => log.info("WebSocket for Simulation opened.");
 
   let lastProgress: number;
+  let lastMaxTicks: number;
 
   rws.onmessage = (msg: MessageEvent<string>) => {
-    const { currentTick, maxTicks, objectCounts, objectCoordinates } =
-      JSON.parse(msg.data) as ProgressMessage;
-    const progress = Math.floor((currentTick / maxTicks) * 100);
+    const { currentTick, maxTicks, typeMetadata } = JSON.parse(
+      msg.data
+    ) as ProgressMessage;
+
+    if (maxTicks) {
+      lastMaxTicks = maxTicks;
+    }
+
+    const progress = Math.floor((currentTick / lastMaxTicks) * 100);
 
     if (lastProgress === undefined || lastProgress < progress) {
       log.debug(
-        `Simulation-Progress: ${currentTick} von ${maxTicks} (${progress}%)`
+        `Simulation-Progress: ${currentTick} von ${lastMaxTicks} (${progress}%)`
       );
 
-      const results: ObjectResultsMap = {};
-      const objCountKeys = Object.keys(objectCounts);
-      objCountKeys.forEach((key) => {
-        results[key] = {
-          coords: objectCoordinates[key],
-          count: objectCounts[key],
-        };
-      });
+      const results: ObjectProgressResults = [];
+
+      if (typeMetadata) {
+        typeMetadata.forEach(({ name, count }) => {
+          results.push({
+            name,
+            count,
+            coords: [
+              {
+                // FIXME
+                x: 1,
+                y: 1,
+                count: 1,
+              },
+            ],
+          });
+        });
+      }
 
       onProgress({
         progress,
@@ -98,6 +115,8 @@ export function handleSimulationProgress(
       case WebSocketCloseCodes.EXITING:
         log.info("WebSocket closed by simulation end.");
         break;
+      default:
+        log.info("WebSocket closed for unknown reason.");
     }
   };
   return () => rws.close(WebSocketCloseCodes.EXITING);

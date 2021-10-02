@@ -1,4 +1,4 @@
-import { createAction, createReducer } from "@reduxjs/toolkit";
+import { createAction, createReducer, current } from "@reduxjs/toolkit";
 import { createReducerContext } from "react-use";
 
 export const add = createAction<{ name: string }, "add">("add");
@@ -28,7 +28,7 @@ const reducer = createReducer(initialState, (builder) =>
     .addCase(toggle, (state, { payload }) => {
       const { name } = payload;
 
-      const indexOfObject = state.findIndex((obj) => obj.name);
+      const indexOfObject = state.findIndex((obj) => obj.name === name);
 
       if (indexOfObject === -1) {
         window.api.logger.warn("Object to toggle was not found: ", name);

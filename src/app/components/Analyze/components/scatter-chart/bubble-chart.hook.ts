@@ -20,24 +20,27 @@ type State = {
 };
 
 function useBubbleChart(): State {
-  const dataMap = useAppSelector(selectResultData);
+  const resultData = useAppSelector(selectResultData);
   const [objectListWithMetaData] = useSharedObjectsWithStatus();
   const [sliderTouched, setSliderTouched] = useBoolean(false);
   const [tick, setTick] = useState(0);
   const [maxTick, setMaxTick] = useState(0);
 
   useEffect(() => {
-    const values = Object.values(dataMap);
+    if (resultData.length === 0) return;
 
-    if (values.length === 0) return;
+    const ticksPerObject = resultData.map(
+      (resultOfObject) => resultOfObject.data.length - 1
+    );
+    const commonMaxStep = _.min(ticksPerObject);
+    const currentStep = Math.max(0, commonMaxStep);
 
-    const currentStep = _.findLastIndex(values[0].data);
     setMaxTick(currentStep);
 
     if (!sliderTouched) {
       setTick(currentStep);
     }
-  }, [dataMap]);
+  }, [resultData]);
 
   const decrementTick = () => setTick(Math.max(0, tick - 1));
   const incrementTick = () => setTick(Math.min(tick + 1, maxTick));
@@ -54,14 +57,16 @@ function useBubbleChart(): State {
     incrementTick,
     decrementTick,
     data: {
-      datasets: Object.keys(dataMap).map((key, index) => ({
-        label: `Coords of ${key} at tick ${tick}`,
-        data: dataMap[key].data[tick].coords.map(({ x, y, count }) => ({
-          x,
-          y,
-          count,
-        })),
-        hidden: !isCheckedByName(objectListWithMetaData, key),
+      datasets: resultData.map(({ name, data }, index) => ({
+        label: `Coords of ${name} at tick ${tick}`,
+        data: data[tick]
+          ? data[tick].coords.map(({ x, y, count }) => ({
+              x,
+              y,
+              count,
+            }))
+          : [],
+        hidden: !isCheckedByName(objectListWithMetaData, name),
         backgroundColor: getColorByIndex(index),
       })),
     },

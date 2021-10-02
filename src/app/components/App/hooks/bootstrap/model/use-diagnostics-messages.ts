@@ -42,7 +42,7 @@ function useDiagnosticsMessages(): State {
   useEffect(resetDiagnostics, [path]);
 
   function handleMessage(msg: Message) {
-    if (isProjectFullyInitialized) return;
+    if (!isProjectFullyInitialized) return;
 
     if (isNotificationMessage(msg) && isDiagnosticMessage(msg)) {
       const diagnosticParams = msg.params as PublishDiagnosticsParams;
