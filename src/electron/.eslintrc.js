@@ -8,6 +8,7 @@ module.exports = {
     "@typescript-eslint/no-namespace": "off",
     "@typescript-eslint/no-var-requires": "off",
     "@typescript-eslint/ban-ts-comment": "off",
+    "import/no-extraneous-dependencies": "off",
   },
   parser: "@typescript-eslint/parser",
   parserOptions: {
