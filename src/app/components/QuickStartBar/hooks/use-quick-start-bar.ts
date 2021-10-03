@@ -7,6 +7,7 @@ import { useAppSelector } from "../../../utils/hooks/use-store";
 import useSimulation from "./use-simulation";
 import { selectModel } from "../../Model/utils/model-slice";
 import useProjectInitializationStatus from "../../App/hooks/bootstrap/model/use-project-initialization-status";
+import useResultsInLocalStorage from "./use-results-in-local-storage";
 
 type State = {
   projectName: string;
@@ -29,6 +30,7 @@ type State = {
 function useQuickStartBar(): State {
   const { isProjectFullyInitialized } = useProjectInitializationStatus();
   const { path, name } = useAppSelector(selectProject);
+  useResultsInLocalStorage();
   const { simState, progress, errorMsg, runSimulation, cancelSimulation } =
     useSimulation();
 

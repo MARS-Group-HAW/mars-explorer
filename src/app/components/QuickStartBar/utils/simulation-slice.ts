@@ -9,6 +9,7 @@ import {
   ResultDataWithMeta,
   ResultDatum,
 } from "../../Analyze/utils/ResultData";
+import ResultsInStorage from "../../../utils/types/results-in-storage";
 
 // Define a type for the slice state
 type SimulationState = {
@@ -23,27 +24,10 @@ const initialResultDataWithMeta: Omit<ResultDataWithMeta, "name"> = {
   hasCompleted: false,
 };
 
-function restoreResults(): ResultData {
-  const restoredData = localStorageService.getItem(CacheKey.RESULTS_BY_KEY);
-
-  if (!restoredData) {
-    window.api.logger.info("Could not restore old result data.");
-    return [];
-  }
-
-  restoredData.forEach((result) => {
-    result.hasBeenRestored = true;
-  });
-
-  window.api.logger.info("Successfully restored old results.");
-
-  return restoredData;
-}
-
 // Define the initial state using that type
 const initialState: SimulationState = {
   simulationState: SimulationStates.NONE,
-  resultData: restoreResults(),
+  resultData: [],
 };
 
 const findIndexOfResultDataByName = (
@@ -90,7 +74,6 @@ export const simulationSlice = createSlice({
       }
     },
     finishResults: (state) => {
-      console.log("IN FINISH RESULTS");
       state.simulationState = SimulationStates.SUCCESS;
       state.resultData.forEach(({ name }) => {
         const indexOfResults = findIndexOfResultDataByName(state, name);
@@ -105,17 +88,52 @@ export const simulationSlice = createSlice({
         state.resultData[indexOfResults].isLoading = false;
         state.resultData[indexOfResults].hasCompleted = true;
       });
+    },
+    saveDataToLocalStorage: (state, action: PayloadAction<string>) => {
+      window.api.logger.info("Saving results");
+      const resultsInStorage: ResultsInStorage = {
+        projectPath: action.payload,
+        results: current(state).resultData,
+      };
 
-      localStorageService.setItem(
-        CacheKey.RESULTS_BY_KEY,
-        current(state.resultData)
-      );
+      localStorageService.setItem(CacheKey.RESULTS_BY_KEY, resultsInStorage);
+    },
+    restoreDataFromLocalStorage: (state, action: PayloadAction<string>) => {
+      const restoredData = localStorageService.getItem(CacheKey.RESULTS_BY_KEY);
+
+      if (!restoredData) {
+        window.api.logger.info("No result data for this project found.");
+        return;
+      }
+
+      if (restoredData && restoredData.projectPath !== action.payload) {
+        window.api.logger.info(
+          "Overwriting result data of ",
+          restoredData.projectPath
+        );
+        localStorageService.removeItem(CacheKey.RESULTS_BY_KEY);
+        return;
+      }
+
+      const restoredDataWithFlag = restoredData.results.map((result) => ({
+        ...result,
+        hasBeenRestored: true,
+      }));
+
+      window.api.logger.info("Successfully restored old results.");
+
+      state.resultData = restoredDataWithFlag;
     },
   },
 });
 
-export const { setSimulationState, addResults, finishResults } =
-  simulationSlice.actions;
+export const {
+  setSimulationState,
+  addResults,
+  finishResults,
+  restoreDataFromLocalStorage,
+  saveDataToLocalStorage,
+} = simulationSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectSimulationState = (state: RootState) =>

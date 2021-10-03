@@ -53,17 +53,7 @@ function useSimulation(): State {
     window.api.logger.info(`Finishing results (Code: ${endState}).`);
 
     if (endState === SimulationStates.SUCCESS) {
-      console.log("with success");
-      try {
-        dispatch(finishResults());
-      } catch (e: unknown) {
-        if (e === "QUOTA_EXCEEDED_ERR") {
-          // TODO
-          alert(
-            "The result could no be saved because it was too large. The results will not be available after a restart."
-          ); // data wasn't successfully saved due to quota exceed so throw an error
-        }
-      }
+      dispatch(finishResults());
     }
   }
 
