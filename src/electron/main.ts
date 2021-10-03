@@ -24,6 +24,7 @@ import { ModelsJson } from "./types/ModelsJson";
 import { launchLanguageServer } from "./server-launcher";
 import { Logger } from "./logger";
 import appPaths from "./app-paths";
+// @ts-ignore
 
 const log = new Logger("main");
 
@@ -189,11 +190,40 @@ async function replaceWithName(dir: string, name: string) {
   await fs.writeFile(programmcsInProj, result, "utf8");
 }
 
-ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
+enum Templates {
+  PROGRAMM_CS = "Program.cs",
+  AGENT_CS = "Agent.cs",
+}
+
+const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
+const OBJECT_NAME_PLACEHOLDER = /\$OBJECT_NAME/g;
+
+type Replaceable = {
+  placeholder: RegExp;
+  value: string;
+};
+
+async function copyAndReplaceTemplate(
+  templateName: Templates,
+  filePath: string,
+  replaceables: Replaceable[]
+): Promise<string> {
+  const templatePath = path.resolve(appPaths.templatesDir, templateName);
+  let content = await fs.readFile(templatePath, "utf8");
+
+  replaceables.forEach(({ placeholder, value }) => {
+    content = content.replace(placeholder, value);
+  });
+
+  await fs.writeFile(filePath, content, "utf8");
+  return content;
+}
+
+ipcMain.on(Channel.CREATE_PROJECT, (_, projectName: string) => {
   const args = [];
   args.push('--language "C#"');
   args.push("--framework netcoreapp3.1");
-  args.push(`--name ${name}`);
+  args.push(`--name ${projectName}`);
 
   log.info(
     `Started "dotnet new" with the following arguments: ${args.toString()}`
@@ -219,15 +249,25 @@ ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
     log.info(`"dotnet new" exited with code ${code}.`);
 
     if (code === 0) {
-      const newDirPath = path.resolve(appPaths.workspaceDir, name);
-      replaceWithName(newDirPath, name)
+      const projectDir = path.join(appPaths.workspaceDir, projectName);
+      const filePath = path.resolve(projectDir, "Program.cs");
+
+      copyAndReplaceTemplate(Templates.PROGRAMM_CS, filePath, [
+        {
+          placeholder: PROJECT_NAME_PLACEHOLDER,
+          value: projectName,
+        },
+      ])
         .then(sendSuccessMsg)
-        .catch((e: unknown) => {
-          log.error("Error while replacing contents in new project: ", e);
-          deleteDir(newDirPath)
+        .catch((replaceErr: unknown) => {
+          log.error(
+            "Error while replacing contents in new project: ",
+            replaceErr
+          );
+          deleteDir(projectDir)
             .then(sendErrorMsg)
-            .catch((e) =>
-              log.error("Error cleaning up after replacing failure: ", e)
+            .catch((delErr: unknown) =>
+              log.error("Error cleaning up after replacing failure: ", delErr)
             );
         });
     } else {
@@ -235,30 +275,6 @@ ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
     }
   });
 });
-
-const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
-const OBJECT_NAME_PLACEHOLDER = /\$OBJECT_NAME/g;
-
-type Replaceable = {
-  placeholder: RegExp;
-  value: string;
-};
-
-async function copyAndReplaceTemplate(
-  templateName: string,
-  filePath: string,
-  replaceables: Replaceable[]
-): Promise<string> {
-  const templatePath = path.resolve(appPaths.templatesDir, templateName);
-  let content = await fs.readFile(templatePath, "utf8");
-
-  replaceables.forEach(({ placeholder, value }) => {
-    content = content.replace(placeholder, value);
-  });
-
-  await fs.writeFile(filePath, content, "utf8");
-  return content;
-}
 
 ipcMain.handle(
   Channel.CREATE_OBJECT,
@@ -272,7 +288,7 @@ ipcMain.handle(
     const objectFile = `${objectName}.cs`; // TODO other templates
     const filePath = path.resolve(projectPath, objectFile);
 
-    const content = await copyAndReplaceTemplate("Agent.cs", filePath, [
+    const content = await copyAndReplaceTemplate(Templates.AGENT_CS, filePath, [
       {
         placeholder: PROJECT_NAME_PLACEHOLDER,
         value: projectName,
