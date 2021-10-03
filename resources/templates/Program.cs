@@ -3,7 +3,7 @@ using System.IO;
 using Mars.Components.Starter;
 using Mars.Interfaces.Model;
 
-namespace $NAME
+namespace $PROJECT_NAME
 {
     internal static class Program
     {
