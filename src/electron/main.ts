@@ -1,4 +1,4 @@
-import { enforceMacOSAppLocation, is } from "electron-util";
+import { enforceMacOSAppLocation } from "electron-util";
 import * as path from "path";
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
 import { Channel } from "@shared/types/Channel";
@@ -14,7 +14,7 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 import { IFileRef } from "@shared/types/File";
 import { ObjectCreationMessage } from "@shared/types/object-creation-message";
 import SimObjects from "@shared/types/sim-objects";
-// @ts-ignore - no types available
+// @ts-ignore
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
 import { handleSimulationProgress } from "./handle-simulation-progress";
@@ -23,23 +23,9 @@ import FileRef from "./types/FileRef";
 import { ModelsJson } from "./types/ModelsJson";
 import { launchLanguageServer } from "./server-launcher";
 import { Logger } from "./logger";
+import appPaths from "./app-paths";
 
 const log = new Logger("main");
-
-const EXAMPLES_DIR_NAME = "examples";
-const USER_DOCUMENTS_PATH = app.getPath("documents");
-const RESOURCES_PATH = is.development
-  ? path.join(__dirname, "..", "..", "resources")
-  : process.resourcesPath;
-const WORKSPACE_PATH = path.join(USER_DOCUMENTS_PATH, "mars-explorer");
-
-export const PATHS = {
-  workspace: WORKSPACE_PATH,
-  workspaceExamples: path.join(WORKSPACE_PATH, EXAMPLES_DIR_NAME),
-  modelsJson: path.resolve(RESOURCES_PATH, EXAMPLES_DIR_NAME, "models.json"),
-  resources: RESOURCES_PATH,
-  templates: path.resolve(RESOURCES_PATH, "templates"),
-};
 
 // IMPORTANT: fixes $PATH variable for macos, see https://stackoverflow.com/questions/62067127/path-variables-empty-in-electron
 fixPath();
@@ -62,9 +48,9 @@ if (squirrel) {
 function setupApp() {
   // FIXME: dont do on every startup
   log.info("Ensuring workspace dirs");
-  fs.ensureDirSync(PATHS.workspaceExamples);
-  log.info(`Copying Examples to ${PATHS.workspaceExamples}`);
-  fs.copySync(path.join(PATHS.resources, "examples"), PATHS.workspaceExamples);
+  fs.ensureDirSync(appPaths.workspaceExamplesDir);
+  log.info(`Copying Examples to ${appPaths.workspaceExamplesDir}`);
+  fs.copySync(appPaths.resourcesExamplesDir, appPaths.workspaceExamplesDir);
 }
 
 let mainWindow: BrowserWindow;
@@ -114,7 +100,7 @@ function createWindow() {
 app
   .whenReady()
   .then(() => {
-    log.info("Configuration: ", PATHS);
+    log.info("Relevant Paths: ", appPaths);
     log.info("Enforcing Location");
     enforceMacOSAppLocation();
     log.info("Starting setup");
@@ -141,12 +127,12 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
 
-ipcMain.handle(Channel.GET_WORKSPACE_PATH, () => PATHS.workspace);
+ipcMain.handle(Channel.GET_WORKSPACE_PATH, () => appPaths.workspaceDir);
 
-ipcMain.handle(Channel.GET_EXAMPLES_PATH, () => PATHS.workspaceExamples);
+ipcMain.handle(Channel.GET_EXAMPLES_PATH, () => appPaths.workspaceExamplesDir);
 
 ipcMain.handle(Channel.GET_EXAMPLE_PROJECTS, (): ModelRef[] => {
-  const modelsJson = fs.readJsonSync(PATHS.modelsJson) as ModelsJson;
+  const modelsJson = fs.readJsonSync(appPaths.modelsJson) as ModelsJson;
   return modelsJson.map(({ name, path }) => ({
     name,
     path,
@@ -155,10 +141,10 @@ ipcMain.handle(Channel.GET_EXAMPLE_PROJECTS, (): ModelRef[] => {
 
 ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
   const userProjects = fs
-    .readdirSync(PATHS.workspace)
-    .filter((file) => file !== EXAMPLES_DIR_NAME) // no example dir
+    .readdirSync(appPaths.workspaceDir)
+    .filter((file) => file !== appPaths.workspaceExamplesDir) // no example dir
     .filter((item) => !/(^|\/)\.[^/.]/g.test(item)) // remove hidden dirs
-    .map((file) => path.join(PATHS.workspace, file)) // to full path
+    .map((file) => path.join(appPaths.workspaceDir, file)) // to full path
     .filter((file) => fs.lstatSync(file).isDirectory())
     .map((file) => ({
       file,
@@ -194,7 +180,7 @@ ipcMain.handle(
 );
 
 async function replaceWithName(dir: string, name: string) {
-  const filePath = path.resolve(PATHS.templates, "Program.cs");
+  const filePath = path.resolve(appPaths.templatesDir, "Program.cs");
   const content = await fs.readFile(filePath, "utf8");
   const result = content.replace(/\$NAME/g, name);
 
@@ -216,7 +202,7 @@ ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
   const installProcess = child_process.exec(
     `dotnet new console ${args.join(" ")}`,
     {
-      cwd: WORKSPACE_PATH,
+      cwd: appPaths.workspaceDir,
     }
   );
 
@@ -233,7 +219,7 @@ ipcMain.on(Channel.CREATE_PROJECT, (_, name: string) => {
     log.info(`"dotnet new" exited with code ${code}.`);
 
     if (code === 0) {
-      const newDirPath = path.resolve(WORKSPACE_PATH, name);
+      const newDirPath = path.resolve(appPaths.workspaceDir, name);
       replaceWithName(newDirPath, name)
         .then(sendSuccessMsg)
         .catch((e: unknown) => {
@@ -263,7 +249,7 @@ async function copyAndReplaceTemplate(
   filePath: string,
   replaceables: Replaceable[]
 ): Promise<string> {
-  const templatePath = path.resolve(PATHS.templates, templateName);
+  const templatePath = path.resolve(appPaths.templatesDir, templateName);
   let content = await fs.readFile(templatePath, "utf8");
 
   replaceables.forEach(({ placeholder, value }) => {
@@ -403,7 +389,7 @@ ipcMain.handle(Channel.OPEN_PROJECT, (_, modelRef: ModelRef): Model => {
 ipcMain.handle(
   Channel.GET_EXAMPLE_PROJECT,
   (_, project: ExampleProject): Project => {
-    const root = path.join(PATHS.workspaceExamples, project);
+    const root = path.join(appPaths.workspaceExamplesDir, project);
     return {
       name: project,
       rootPath: root,

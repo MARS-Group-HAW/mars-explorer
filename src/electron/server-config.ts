@@ -1,9 +1,9 @@
 import * as path from "path";
-import { OmnisharpConfiguration } from "./types/OmnisharpConfiguration";
-import { Server } from "./types/OmnisharpServerConfiguration";
-import { PATHS } from "./main";
 import { is } from "electron-util";
 import os = require("os");
+import { OmnisharpConfiguration } from "./types/OmnisharpConfiguration";
+import { Server } from "./types/OmnisharpServerConfiguration";
+import appPaths from "./app-paths";
 
 let currentOS: "linux" | "osx" | "win";
 
@@ -74,7 +74,7 @@ export function getServer(projectPath: string): Server {
     ...OMNISHARP_BASE,
     args: [...OMNISHARP_BASE.args, `-s ${projectPath}`],
     options: {
-      cwd: path.join(PATHS.resources, "omnisharp", currentOS),
+      cwd: path.join(appPaths.resourcesDir, "omnisharp", currentOS),
       shell: true,
     },
   };
