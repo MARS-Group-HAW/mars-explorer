@@ -1,20 +1,22 @@
 import * as React from "react";
 import { Line } from "react-chartjs-2";
-import { ChartOptions } from "chart.js";
 import useLineChart from "./line-chart.hook";
 
-const options: ChartOptions = {
-  plugins: {
-    legend: {
-      onClick: () => {}, // suppress for now
-    },
-  },
-};
-
 function LineChart() {
-  const { data } = useLineChart();
+  const { data, onLabelClick } = useLineChart();
 
-  return <Line data={data} options={options} />;
+  return (
+    <Line
+      data={data}
+      options={{
+        plugins: {
+          legend: {
+            onClick: (e, legendItem) => onLabelClick(legendItem),
+          },
+        },
+      }}
+    />
+  );
 }
 
 export default LineChart;
