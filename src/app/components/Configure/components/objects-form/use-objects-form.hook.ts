@@ -1,8 +1,9 @@
 import useTabBar from "../../hooks/use-tab-bar";
 
-enum TabIndizes {
-  AGENTS,
-  LAYERS,
+export enum TabIndizes {
+  AGENTS = "AGENTS",
+  LAYERS = "LAYERS",
+  ENTITIES = "ENTITIES",
 }
 
 type Tabs = {
@@ -11,9 +12,9 @@ type Tabs = {
 }[];
 
 type State = {
-  currentTab: TabIndizes;
-  handleTabChange: (index: TabIndizes) => void;
+  tab: TabIndizes;
   tabs: Tabs;
+  handleTabChange: (index: TabIndizes) => void;
 };
 
 const tabs: Tabs = [
@@ -25,15 +26,19 @@ const tabs: Tabs = [
     label: "Layers",
     value: TabIndizes.LAYERS,
   },
+  {
+    label: "Entities",
+    value: TabIndizes.ENTITIES,
+  },
 ];
 
 function useObjectsForm(): State {
   const { tab, handleTabChange } = useTabBar<TabIndizes>(TabIndizes.AGENTS);
 
   return {
-    currentTab: tab,
-    handleTabChange,
+    tab,
     tabs,
+    handleTabChange,
   };
 }
 
