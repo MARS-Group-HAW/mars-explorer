@@ -10,6 +10,7 @@ import {
   selectSimulationRunningStatus,
 } from "../../../QuickStartBar/utils/simulation-slice";
 import getColorByIndex from "../../utils/colors";
+import useLabelClick from "../../hooks/use-label-click";
 
 type State = {
   data: ChartData;
@@ -21,19 +22,8 @@ const xData = [...Array(101).keys()];
 function useLineChart(): State {
   const dataMap = useAppSelector(selectResultData);
   const isRunning = useAppSelector(selectSimulationRunningStatus);
-  const [objectListWithMetaData, dispatch] = useSharedObjectsWithStatus();
-
-  const onLabelClick = (legendItem: LegendItem) => {
-    const index = legendItem.datasetIndex;
-    const clickedObj = objectListWithMetaData[index];
-
-    if (!clickedObj) {
-      window.api.logger.warn("Clicked item not found.");
-      return;
-    }
-
-    dispatch(toggle({ name: clickedObj.name }));
-  };
+  const [objectListWithMetaData] = useSharedObjectsWithStatus();
+  const { onLabelClick } = useLabelClick();
 
   const yData = (indexOfDataSet: number) => {
     const newArr = new Array(101);

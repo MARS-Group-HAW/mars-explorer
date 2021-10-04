@@ -7,6 +7,7 @@ import {
   SimulationCountMessage,
   SimulationVisMessage,
 } from "@shared/types/SimulationMessages";
+import _ from "lodash";
 import type { RootState } from "../../../utils/store";
 import { ResultData, ResultDataWithMeta } from "../../Analyze/utils/ResultData";
 import ResultsInStorage from "../../../utils/types/results-in-storage";
@@ -14,6 +15,7 @@ import ResultsInStorage from "../../../utils/types/results-in-storage";
 // Define a type for the slice state
 type SimulationState = {
   simulationState: SimulationStates;
+  maxProgress?: number;
   resultData: ResultData;
 };
 
@@ -57,11 +59,11 @@ export const simulationSlice = createSlice({
           name,
           ...initialResultDataWithMeta,
         }));
+        state.maxProgress = 0;
       }
     },
     addCountData: (state, action: PayloadAction<SimulationCountMessage>) => {
       const { progress, objectCounts } = action.payload;
-      state.simulationState = SimulationStates.RUNNING;
 
       objectCounts.forEach(({ name, count }) => {
         let indexOfResults = findIndexOfResultDataByName(state, name);
@@ -89,15 +91,11 @@ export const simulationSlice = createSlice({
           state.resultData[indexOfResults].data[indexOfObjWithProgress].count =
             count;
         }
-        state.resultData[indexOfResults].isLoading = true;
-        state.resultData[indexOfResults].hasCompleted = false;
       });
     },
     addPosData: (state, action: PayloadAction<SimulationVisMessage>) => {
       const { progress, objectCoords } = action.payload;
       const { name, coords } = objectCoords;
-
-      state.simulationState = SimulationStates.RUNNING;
 
       let indexOfResults = findIndexOfResultDataByName(state, name);
 
@@ -124,11 +122,8 @@ export const simulationSlice = createSlice({
         state.resultData[indexOfResults].data[indexOfObjWithProgress].coords =
           coords;
       }
-      state.resultData[indexOfResults].isLoading = true;
-      state.resultData[indexOfResults].hasCompleted = false;
     },
     finishResults: (state) => {
-      console.log(current(state).resultData);
       state.simulationState = SimulationStates.SUCCESS;
       state.resultData.forEach(({ name }) => {
         const indexOfResults = findIndexOfResultDataByName(state, name);
@@ -145,7 +140,6 @@ export const simulationSlice = createSlice({
       });
     },
     saveDataToLocalStorage: (state, action: PayloadAction<string>) => {
-      console.log(current(state).resultData);
       window.api.logger.info("Saving results");
       const resultsInStorage: ResultsInStorage = {
         projectPath: action.payload,
@@ -179,8 +173,45 @@ export const simulationSlice = createSlice({
       window.api.logger.info("Successfully restored old results.");
 
       state.resultData = restoredDataWithFlag;
+
+      const maxProgressArr = restoredDataWithFlag.map(
+        (value) => _.maxBy(value.data, (datum) => datum.progress).progress
+      );
+
+      state.maxProgress = _.max(maxProgressArr);
     },
   },
+  extraReducers: (builder) =>
+    builder.addMatcher(
+      (action) => action.type.startsWith("simulation/add"),
+      (
+        state,
+        action: PayloadAction<SimulationCountMessage | SimulationVisMessage>
+      ) => {
+        const { progress } = action.payload;
+        state.simulationState = SimulationStates.RUNNING;
+        state.maxProgress = Math.min(
+          Math.max(state.maxProgress, progress),
+          100
+        );
+
+        let names: string[] = [];
+
+        if ((action.payload as SimulationVisMessage).objectCoords) {
+          const visMsg = action.payload as SimulationVisMessage;
+          names.push(visMsg.objectCoords.name);
+        } else if ((action.payload as SimulationCountMessage).objectCounts) {
+          const countMsg = action.payload as SimulationCountMessage;
+          names = countMsg.objectCounts.map((count) => count.name);
+        }
+
+        names.forEach((name) => {
+          const indexOfResults = findIndexOfResultDataByName(state, name);
+          state.resultData[indexOfResults].isLoading = true;
+          state.resultData[indexOfResults].hasCompleted = false;
+        });
+      }
+    ),
 });
 
 export const {
@@ -207,5 +238,7 @@ export const selectResultKeys = (state: RootState) =>
   state.simulation.resultData.map((data) => data.name);
 export const selectResultData = (state: RootState) =>
   state.simulation.resultData;
+export const selectProgress = (state: RootState) =>
+  state.simulation.maxProgress;
 
 export default simulationSlice.reducer;

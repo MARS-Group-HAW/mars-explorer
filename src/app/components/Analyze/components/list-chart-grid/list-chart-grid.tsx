@@ -7,7 +7,7 @@ import useListChartGrid from "./list-chart-grid.hook";
 import EmptyMessage from "../empty-message";
 import ChartSelector from "../chart-selector";
 import ChartType from "../../utils/chart-type";
-import BubbleChart from "../scatter-chart";
+import BubbleChart from "../bubble-chart";
 
 const useStyles = makeStyles((theme) => ({
   container: {

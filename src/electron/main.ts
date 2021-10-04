@@ -24,6 +24,7 @@ import { launchLanguageServer } from "./server-launcher";
 import { Logger } from "./logger";
 import appPaths from "./app-paths";
 import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
+// @ts-ignore
 
 const log = new Logger("main");
 
@@ -469,7 +470,9 @@ ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
     handleCountMsg: (msg) =>
       msg !== null &&
       mainWindow.webContents.send(Channel.SIMULATION_COUNT_PROGRESS, msg),
-    handleVisMsg: (msg) => msg !== null && console.log(msg),
+    handleVisMsg: (msg) =>
+      msg !== null &&
+      mainWindow.webContents.send(Channel.SIMULATION_COORDS_PROGRESS, msg),
     handleMaxRetries: () => simulationProcess.kill(),
   });
 
