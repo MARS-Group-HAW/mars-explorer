@@ -1,6 +1,13 @@
-import { ObjectProgressResults } from "./ObjectData";
+import { ObjectCoordinates, ObjectCounts } from "./ObjectData";
 
-export type SimulationProgressMessage = {
+type SimulationMessage = {
   progress: number;
-  results: ObjectProgressResults;
+};
+
+export type SimulationCountMessage = SimulationMessage & {
+  objectCounts: ObjectCounts;
+};
+
+export type SimulationVisMessage = SimulationMessage & {
+  objectCoords: ObjectCoordinates;
 };

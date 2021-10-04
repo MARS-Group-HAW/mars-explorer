@@ -35,15 +35,25 @@ function useLineChart(): State {
     dispatch(toggle({ name: clickedObj.name }));
   };
 
+  const yData = (indexOfDataSet: number) => {
+    const newArr = new Array(101);
+    dataMap[indexOfDataSet].data
+      .filter((datum) => Number.isInteger(datum.count))
+      .forEach((datum) => {
+        newArr[datum.progress] = datum.count;
+      });
+    return newArr;
+  };
+
   return {
     data: {
       labels: xData,
-      datasets: dataMap.map(({ name, data }, index) => ({
+      datasets: dataMap.map(({ name }, indexOfDataset) => ({
         label: `# of ${name}`,
-        data: data.map((datum) => datum.count),
+        data: yData(indexOfDataset),
         hidden: !isCheckedByName(objectListWithMetaData, name),
-        backgroundColor: getColorByIndex(index),
-        borderColor: getColorByIndex(index),
+        backgroundColor: getColorByIndex(indexOfDataset),
+        borderColor: getColorByIndex(indexOfDataset),
         animation: !isRunning,
       })),
     },

@@ -3,12 +3,12 @@ import localStorageService, {
 } from "@app/utils/local-storage-service";
 import { createSlice, current, PayloadAction } from "@reduxjs/toolkit";
 import { SimulationStates } from "@shared/types/SimulationStates";
-import type { RootState } from "../../../utils/store";
 import {
-  ResultData,
-  ResultDataWithMeta,
-  ResultDatum,
-} from "../../Analyze/utils/ResultData";
+  SimulationCountMessage,
+  SimulationVisMessage,
+} from "@shared/types/SimulationMessages";
+import type { RootState } from "../../../utils/store";
+import { ResultData, ResultDataWithMeta } from "../../Analyze/utils/ResultData";
 import ResultsInStorage from "../../../utils/types/results-in-storage";
 
 // Define a type for the slice state
@@ -35,6 +35,15 @@ const findIndexOfResultDataByName = (
   name: string
 ): number => state.resultData.findIndex((results) => results.name === name);
 
+const findIndexInResultByProgress = (
+  state: SimulationState,
+  index: number,
+  progress: number
+): number =>
+  state.resultData[index].data.findIndex(
+    (result) => result.progress === progress
+  );
+
 export const simulationSlice = createSlice({
   name: "simulation",
   // `createSlice` will infer the state type from the `initialState` argument
@@ -50,30 +59,76 @@ export const simulationSlice = createSlice({
         }));
       }
     },
-    addResults: (
-      state,
-      action: PayloadAction<{ name: string; data: ResultDatum }>
-    ) => {
-      const { name, data } = action.payload;
+    addCountData: (state, action: PayloadAction<SimulationCountMessage>) => {
+      const { progress, objectCounts } = action.payload;
       state.simulationState = SimulationStates.RUNNING;
 
-      const indexOfResults = findIndexOfResultDataByName(state, name);
+      objectCounts.forEach(({ name, count }) => {
+        let indexOfResults = findIndexOfResultDataByName(state, name);
 
-      if (indexOfResults === -1) {
-        state.resultData.push({
-          name,
-          isLoading: true,
-          hasCompleted: false,
-          hasBeenRestored: false,
-          data: [data],
-        });
-      } else {
+        if (indexOfResults === -1) {
+          indexOfResults =
+            state.resultData.push({
+              name,
+              ...initialResultDataWithMeta,
+            }) - 1;
+        }
+
+        const indexOfObjWithProgress = findIndexInResultByProgress(
+          state,
+          indexOfResults,
+          progress
+        );
+
+        if (indexOfObjWithProgress === -1) {
+          state.resultData[indexOfResults].data.push({
+            progress,
+            count,
+          });
+        } else {
+          state.resultData[indexOfResults].data[indexOfObjWithProgress].count =
+            count;
+        }
         state.resultData[indexOfResults].isLoading = true;
         state.resultData[indexOfResults].hasCompleted = false;
-        state.resultData[indexOfResults].data.push(data);
+      });
+    },
+    addPosData: (state, action: PayloadAction<SimulationVisMessage>) => {
+      const { progress, objectCoords } = action.payload;
+      const { name, coords } = objectCoords;
+
+      state.simulationState = SimulationStates.RUNNING;
+
+      let indexOfResults = findIndexOfResultDataByName(state, name);
+
+      if (indexOfResults === -1) {
+        indexOfResults =
+          state.resultData.push({
+            name,
+            ...initialResultDataWithMeta,
+          }) - 1;
       }
+
+      const indexOfObjWithProgress = findIndexInResultByProgress(
+        state,
+        indexOfResults,
+        progress
+      );
+
+      if (indexOfObjWithProgress === -1) {
+        state.resultData[indexOfResults].data.push({
+          progress,
+          coords,
+        });
+      } else {
+        state.resultData[indexOfResults].data[indexOfObjWithProgress].coords =
+          coords;
+      }
+      state.resultData[indexOfResults].isLoading = true;
+      state.resultData[indexOfResults].hasCompleted = false;
     },
     finishResults: (state) => {
+      console.log(current(state).resultData);
       state.simulationState = SimulationStates.SUCCESS;
       state.resultData.forEach(({ name }) => {
         const indexOfResults = findIndexOfResultDataByName(state, name);
@@ -90,6 +145,7 @@ export const simulationSlice = createSlice({
       });
     },
     saveDataToLocalStorage: (state, action: PayloadAction<string>) => {
+      console.log(current(state).resultData);
       window.api.logger.info("Saving results");
       const resultsInStorage: ResultsInStorage = {
         projectPath: action.payload,
@@ -129,7 +185,8 @@ export const simulationSlice = createSlice({
 
 export const {
   setSimulationState,
-  addResults,
+  addCountData,
+  addPosData,
   finishResults,
   restoreDataFromLocalStorage,
   saveDataToLocalStorage,

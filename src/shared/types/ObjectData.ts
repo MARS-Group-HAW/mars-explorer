@@ -3,22 +3,15 @@ export type ObjectCount = {
   count: number;
 };
 
-export type TypedMetaData = ObjectCount[];
-
-export type InputObjectCoordinates = {
-  [key: string]: ObjectCoordinate;
-};
+export type ObjectCounts = ObjectCount[];
 
 export type ObjectCoordinate = {
   x: number;
   y: number;
   count: number;
-}[];
-
-export type ObjectProgressResult = {
-  name: string;
-  count: number;
-  coords: ObjectCoordinate;
 };
 
-export type ObjectProgressResults = ObjectProgressResult[];
+export type ObjectCoordinates = {
+  name: string;
+  coords: ObjectCoordinate[];
+};

@@ -1,6 +1,10 @@
-import { ObjectProgressResult } from "@shared/types/ObjectData";
+import { ObjectCoordinate } from "@shared/types/ObjectData";
 
-export type ResultDatum = Omit<ObjectProgressResult, "name">;
+export type ResultDatum = {
+  progress: number;
+  count?: number;
+  coords?: ObjectCoordinate[];
+};
 
 export type ResultDataPerTick = ResultDatum[];
 

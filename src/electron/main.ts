@@ -17,14 +17,13 @@ import SimObjects from "@shared/types/sim-objects";
 // @ts-ignore
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
-import { handleSimulationProgress } from "./handle-simulation-progress";
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
 import { ModelsJson } from "./types/ModelsJson";
 import { launchLanguageServer } from "./server-launcher";
 import { Logger } from "./logger";
 import appPaths from "./app-paths";
-// @ts-ignore
+import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 
 const log = new Logger("main");
 
@@ -314,7 +313,7 @@ ipcMain.on(Channel.INSTALL_MARS, (_, path: string) => {
     );
   }
 
-  const versionFlag = " --version 4.3.1"; // FIXME
+  const versionFlag = " --version 4.3.2"; // FIXME
 
   const installProcess = child_process.exec(
     `dotnet add package Mars.Life.Simulations${versionFlag}`,
@@ -465,16 +464,18 @@ ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
     simulationProcess.kill();
   });
 
-  const closeWs = handleSimulationProgress(
+  const wsHandler = new SimulationHandler({
     log,
-    (progress) =>
-      mainWindow.webContents.send(Channel.SIMULATION_PROGRESS, progress),
-    () => simulationProcess.kill()
-  );
+    handleCountMsg: (msg) =>
+      msg !== null &&
+      mainWindow.webContents.send(Channel.SIMULATION_COUNT_PROGRESS, msg),
+    handleVisMsg: (msg) => msg !== null && console.log(msg),
+    handleMaxRetries: () => simulationProcess.kill(),
+  });
 
-  const cleanupHandler = () => {
+  const cleanupHandler = (wsCode?: WebSocketCloseCodes) => {
     ipcMain.removeHandler(Channel.TERMINATE_SIMULATION);
-    closeWs();
+    wsHandler.closeSockets(wsCode);
   };
 
   simulationProcess.on("exit", (code) => {
@@ -484,20 +485,23 @@ ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
       case ProcessExitCode.SUCCESS:
         log.info(`Simulation exited successfully (${code}).`);
         exitState = SimulationStates.SUCCESS;
+        cleanupHandler(WebSocketCloseCodes.EXITING);
         break;
       case ProcessExitCode.TERMINATED:
         log.info(`Simulation was terminated (${code}).`);
         exitState = SimulationStates.TERMINATED;
+        cleanupHandler(WebSocketCloseCodes.TERMINATED);
         break;
       case ProcessExitCode.ERROR:
         log.error(`Simulation errored (${code}).`);
         exitState = SimulationStates.FAILED;
+        cleanupHandler();
         break;
       default:
         exitState = SimulationStates.UNKNOWN;
+        cleanupHandler();
     }
 
     mainWindow.webContents.send(Channel.SIMULATION_EXITED, exitState);
-    cleanupHandler();
   });
 });
