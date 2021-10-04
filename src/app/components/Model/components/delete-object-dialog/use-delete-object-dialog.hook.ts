@@ -1,37 +1,42 @@
 import { useContext } from "react";
 import { Channel } from "@shared/types/Channel";
 import { useBoolean } from "react-use";
-import { IModelFile } from "@shared/types/Model";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
 import { useAppDispatch } from "../../../../utils/hooks/use-store";
 import { removeModel } from "../../utils/model-slice";
+import {
+  closeModelDeletion,
+  useSharedModels,
+} from "../../hooks/use-shared-models";
 
 type State = {
   isLoading: boolean;
-  onObjectDeleteDialogClose: () => void;
-  onObjectDeleteDialogConfirm: () => void;
+  isOpen: boolean;
+  name?: string;
+  onDialogClose: () => void;
+  onDialogConfirm: () => void;
 };
 
-function useDeleteObjectDialog(
-  onClose: () => void,
-  objectToDelete?: IModelFile
-): State {
+function useDeleteObjectDialog(): State {
   const dispatch = useAppDispatch();
+  const [{ isDeleteDialogOpen, processedModel }, sharedModelDispatch] =
+    useSharedModels();
+
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isLoading, setIsLoading] = useBoolean(false);
 
-  const onObjectDeleteDialogClose = () => {
+  const onDialogClose = () => {
     setIsLoading(false);
-    onClose();
+    sharedModelDispatch(closeModelDeletion);
   };
 
-  const onObjectDeleteDialogConfirm = async () => {
-    if (!objectToDelete) {
+  const onDialogConfirm = async () => {
+    if (!processedModel) {
       window.api.logger.warn("No object to delete.");
       return;
     }
 
-    const { path, name } = objectToDelete;
+    const { path, name } = processedModel;
 
     setIsLoading(true);
 
@@ -42,21 +47,23 @@ function useDeleteObjectDialog(
 
     if (deleted) {
       addSuccessAlert({ msg: `"${name}" has been deleted.` });
-      dispatch(removeModel(objectToDelete));
+      dispatch(removeModel(processedModel));
     } else {
       addErrorAlert({
         msg: `An error occurred while deleting "${name}".`,
       });
     }
 
-    onObjectDeleteDialogClose();
+    onDialogClose();
     setIsLoading(false);
   };
 
   return {
+    isOpen: isDeleteDialogOpen,
     isLoading,
-    onObjectDeleteDialogConfirm,
-    onObjectDeleteDialogClose,
+    name: processedModel?.name,
+    onDialogConfirm,
+    onDialogClose,
   };
 }
 

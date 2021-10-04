@@ -12,6 +12,11 @@ import {
 } from "../../../../utils/hooks/use-store";
 import { selectProject } from "../../../Home/utils/project-slice";
 import { addModel } from "../../utils/model-slice";
+import {
+  closeModelCreation,
+  selectModel,
+  useSharedModels,
+} from "../../hooks/use-shared-models";
 
 type State = {
   disableConfirmButton: boolean;
@@ -20,24 +25,26 @@ type State = {
   setNewObjectName: (value: string) => void;
   selectedObject: SimObjects;
   onObjectTypeClick: (objectType: SimObjects) => void;
-  onNewObjectDialogClose: () => void;
-  onNewObjectDialogConfirm: () => void;
+  isOpen: boolean;
+  onDialogClose: () => void;
+  onDialogConfirm: () => void;
 };
 
-function useNewObjectDialog(onClose: () => void): State {
+function useNewObjectDialog(): State {
   const { path, name } = useAppSelector(selectProject);
+  const [{ isCreateDialogOpen }, sharedModelDispatch] = useSharedModels();
   const dispatch = useAppDispatch();
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isLoading, setIsLoading] = useBoolean(false);
   const [newObjectName, setNewObjectName] = useCapitalizedValue();
   const [selectedObject, setSelectedObject] = useState<SimObjects>();
 
-  const onNewObjectDialogClose = () => {
+  const onDialogClose = () => {
     setNewObjectName("");
-    onClose();
+    sharedModelDispatch(closeModelCreation);
   };
 
-  const onNewObjectDialogConfirm = () => {
+  const onDialogConfirm = () => {
     setIsLoading(true);
 
     window.api
@@ -50,6 +57,7 @@ function useNewObjectDialog(onClose: () => void): State {
       .then((model) => {
         addSuccessAlert({ msg: `Object "${newObjectName}" has been created.` });
         dispatch(addModel(model));
+        sharedModelDispatch(selectModel({ model }));
       })
       .catch((e: unknown) =>
         addErrorAlert({
@@ -57,7 +65,7 @@ function useNewObjectDialog(onClose: () => void): State {
         })
       )
       .finally(() => {
-        onNewObjectDialogClose();
+        onDialogClose();
         setIsLoading(false);
       });
   };
@@ -70,8 +78,9 @@ function useNewObjectDialog(onClose: () => void): State {
     setNewObjectName,
     selectedObject,
     onObjectTypeClick: setSelectedObject,
-    onNewObjectDialogClose,
-    onNewObjectDialogConfirm,
+    isOpen: isCreateDialogOpen,
+    onDialogClose,
+    onDialogConfirm,
   };
 }
 
