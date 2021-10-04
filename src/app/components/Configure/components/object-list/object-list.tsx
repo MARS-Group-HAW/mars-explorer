@@ -1,37 +1,29 @@
 import * as React from "react";
 import { List, ListItem, ListItemText } from "@material-ui/core";
+import useObjectList from "./object-list.hook";
 
 let agentKey = 1;
 
-type Props = {
-  objectNames: string[];
-  selectedObjectNameIndex: number;
-  handleObjectNameClick: (index: number) => void;
-  handleNewObject: () => void;
-};
+const ObjectList = () => {
+  const { objectNames, selectedIndex, setSelectedIndex } = useObjectList();
 
-// eslint-disable-next-line react/require-default-props
-const ObjectList = ({
-  objectNames,
-  selectedObjectNameIndex,
-  handleObjectNameClick,
-  handleNewObject,
-}: Props) => (
-  <List>
-    {objectNames.map((objName, index) => (
-      <ListItem
-        key={agentKey++}
-        button
-        selected={selectedObjectNameIndex === index}
-        onClick={() => handleObjectNameClick(index)}
-      >
-        <ListItemText primary={objName} />
+  return (
+    <List>
+      {objectNames.map((name, index) => (
+        <ListItem
+          key={agentKey++}
+          button
+          selected={selectedIndex === index}
+          onClick={() => setSelectedIndex(index)}
+        >
+          <ListItemText primary={name} />
+        </ListItem>
+      ))}
+      <ListItem button onClick={console.log}>
+        <ListItemText primary="Add" />
       </ListItem>
-    ))}
-    <ListItem button onClick={handleNewObject}>
-      <ListItemText primary="Add" />
-    </ListItem>
-  </List>
-);
+    </List>
+  );
+};
 
 export default ObjectList;

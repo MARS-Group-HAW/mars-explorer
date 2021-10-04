@@ -73,7 +73,7 @@ export default function Configure() {
                     <GlobalsForm namespace={FieldNames.GLOBALS} />
                   </Grid>
                   <Grid item xs={12} style={{ height: "60%" }}>
-                    <ObjectsForm namespaceAgents={FieldNames.AGENTS} />
+                    <ObjectsForm />
                   </Grid>
                 </Grid>
                 <Fab

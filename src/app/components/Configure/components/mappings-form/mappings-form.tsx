@@ -11,6 +11,7 @@ type Props = {
 
 // eslint-disable-next-line react/require-default-props
 const MappingsForm = ({ namespace }: Props) => {
+  console.log(namespace);
   useMappingsForm(namespace);
 
   return (
