@@ -1,14 +1,17 @@
 import { enforceMacOSAppLocation } from "electron-util";
 import * as path from "path";
-import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from "electron";
+import {
+  app,
+  BrowserWindow,
+  ipcMain,
+  IpcMainInvokeEvent,
+  Menu,
+} from "electron";
 import { Channel } from "@shared/types/Channel";
 import { ExampleProject } from "@shared/types/ExampleProject";
 import { Project } from "@shared/types/Project";
 import fixPath from "fix-path";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
-import installExtension, {
-  REACT_DEVELOPER_TOOLS,
-} from "electron-devtools-installer";
 import * as child_process from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import { IFileRef } from "@shared/types/File";
@@ -24,6 +27,7 @@ import { launchLanguageServer } from "./server-launcher";
 import { Logger } from "./logger";
 import appPaths from "./app-paths";
 import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
+import menuItems from "./menu";
 // @ts-ignore
 
 const log = new Logger("main");
@@ -76,6 +80,7 @@ function createWindow() {
     .loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
     .catch((e: Error) => log.error("main window could not be loaded: ", e));
 
+  /*
   Promise.all([
     installExtension(REACT_DEVELOPER_TOOLS, {
       loadExtensionOptions: { allowFileAccess: true },
@@ -85,10 +90,10 @@ function createWindow() {
       REDUX_DEVTOOLS,
       { loadExtensionOptions: { allowFileAccess: true } } //this is the key line
     ),
-     */
   ])
     .then((names) => console.log(`Added Extensions: ${names.join(", ")}`))
     .catch((err) => console.log("An error occurred: ", err));
+  */
 
   mainWindow.webContents.on("did-frame-finish-load", () =>
     mainWindow.webContents.openDevTools()
@@ -110,6 +115,10 @@ app
     // webSocketPort = startServer();
     log.info("Creating window");
     createWindow();
+
+    const menu = Menu.getApplicationMenu();
+    menuItems.forEach((menuItem) => menu.append(menuItem));
+    Menu.setApplicationMenu(menu);
 
     app.on("activate", () => {
       // On macOS it's common to re-create a window in the app when the
