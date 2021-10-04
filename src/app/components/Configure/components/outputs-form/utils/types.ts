@@ -5,8 +5,8 @@ import SqliteOutput from "../../output-sqlite-form/utils/types";
 
 export enum OutputSpecification {
   NONE = "none",
-  CSV = "CSV",
-  SQLITE = "SQLite",
+  CSV = "csv",
+  SQLITE = "sqlite",
 }
 
 class Outputs {

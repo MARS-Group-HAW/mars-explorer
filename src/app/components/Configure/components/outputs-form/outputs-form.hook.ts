@@ -66,7 +66,7 @@ function useOutputsForm(namespace: string): State {
   return {
     outputNamespace,
     optionsNamespace,
-    value,
+    value: OutputSpecification.CSV,
     handleChange: onChange,
     choices: CHOICES,
   };
