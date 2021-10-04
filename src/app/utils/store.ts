@@ -1,4 +1,5 @@
 import { configureStore } from "@reduxjs/toolkit";
+import logger from "redux-logger";
 import projectReducer from "../components/Home/utils/project-slice";
 import modelReducer from "../components/Model/utils/model-slice";
 import simulationReducer from "../components/QuickStartBar/utils/simulation-slice";
@@ -12,7 +13,7 @@ const store = configureStore({
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
-    }),
+    }).concat(logger),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
