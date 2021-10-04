@@ -35,7 +35,14 @@ const GlobalsForm = ({ namespace }: { namespace: string }) => (
       </FormPaper>
     </Grid>
     <Grid item xs={6}>
-      <FormPaper>
+      <FormPaper
+        style={{
+          backgroundColor: "darkgrey",
+          zIndex: 500,
+          pointerEvents: "none",
+          filter: "blur(3px)",
+        }}
+      >
         <OutputsForm namespace={namespace} />
       </FormPaper>
     </Grid>
