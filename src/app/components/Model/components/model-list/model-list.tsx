@@ -4,17 +4,21 @@ import {
   Button,
   ButtonGroup,
   Fab,
+  IconButton,
   LinearProgress,
   List,
   ListItem,
+  ListItemSecondaryAction,
   ListItemText,
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
 import { WorkingModel } from "@shared/types/Model";
 import AddIcon from "@material-ui/icons/Add";
+import DeleteIcon from "@material-ui/icons/Delete";
 import useModelList from "./model-list.hook";
 import NewObjectDialog from "../new-object-dialog";
+import DeleteObjectDialog from "../delete-object-dialog";
 
 const buttonGroupHeight = 45;
 
@@ -64,6 +68,10 @@ function ModelList({
     onAddButtonClick,
     isNewObjectDialogOpen,
     onNewObjectDialogClose,
+    objectToDelete,
+    onDeleteObjectClick,
+    isDeleteObjectDialogOpen,
+    onDeleteObjectDialogClose,
   } = useModelList();
 
   return (
@@ -105,6 +113,15 @@ function ModelList({
               primary={model.name}
               primaryTypographyProps={{ className: classes.primaryText }}
             />
+            <ListItemSecondaryAction>
+              <IconButton
+                edge="end"
+                aria-label="delete"
+                onClick={() => onDeleteObjectClick(model)}
+              >
+                <DeleteIcon />
+              </IconButton>
+            </ListItemSecondaryAction>
           </ListItem>
         ))}
       </List>
@@ -116,6 +133,11 @@ function ModelList({
       <NewObjectDialog
         open={isNewObjectDialogOpen}
         onClose={onNewObjectDialogClose}
+      />
+      <DeleteObjectDialog
+        open={isDeleteObjectDialogOpen}
+        onClose={onDeleteObjectDialogClose}
+        objectToDelete={objectToDelete}
       />
     </>
   );

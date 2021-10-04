@@ -17,7 +17,7 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 import { IFileRef } from "@shared/types/File";
 import { ObjectCreationMessage } from "@shared/types/object-creation-message";
 import SimObjects from "@shared/types/sim-objects";
-// @ts-ignore
+import NotImplementedError from "@shared/errors/not-implemented-error";
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
@@ -28,7 +28,6 @@ import { Logger } from "./logger";
 import appPaths from "./app-paths";
 import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import menuItems from "./menu";
-// @ts-ignore
 
 const log = new Logger("main");
 
@@ -173,35 +172,26 @@ ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
   return null;
 });
 
-async function deleteDir(path: string): Promise<boolean> {
+async function remove(pathTo: string): Promise<boolean> {
   try {
-    await fs.remove(path);
-    log.info("Deleted project: ", path);
+    await fs.remove(pathTo);
+    log.info("Deleted file/dir: ", pathTo);
     return true;
   } catch (e: unknown) {
-    log.error("Could not delete project", path, e);
+    log.error("Could not delete file/dir", pathTo, e);
     return false;
   }
 }
 
 ipcMain.handle(
-  Channel.DELETE_PROJECT,
-  async (_, path: string): Promise<boolean> => deleteDir(path)
+  Channel.DELETE_FILE_OR_DIR,
+  async (_, pathToObject: string): Promise<boolean> => remove(pathToObject)
 );
-
-async function replaceWithName(dir: string, name: string) {
-  const filePath = path.resolve(appPaths.templatesDir, "Program.cs");
-  const content = await fs.readFile(filePath, "utf8");
-  const result = content.replace(/\$NAME/g, name);
-
-  const programmcsInProj = path.resolve(dir, "Program.cs");
-
-  await fs.writeFile(programmcsInProj, result, "utf8");
-}
 
 enum Templates {
   PROGRAMM_CS = "Program.cs",
   AGENT_CS = "Agent.cs",
+  LAYER_CS = "Layer.cs",
 }
 
 const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
@@ -273,7 +263,7 @@ ipcMain.on(Channel.CREATE_PROJECT, (_, projectName: string) => {
             "Error while replacing contents in new project: ",
             replaceErr
           );
-          deleteDir(projectDir)
+          remove(projectDir)
             .then(sendErrorMsg)
             .catch((delErr: unknown) =>
               log.error("Error cleaning up after replacing failure: ", delErr)
@@ -291,13 +281,24 @@ ipcMain.handle(
     _,
     { projectPath, projectName, objectType, objectName }: ObjectCreationMessage
   ): Promise<IModelFile> => {
-    if (objectType !== SimObjects.AGENT)
-      throw new Error("Type not supported yet.");
+    let template: Templates;
 
-    const objectFile = `${objectName}.cs`; // TODO other templates
+    switch (objectType) {
+      case SimObjects.AGENT:
+        template = Templates.AGENT_CS;
+        break;
+      case SimObjects.LAYER:
+        template = Templates.LAYER_CS;
+        break;
+      case SimObjects.ENTITY:
+      default:
+        throw new NotImplementedError("Entity");
+    }
+
+    const objectFile = `${objectName}.cs`;
     const filePath = path.resolve(projectPath, objectFile);
 
-    const content = await copyAndReplaceTemplate(Templates.AGENT_CS, filePath, [
+    const content = await copyAndReplaceTemplate(template, filePath, [
       {
         placeholder: PROJECT_NAME_PLACEHOLDER,
         value: projectName,
