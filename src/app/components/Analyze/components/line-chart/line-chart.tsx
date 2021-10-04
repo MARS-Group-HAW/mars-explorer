@@ -9,6 +9,20 @@ function LineChart() {
     <Line
       data={data}
       options={{
+        scales: {
+          x: {
+            title: {
+              display: true,
+              text: "Progress in %",
+            },
+          },
+          y: {
+            title: {
+              display: true,
+              text: "Number of entities",
+            },
+          },
+        },
         plugins: {
           legend: {
             onClick: (e, legendItem) => onLabelClick(legendItem),
