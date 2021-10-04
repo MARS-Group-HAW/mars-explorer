@@ -1,4 +1,4 @@
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { Message, NotificationMessage } from "vscode-jsonrpc";
 import { isNotificationMessage } from "vscode-jsonrpc/lib/common/messages";
 import { Diagnostic, PublishDiagnosticsParams } from "monaco-languageclient";
@@ -33,6 +33,11 @@ function useDiagnosticsMessages(): State {
   const { path } = useAppSelector(selectProject);
   const { isProjectFullyInitialized } = useProjectInitializationStatus();
 
+  const initRef = useRef(false);
+  useEffect(() => {
+    initRef.current = isProjectFullyInitialized;
+  }, []);
+
   const dispatch = useAppDispatch();
 
   const resetDiagnostics = () => {
@@ -42,7 +47,7 @@ function useDiagnosticsMessages(): State {
   useEffect(resetDiagnostics, [path]);
 
   function handleMessage(msg: Message) {
-    if (!isProjectFullyInitialized) return;
+    if (!initRef) return;
 
     if (isNotificationMessage(msg) && isDiagnosticMessage(msg)) {
       const diagnosticParams = msg.params as PublishDiagnosticsParams;
