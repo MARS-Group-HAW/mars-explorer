@@ -1,15 +1,18 @@
 import * as React from "react";
 import { Bubble } from "react-chartjs-2";
-import { ChartOptions } from "chart.js";
+import { ChartOptions, LegendItem } from "chart.js";
 import { Grid, IconButton, Slider, Typography } from "@material-ui/core";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+import { ObjectCoordinate } from "@shared/types/ObjectData";
 import useBubbleChart from "./bubble-chart.hook";
 
-const options: ChartOptions = {
+const options = (
+  onLabelClick: (legendItem: LegendItem) => void
+): ChartOptions => ({
   plugins: {
     legend: {
-      onClick: () => {}, // suppress for now
+      onClick: (e, legendItem) => onLabelClick(legendItem),
     },
     tooltip: {
       callbacks: {
@@ -23,17 +26,26 @@ const options: ChartOptions = {
   elements: {
     point: {
       radius(context) {
+        if (context.dataset.data.length === 0) return 0;
+
         const size = context.chart.width;
-        const base = Math.abs((context.raw as any).count) / 1000;
-        return (size / 24) * base;
+        const base = (context.raw as ObjectCoordinate).count / 500;
+        return size * base;
       },
     },
   },
-};
+});
 
 function BubbleChart() {
-  const { data, tick, maxTick, onTickChange, incrementTick, decrementTick } =
-    useBubbleChart();
+  const {
+    data,
+    tick,
+    maxTick,
+    onTickChange,
+    incrementTick,
+    decrementTick,
+    onLabelClick,
+  } = useBubbleChart();
 
   return (
     <Grid
@@ -42,7 +54,7 @@ function BubbleChart() {
       justifyContent="space-around"
       style={{ height: "100%" }}
     >
-      <Bubble data={data} options={options} />
+      <Bubble data={data} options={options(onLabelClick)} />
       <Grid
         container
         justifyContent="space-between"

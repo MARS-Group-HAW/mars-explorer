@@ -53,7 +53,9 @@ class SimulationHandler {
 
   private visSocket: ReconnectingWebSocket;
 
-  private lastProgress: number;
+  private countProgress: number;
+
+  private visProgress = new Map<string, number>();
 
   private maxTicks: number;
 
@@ -93,11 +95,14 @@ class SimulationHandler {
   private static parseMsg = <T>(msg: MessageEvent<string>): T =>
     JSON.parse(msg.data) as T;
 
-  private calcProgress = (currentTick: number) =>
-    Math.floor((currentTick / this.maxTicks) * 100);
+  private calcProgress = (currentTick: number) => {
+    const progress = Math.floor((currentTick / this.maxTicks) * 100);
 
-  private isNewProgress = (progress: number) =>
-    this.lastProgress === undefined || this.lastProgress < progress;
+    return Number.isNaN(progress) ? 0 : progress;
+  };
+
+  private isNewProgress = (progress: number, lastProgress?: number) =>
+    lastProgress === undefined || lastProgress < progress;
 
   private handleCountMsg = (
     msg: MessageEvent<string>
@@ -111,7 +116,7 @@ class SimulationHandler {
 
     const progress = this.calcProgress(currentTick);
 
-    if (this.isNewProgress(progress)) {
+    if (this.isNewProgress(progress, this.countProgress)) {
       this.logger.debug(
         `Simulation-Progress: ${currentTick} von ${this.maxTicks} (${progress}%)`
       );
@@ -127,7 +132,7 @@ class SimulationHandler {
         });
       }
 
-      this.lastProgress = progress;
+      this.countProgress = progress;
 
       return {
         progress,
@@ -146,7 +151,13 @@ class SimulationHandler {
 
     const progress = this.calcProgress(currentTick);
 
-    if (this.isNewProgress(progress) && entities) {
+    const progressOfType = this.visProgress.get(typeName);
+
+    if (
+      this.isNewProgress(progress, progressOfType) &&
+      entities &&
+      entities.length > 0
+    ) {
       const coords: SimulationVisMessage["objectCoords"]["coords"] = [];
       entities.forEach(({ x, y }) => {
         const found = coords.find((coord) => coord.x === x && coord.y === y);
@@ -161,6 +172,8 @@ class SimulationHandler {
           });
         }
       });
+
+      this.visProgress.set(typeName, progress);
 
       return {
         progress,

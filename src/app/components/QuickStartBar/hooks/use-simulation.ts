@@ -1,10 +1,14 @@
 import { Channel } from "@shared/types/Channel";
 import { useEffect, useState } from "react";
 import { SimulationStates } from "@shared/types/SimulationStates";
-import { SimulationCountMessage } from "@shared/types/SimulationMessages";
+import {
+  SimulationCountMessage,
+  SimulationVisMessage,
+} from "@shared/types/SimulationMessages";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
   addCountData,
+  addPosData,
   finishResults,
   selectSimulationState,
   setSimulationState,
@@ -37,10 +41,19 @@ function useSimulation(): State {
     window.api.send(Channel.TERMINATE_SIMULATION);
   }
 
-  function handleSimulationProgress(msg: SimulationCountMessage) {
+  function handleSimulationProgress(newProgress: number) {
     dispatchSimState(SimulationStates.RUNNING);
-    setProgress(msg.progress);
+    setProgress(Math.max(progress, newProgress));
+  }
+
+  function handleSimulationCountMsg(msg: SimulationCountMessage) {
+    handleSimulationProgress(msg.progress);
     dispatch(addCountData(msg));
+  }
+
+  function handleSimulationCoordsMsg(msg: SimulationVisMessage) {
+    handleSimulationProgress(msg.progress);
+    dispatch(addPosData(msg));
   }
 
   function handleSimulationEnd(endState: SimulationStates) {
@@ -53,8 +66,13 @@ function useSimulation(): State {
   }
 
   useChannelSubscription(
+    Channel.SIMULATION_COORDS_PROGRESS,
+    handleSimulationCoordsMsg
+  );
+
+  useChannelSubscription(
     Channel.SIMULATION_COUNT_PROGRESS,
-    handleSimulationProgress
+    handleSimulationCountMsg
   );
 
   useChannelSubscription(Channel.SIMULATION_FAILED, (e: Error) => {
