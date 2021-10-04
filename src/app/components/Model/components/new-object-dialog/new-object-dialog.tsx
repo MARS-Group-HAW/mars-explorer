@@ -16,11 +16,6 @@ import SimObjects from "@shared/types/sim-objects";
 import useNewObjectDialog from "./use-new-object-dialog.hook";
 import ObjectButton from "../object-button";
 
-type Props = {
-  open: boolean;
-  onClose: () => void;
-};
-
 const description: { [key in SimObjects]: string } = {
   [SimObjects.AGENT]:
     "Agents are the main part of every model (besides layers). Once the layers have been created, we can start specifying the the agents. For this step you, as a modeler, need to know what your agents are going to be, what attributes define them and what their actions will look like. Once this has been established, we can start with the agent creation.",
@@ -53,7 +48,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function NewObjectDialog({ open, onClose }: Props) {
+function NewObjectDialog() {
   const classes = useStyles();
 
   const {
@@ -63,12 +58,13 @@ function NewObjectDialog({ open, onClose }: Props) {
     setNewObjectName,
     selectedObject,
     onObjectTypeClick,
-    onNewObjectDialogClose,
-    onNewObjectDialogConfirm,
-  } = useNewObjectDialog(onClose);
+    isOpen,
+    onDialogConfirm,
+    onDialogClose,
+  } = useNewObjectDialog();
 
   return (
-    <Dialog open={open} onClose={onNewObjectDialogClose}>
+    <Dialog open={isOpen} onClose={onDialogClose}>
       <DialogTitle id="form-dialog-title">Create new Object</DialogTitle>
       <DialogContent className={classes.dialogContent}>
         <DialogContentText>
@@ -109,11 +105,11 @@ function NewObjectDialog({ open, onClose }: Props) {
         />
       </DialogContent>
       <DialogActions>
-        <Button onClick={onNewObjectDialogClose} color="primary">
+        <Button onClick={onDialogClose} color="primary">
           Cancel
         </Button>
         <Button
-          onClick={onNewObjectDialogConfirm}
+          onClick={onDialogConfirm}
           color="primary"
           disabled={disableConfirmButton}
         >

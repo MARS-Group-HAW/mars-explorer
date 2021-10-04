@@ -1,14 +1,15 @@
-import { RefObject, useEffect, useState } from "react";
+import { RefObject, useEffect } from "react";
 import { WorkingModel } from "@shared/types/Model";
-import useEditor from "./use-editor";
-import { useAppSelector } from "../../../utils/hooks/use-store";
-import useModels from "./use-models";
-import useProjectInitializationStatus from "../../App/hooks/bootstrap/model/use-project-initialization-status";
+import useEditor from "../../hooks/use-editor";
+import { useAppSelector } from "../../../../utils/hooks/use-store";
+import useModels from "../../hooks/use-models";
+import useProjectInitializationStatus from "../../../App/hooks/bootstrap/model/use-project-initialization-status";
 import {
   selectModelLoadingProgress,
   selectStepWithStatus,
-} from "../utils/model-slice";
-import LoadingSteps from "../utils/LoadingSteps";
+} from "../../utils/model-slice";
+import LoadingSteps from "../../utils/LoadingSteps";
+import { selectModel, useSharedModels } from "../../hooks/use-shared-models";
 
 type Props = {
   containerRef: RefObject<HTMLDivElement>;
@@ -22,37 +23,28 @@ type State = {
   showLoading: boolean;
   showModelListLoading: boolean;
   models: WorkingModel;
-  selectedModelIndex: number;
-  selectModelAtIndex: (index: number) => void;
 };
 
 function useModeler({ containerRef }: Props): State {
   const progress = useAppSelector(selectModelLoadingProgress);
   const steps = useAppSelector(selectStepWithStatus);
-
-  const [selectedModelIndex, setSelectedModelIndex] = useState<number>(0);
+  const [{ selectedModel }, dispatch] = useSharedModels();
 
   const { models, areModelsLoading } = useModels();
 
-  const { setModel: setModelInMonacoEditor } = useEditor(containerRef);
+  const { setModel } = useEditor(containerRef);
 
-  function selectModelAtIndex(index: number) {
-    const selectedModel = models[index];
-
-    if (!selectedModel) {
-      window.api.logger.warn("Tried to access a model at an invalid index.");
-      return;
-    }
+  function setModelInEditor() {
+    if (!selectedModel) return;
 
     const { path, content } = selectedModel;
-
-    setModelInMonacoEditor(path, content);
+    setModel(path, content);
   }
 
   useEffect(() => {
     if (areModelsLoading) return;
-    selectModelAtIndex(selectedModelIndex);
-  }, [selectedModelIndex, areModelsLoading]);
+    setModelInEditor();
+  }, [selectedModel, areModelsLoading]);
 
   const { isProjectFullyInitialized } = useProjectInitializationStatus();
 
@@ -60,19 +52,19 @@ function useModeler({ containerRef }: Props): State {
   useEffect(() => {
     if (!isProjectFullyInitialized || !models) return;
 
+    const currentSelectedModel = selectedModel;
+
     // set every model in editor to enable validation of each
-    models.forEach((_, index) => selectModelAtIndex(index));
+    models.forEach((model) => dispatch(selectModel({ model })));
     // reset to last state
-    selectModelAtIndex(selectedModelIndex);
+    dispatch(selectModel({ model: currentSelectedModel }));
   }, [isProjectFullyInitialized, models]);
 
   return {
+    models,
     stepWithStatus: steps,
     showLoading: progress < 100,
     showModelListLoading: areModelsLoading,
-    models,
-    selectedModelIndex,
-    selectModelAtIndex: setSelectedModelIndex,
   };
 }
 

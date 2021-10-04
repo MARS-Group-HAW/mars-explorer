@@ -1,61 +1,46 @@
 import { useBoolean } from "react-use";
-import { useState } from "react";
 import { IModelFile } from "@shared/types/Model";
-import useDialog from "../../../../utils/hooks/use-dialog";
+import {
+  openModelCreation,
+  openModelDeletion,
+  selectModel,
+  useSharedModels,
+} from "../../hooks/use-shared-models";
 
 type State = {
+  selectedModel: IModelFile;
   isProjectView: boolean;
   isExampleView: boolean;
   showAddButton: boolean;
+  onModelClick: (model: IModelFile) => void;
   onMyProjectButtonClick: () => void;
   onExamplesButtonClick: () => void;
-  objectToDelete?: IModelFile;
   onDeleteObjectClick: (model: IModelFile) => void;
   onAddButtonClick: () => void;
-  isNewObjectDialogOpen: boolean;
-  onNewObjectDialogClose: () => void;
-  isDeleteObjectDialogOpen: boolean;
-  onDeleteObjectDialogClose: () => void;
 };
 
 function useModelList(): State {
+  const [{ selectedModel }, dispatch] = useSharedModels();
+
   const [isProjectView, setProjectView] = useBoolean(true);
-  const [processingObj, setProcessingObj] = useState<IModelFile>();
-  const {
-    open: isNewObjectDialogOpen,
-    openDialog: openNewObjectDialog,
-    closeDialog: closeNewObjectDialog,
-  } = useDialog();
 
-  const {
-    open: isDeleteObjectDialogOpen,
-    openDialog: openDeleteObjectDialog,
-    closeDialog: closeDeleteObjectDialog,
-  } = useDialog();
+  const onAddButtonClick = () => dispatch(openModelCreation());
 
-  const onDeleteObjectClick = (model: IModelFile) => {
-    setProcessingObj(model);
-    openDeleteObjectDialog();
-  };
+  const onModelClick = (model: IModelFile) => dispatch(selectModel({ model }));
 
-  const onDeleteObjectDialogClose = () => {
-    setProcessingObj(undefined);
-    closeDeleteObjectDialog();
-  };
+  const onDeleteObjectClick = (model: IModelFile) =>
+    dispatch(openModelDeletion({ model }));
 
   return {
-    objectToDelete: processingObj,
+    selectedModel,
     isProjectView,
     isExampleView: !isProjectView,
     showAddButton: isProjectView,
+    onModelClick,
     onMyProjectButtonClick: () => setProjectView(true),
     onExamplesButtonClick: () => setProjectView(false),
     onDeleteObjectClick,
-    onAddButtonClick: openNewObjectDialog,
-    isNewObjectDialogOpen,
-    onNewObjectDialogClose: closeNewObjectDialog,
-    isDeleteObjectDialogOpen,
-    onDeleteObjectDialogClose,
+    onAddButtonClick,
   };
 }
 

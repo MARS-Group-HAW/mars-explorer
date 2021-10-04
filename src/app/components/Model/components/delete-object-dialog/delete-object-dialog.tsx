@@ -8,37 +8,27 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
-import { makeStyles } from "@material-ui/core/styles";
-import { IModelFile } from "@shared/types/Model";
 import useDeleteObjectDialog from "./use-delete-object-dialog.hook";
 
-type Props = {
-  open: boolean;
-  objectToDelete?: IModelFile;
-  onClose: () => void;
-};
-
-const useStyles = makeStyles(() => ({}));
-
-function DeleteObjectDialog({ open, onClose, objectToDelete }: Props) {
-  const { isLoading, onObjectDeleteDialogConfirm, onObjectDeleteDialogClose } =
-    useDeleteObjectDialog(onClose, objectToDelete);
+function DeleteObjectDialog() {
+  const { name, isLoading, isOpen, onDialogConfirm, onDialogClose } =
+    useDeleteObjectDialog();
 
   return (
-    <Dialog open={open} onClose={onObjectDeleteDialogClose}>
-      <DialogTitle>{`Delete ${objectToDelete?.name} ?`}</DialogTitle>
+    <Dialog open={isOpen} onClose={onDialogClose}>
+      <DialogTitle>{`Delete ${name} ?`}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           This action cannot be undone.
         </DialogContentText>
       </DialogContent>
       <DialogActions>
-        <Button onClick={onObjectDeleteDialogClose} color="primary">
+        <Button onClick={onDialogClose} color="primary">
           Cancel
         </Button>
         <Button
           autoFocus
-          onClick={onObjectDeleteDialogConfirm}
+          onClick={onDialogConfirm}
           color="primary"
           disabled={isLoading}
         >

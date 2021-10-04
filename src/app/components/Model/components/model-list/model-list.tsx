@@ -13,12 +13,10 @@ import {
   Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { WorkingModel } from "@shared/types/Model";
+import { IModelFile } from "@shared/types/Model";
 import AddIcon from "@material-ui/icons/Add";
 import DeleteIcon from "@material-ui/icons/Delete";
 import useModelList from "./model-list.hook";
-import NewObjectDialog from "../new-object-dialog";
-import DeleteObjectDialog from "../delete-object-dialog";
 
 const buttonGroupHeight = 45;
 
@@ -46,32 +44,22 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 type Props = {
-  showLoading: boolean;
-  models: WorkingModel;
-  selectedModelIndex: number;
-  selectModelAtIndex: (index: number) => void;
+  models: IModelFile[];
+  isLoading: boolean;
 };
 
-function ModelList({
-  showLoading,
-  models,
-  selectedModelIndex,
-  selectModelAtIndex,
-}: Props) {
+function ModelList({ models, isLoading }: Props) {
   const classes = useStyles();
   const {
+    selectedModel,
     isProjectView,
     isExampleView,
     showAddButton,
+    onModelClick,
     onExamplesButtonClick,
     onMyProjectButtonClick,
     onAddButtonClick,
-    isNewObjectDialogOpen,
-    onNewObjectDialogClose,
-    objectToDelete,
     onDeleteObjectClick,
-    isDeleteObjectDialogOpen,
-    onDeleteObjectDialogClose,
   } = useModelList();
 
   return (
@@ -98,16 +86,16 @@ function ModelList({
         </ButtonGroup>
       </Box>
       <List aria-label="models" className={classes.list}>
-        {showLoading && <LinearProgress />}
-        {models.length === 0 && (
+        {isLoading && <LinearProgress />}
+        {!isLoading && models.length === 0 && (
           <Typography variant="caption">No Models found</Typography>
         )}
-        {models.map((model, index) => (
+        {models.map((model) => (
           <ListItem
             key={model.path}
             button
-            selected={selectedModelIndex === index}
-            onClick={() => selectModelAtIndex(index)}
+            selected={model === selectedModel}
+            onClick={() => onModelClick(model)}
           >
             <ListItemText
               primary={model.name}
@@ -130,15 +118,6 @@ function ModelList({
           <AddIcon />
         </Fab>
       )}
-      <NewObjectDialog
-        open={isNewObjectDialogOpen}
-        onClose={onNewObjectDialogClose}
-      />
-      <DeleteObjectDialog
-        open={isDeleteObjectDialogOpen}
-        onClose={onDeleteObjectDialogClose}
-        objectToDelete={objectToDelete}
-      />
     </>
   );
 }
