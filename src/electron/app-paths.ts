@@ -1,9 +1,12 @@
 import { app } from "electron";
 import path from "path";
 import { is } from "electron-util";
+import ElectronLog from "electron-log";
 
 class AppPaths {
   private readonly userDocuments = app.getPath("documents");
+
+  readonly logsDir = path.dirname(ElectronLog.transports.file.getFile().path);
 
   readonly resourcesDir = is.development
     ? path.join(__dirname, "..", "..", "resources")
