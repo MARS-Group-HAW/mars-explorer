@@ -3,6 +3,7 @@ import { Message, NotificationMessage } from "vscode-jsonrpc";
 import { isNotificationMessage } from "vscode-jsonrpc/lib/common/messages";
 import { Diagnostic, PublishDiagnosticsParams } from "monaco-languageclient";
 import { DiagnosticSeverity } from "vscode-languageserver";
+import { Channel } from "@shared/types/Channel";
 import {
   useAppDispatch,
   useAppSelector,
@@ -46,7 +47,7 @@ function useDiagnosticsMessages(): State {
 
   useEffect(resetDiagnostics, [path]);
 
-  function handleMessage(msg: Message) {
+  async function handleMessage(msg: Message) {
     if (!initRef) return;
 
     if (isNotificationMessage(msg) && isDiagnosticMessage(msg)) {
@@ -58,11 +59,15 @@ function useDiagnosticsMessages(): State {
         diagnosticParams.diagnostics.filter(diagnosticIsError);
 
       const { uri } = diagnosticParams;
+      const pathFromUri = await window.api.invoke<string, string>(
+        Channel.URI_TO_NAME,
+        uri
+      );
 
       if (diagnosticErrors.length > 0) {
-        dispatch(setErrorsInPath(uri));
+        dispatch(setErrorsInPath(pathFromUri));
       } else {
-        dispatch(removeErrorsInPath(uri));
+        dispatch(removeErrorsInPath(pathFromUri));
       }
     }
   }

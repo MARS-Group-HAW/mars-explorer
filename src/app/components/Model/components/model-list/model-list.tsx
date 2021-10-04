@@ -41,9 +41,10 @@ type Props = {
 function ModelList({ models, isLoading }: Props) {
   const classes = useStyles();
   const {
-    selectedModel,
     isProjectView,
     isExampleView,
+    isModelInvalid,
+    isModelSelected,
     showAddButton,
     onModelClick,
     onExamplesButtonClick,
@@ -84,7 +85,8 @@ function ModelList({ models, isLoading }: Props) {
           <ModelListItem
             key={model.path}
             name={model.name}
-            selected={model === selectedModel}
+            selected={isModelSelected(model)}
+            invalid={isModelInvalid(model)}
             onClick={() => onModelClick(model)}
             onDeleteClick={() => onDeleteObjectClick(model)}
           />

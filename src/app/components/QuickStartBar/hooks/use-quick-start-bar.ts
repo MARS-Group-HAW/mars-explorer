@@ -36,7 +36,7 @@ function useQuickStartBar(): State {
 
   const isProjectDefined = Boolean(path);
 
-  const { hasErrorsIn } = useAppSelector(selectModel);
+  const { namesWithError } = useAppSelector(selectModel);
 
   const [showErrorDialog, setShowErrorDialog] = useBoolean(false);
 
@@ -64,9 +64,9 @@ function useQuickStartBar(): State {
   };
 
   useEffect(() => {
-    handleValidation(setModelValidationState, hasErrorsIn.length > 0);
+    handleValidation(setModelValidationState, namesWithError.length > 0);
     handleValidation(setConfigValidationState, false);
-  }, [path, hasErrorsIn, isProjectFullyInitialized]);
+  }, [path, namesWithError, isProjectFullyInitialized]);
 
   useEffect(() => {
     setShowErrorDialog(Boolean(errorMsg));
@@ -97,7 +97,7 @@ function useQuickStartBar(): State {
     openErrorDialog: () => setShowErrorDialog(true),
     closeErrorDialog: () => setShowErrorDialog(false),
     modelErrorFiles:
-      modelValidationState === ValidationState.INVALID && hasErrorsIn,
+      modelValidationState === ValidationState.INVALID && namesWithError,
     disableStart,
     disableStop,
     handleStart,

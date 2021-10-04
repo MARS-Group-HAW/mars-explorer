@@ -18,6 +18,8 @@ import { IFileRef } from "@shared/types/File";
 import { ObjectCreationMessage } from "@shared/types/object-creation-message";
 import SimObjects from "@shared/types/sim-objects";
 import NotImplementedError from "@shared/errors/not-implemented-error";
+import { Files } from "vscode-languageserver/node";
+import { fileURLToPath } from "url";
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
@@ -147,6 +149,10 @@ ipcMain.handle(Channel.GET_EXAMPLE_PROJECTS, (): ModelRef[] => {
     path,
   }));
 });
+
+ipcMain.handle(Channel.URI_TO_NAME, (_, uri: string) =>
+  path.basename(fileURLToPath(uri))
+);
 
 ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
   const userProjects = fs
