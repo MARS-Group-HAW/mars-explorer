@@ -1,8 +1,13 @@
 import { configureStore } from "@reduxjs/toolkit";
-import logger from "redux-logger";
+import { createLogger } from "redux-logger";
 import projectReducer from "../components/Home/utils/project-slice";
 import modelReducer from "../components/Model/utils/model-slice";
 import simulationReducer from "../components/QuickStartBar/utils/simulation-slice";
+
+const logger = createLogger({
+  collapsed: true,
+  predicate: (getState, action) => !action.type.startsWith("simulation"),
+});
 
 const store = configureStore({
   reducer: {
