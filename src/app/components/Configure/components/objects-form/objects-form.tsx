@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useCallback, useState } from "react";
 import AgentsForm from "@app/components/Configure/components/agents-form";
 import { AppBar, Divider, Grid, Tab, Tabs } from "@material-ui/core";
 import FormPaper from "../form-paper";
@@ -6,10 +7,13 @@ import useObjectsForm, { TabIndizes } from "./use-objects-form.hook";
 import useStyles from "./objects-form-styles";
 import ObjectList from "../object-list";
 import { SharedMappingsProvider } from "../../hooks/use-shared-mappings";
+import useNodeHeight from "../../../../utils/hooks/use-node-height";
 
 const ObjectsForm = () => {
   const classes = useStyles();
   const { tab, handleTabChange, tabs } = useObjectsForm();
+
+  const { ref, height } = useNodeHeight();
 
   return (
     <SharedMappingsProvider>
@@ -27,8 +31,8 @@ const ObjectsForm = () => {
           </Tabs>
         </AppBar>
         <FormPaper className={classes.content}>
-          <Grid container spacing={2} style={{ height: "100%" }}>
-            <Grid item xs={2}>
+          <Grid ref={ref} container spacing={2} style={{ height: "100%" }}>
+            <Grid style={{ height }} item xs={2}>
               <ObjectList />
             </Grid>
             <Divider orientation="vertical" flexItem />
