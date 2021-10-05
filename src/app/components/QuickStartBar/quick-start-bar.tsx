@@ -48,6 +48,7 @@ function QuickStartBar() {
     modelState,
     modelErrorFiles,
     configState,
+    configErrors,
     disableStart,
     disableStop,
     simState,
@@ -73,13 +74,12 @@ function QuickStartBar() {
         <Grid item xs={3}>
           <Typography variant="h6">{projectName}</Typography>
         </Grid>
-
         <StatusChip
           label="Model"
           status={modelState}
           errors={modelErrorFiles}
         />
-        <StatusChip label="Config" status={configState} />
+        <StatusChip label="Config" status={configState} errors={configErrors} />
         <ActionButton
           icon={<PlayCircleOutlineIcon />}
           disabled={disableStart}
@@ -95,6 +95,7 @@ function QuickStartBar() {
           Stop
         </ActionButton>
         <div
+          role="progressbar"
           style={{
             display: "flex",
             width: 40,

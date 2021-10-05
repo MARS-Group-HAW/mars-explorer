@@ -14,6 +14,7 @@ export type FormSchema = TypeOf<typeof validationSchema>;
 
 class FormTransformer {
   public static configToForm(config: unknown): FormSchema {
+    console.log("Config to form");
     const parsedConfig = validationSchema.cast(config);
 
     const globals = parsedConfig.globals as GlobalsValidationSchema &

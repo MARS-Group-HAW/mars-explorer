@@ -3,7 +3,7 @@ import useLastProjectPath from "./use-last-project-path";
 import useCheckForDotNet from "./use-check-for-dotnet";
 import useBootstrap from "./bootstrap";
 
-type State = {};
+type State = void;
 
 function useApp(): State {
   useBootstrap();
@@ -11,8 +11,6 @@ function useApp(): State {
   useCheckForDotNet();
 
   useEffect(() => window.api.logger.info("App mounted."), []);
-
-  return {};
 }
 
 export default useApp;

@@ -3,20 +3,21 @@ import "@fontsource/roboto";
 import { CssBaseline } from "@material-ui/core";
 import { Route } from "react-router-dom";
 import Modeler from "@app/components/Model";
+import { ErrorBoundary } from "react-error-boundary";
 import Drawer from "./components/Drawer";
 import Path from "./utils/app-paths";
 import Home from "../Home";
 import Configure from "../Configure";
 import Analyze from "../Analyze";
 import useApp from "./hooks";
-import SnackBarProvider from "../shared/snackbar";
+import ErrorPage from "./components/ErrorPage";
 
 function App() {
   useApp();
 
   return (
-    <CssBaseline>
-      <SnackBarProvider>
+    <ErrorBoundary fallbackRender={(props) => <ErrorPage {...props} />}>
+      <CssBaseline>
         <Drawer>
           <Route path={Path.HOME} exact>
             <Home />
@@ -31,8 +32,8 @@ function App() {
             <Analyze />
           </Route>
         </Drawer>
-      </SnackBarProvider>
-    </CssBaseline>
+      </CssBaseline>
+    </ErrorBoundary>
   );
 }
 

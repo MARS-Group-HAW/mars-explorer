@@ -7,11 +7,14 @@ import { Provider } from "react-redux";
 import App from "./components/App";
 import store from "./utils/store";
 import "./utils/native-overwrites";
+import SnackBarProvider from "./components/shared/snackbar";
 
 ReactDOM.render(
   <HashRouter>
     <Provider store={store}>
-      <App />
+      <SnackBarProvider>
+        <App />
+      </SnackBarProvider>
     </Provider>
   </HashRouter>,
   document.querySelector("#root")
