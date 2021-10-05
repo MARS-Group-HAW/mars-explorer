@@ -66,16 +66,57 @@ export const simulationSlice = createSlice({
       const { progress, objectCounts } = action.payload;
 
       objectCounts.forEach(({ name, count }) => {
-        let indexOfResults = findIndexOfResultDataByName(state, name);
+        const indexOfResults = findIndexOfResultDataByName(state, name);
 
         if (indexOfResults === -1) {
-          indexOfResults =
-            state.resultData.push({
-              name,
-              ...initialResultDataWithMeta,
-            }) - 1;
-        }
+          state.resultData.push({
+            name,
+            ...initialResultDataWithMeta,
+            data: [
+              {
+                progress,
+                count,
+              },
+            ],
+          });
+        } else {
+          const indexOfObjWithProgress = findIndexInResultByProgress(
+            state,
+            indexOfResults,
+            progress
+          );
 
+          if (indexOfObjWithProgress === -1) {
+            state.resultData[indexOfResults].data.push({
+              progress,
+              count,
+            });
+          } else {
+            state.resultData[indexOfResults].data[
+              indexOfObjWithProgress
+            ].count = count;
+          }
+        }
+      });
+    },
+    addPosData: (state, action: PayloadAction<SimulationVisMessage>) => {
+      const { progress, objectCoords } = action.payload;
+      const { name, coords } = objectCoords;
+
+      const indexOfResults = findIndexOfResultDataByName(state, name);
+
+      if (indexOfResults === -1) {
+        state.resultData.push({
+          name,
+          ...initialResultDataWithMeta,
+          data: [
+            {
+              progress,
+              coords,
+            },
+          ],
+        });
+      } else {
         const indexOfObjWithProgress = findIndexInResultByProgress(
           state,
           indexOfResults,
@@ -85,42 +126,12 @@ export const simulationSlice = createSlice({
         if (indexOfObjWithProgress === -1) {
           state.resultData[indexOfResults].data.push({
             progress,
-            count,
+            coords,
           });
         } else {
-          state.resultData[indexOfResults].data[indexOfObjWithProgress].count =
-            count;
+          state.resultData[indexOfResults].data[indexOfObjWithProgress].coords =
+            coords;
         }
-      });
-    },
-    addPosData: (state, action: PayloadAction<SimulationVisMessage>) => {
-      const { progress, objectCoords } = action.payload;
-      const { name, coords } = objectCoords;
-
-      let indexOfResults = findIndexOfResultDataByName(state, name);
-
-      if (indexOfResults === -1) {
-        indexOfResults =
-          state.resultData.push({
-            name,
-            ...initialResultDataWithMeta,
-          }) - 1;
-      }
-
-      const indexOfObjWithProgress = findIndexInResultByProgress(
-        state,
-        indexOfResults,
-        progress
-      );
-
-      if (indexOfObjWithProgress === -1) {
-        state.resultData[indexOfResults].data.push({
-          progress,
-          coords,
-        });
-      } else {
-        state.resultData[indexOfResults].data[indexOfObjWithProgress].coords =
-          coords;
       }
     },
     finishResults: (state) => {
