@@ -8,6 +8,10 @@ import useSimulation from "./use-simulation";
 import { selectModel } from "../../Model/utils/model-slice";
 import useProjectInitializationStatus from "../../App/hooks/bootstrap/model/use-project-initialization-status";
 import useResultsInLocalStorage from "./use-results-in-local-storage";
+import {
+  selectConfigErrors,
+  selectConfigStatus,
+} from "../../Configure/utils/config-slice";
 
 type State = {
   projectName: string;
@@ -20,6 +24,7 @@ type State = {
   errorMsg: string;
   modelState: ValidationState;
   modelErrorFiles?: string[];
+  configErrors: string[];
   configState: ValidationState;
   disableStart: boolean;
   disableStop: boolean;
@@ -37,14 +42,12 @@ function useQuickStartBar(): State {
   const isProjectDefined = Boolean(path);
 
   const { namesWithError } = useAppSelector(selectModel);
+  const configErrors = useAppSelector(selectConfigErrors);
+  const configStatus = useAppSelector(selectConfigStatus);
 
   const [showErrorDialog, setShowErrorDialog] = useBoolean(false);
 
   const [modelValidationState, setModelValidationState] = useState(
-    ValidationState.UNKNOWN
-  );
-
-  const [configValidationState, setConfigValidationState] = useState(
     ValidationState.UNKNOWN
   );
 
@@ -65,7 +68,6 @@ function useQuickStartBar(): State {
 
   useEffect(() => {
     handleValidation(setModelValidationState, namesWithError.length > 0);
-    handleValidation(setConfigValidationState, false);
   }, [path, namesWithError, isProjectFullyInitialized]);
 
   useEffect(() => {
@@ -77,7 +79,7 @@ function useQuickStartBar(): State {
 
   const isAllValid =
     modelValidationState === ValidationState.VALID &&
-    configValidationState === ValidationState.VALID;
+    configStatus === ValidationState.VALID;
 
   const isRunning =
     simState === SimulationStates.RUNNING ||
@@ -88,7 +90,7 @@ function useQuickStartBar(): State {
   return {
     projectName: name || "No project selected",
     modelState: modelValidationState,
-    configState: configValidationState,
+    configState: configStatus,
     simState,
     progress,
     showProgress: isRunning,
@@ -98,6 +100,7 @@ function useQuickStartBar(): State {
     closeErrorDialog: () => setShowErrorDialog(false),
     modelErrorFiles:
       modelValidationState === ValidationState.INVALID && namesWithError,
+    configErrors,
     disableStart,
     disableStop,
     handleStart,

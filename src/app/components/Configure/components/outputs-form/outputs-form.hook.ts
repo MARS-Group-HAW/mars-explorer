@@ -43,6 +43,8 @@ function useOutputsForm(namespace: string): State {
   );
 
   useEffect(() => {
+    if (!value) return;
+
     switch (value) {
       case OutputSpecification.CSV:
         setValue(csvDefaultValues);

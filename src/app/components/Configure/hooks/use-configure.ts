@@ -1,16 +1,20 @@
 import { FormikValues } from "formik";
-import useGetConfig from "@app/components/Configure/hooks/use-get-config";
 import { selectProject } from "@app/components/Home/utils/project-slice";
-import { useContext, useEffect } from "react";
+import { useContext } from "react";
 import { Channel } from "@shared/types/Channel";
 import { useLatest } from "react-use";
 import { useAppSelector } from "../../../utils/hooks/use-store";
 import validationSchema from "../utils/validationSchema";
 import { SnackBarContext } from "../../shared/snackbar/snackbar-provider";
-import FormTransformer from "../utils/transform";
+import FormTransformer, { FormSchema } from "../utils/transform";
+import {
+  selectConfig,
+  selectConfigHasBeenChecked,
+  selectConfigLoading,
+} from "../utils/config-slice";
 
 type State = {
-  config: any;
+  config: FormSchema;
   showNoPathMsg: boolean;
   showForm: boolean;
   showLoading: boolean;
@@ -18,14 +22,14 @@ type State = {
 };
 
 function useConfigure(): State {
+  const hasBeenChecked = useAppSelector(selectConfigHasBeenChecked);
+  const isLoading = useAppSelector(selectConfigLoading);
+  const config = useAppSelector(selectConfig);
   const { path } = useAppSelector(selectProject);
   const latestPath = useLatest(path);
-  const { config, loading, error, wasCreated } = useGetConfig(path);
-  const { addInfoAlert, addSuccessAlert, addErrorAlert } =
-    useContext(SnackBarContext);
+  const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
 
   const handleSubmit = (values: FormikValues) => {
-    window.api.logger.info("Submitting", values);
     validationSchema
       .validate(values)
       .then((parsedConfig: any) => {
@@ -55,34 +59,11 @@ function useConfigure(): State {
       });
   };
 
-  useEffect(() => {
-    if (loading) return;
-
-    if (error) {
-      addErrorAlert({
-        msg: `An error occurred while parsing your config: ${error}`,
-      });
-      return;
-    }
-
-    if (!config) return;
-
-    let msg;
-
-    if (wasCreated) {
-      msg = "Config was created.";
-    } else {
-      msg = "Config was loaded.";
-    }
-
-    addInfoAlert({ msg });
-  }, [loading, error, config, wasCreated]);
-
   return {
-    showNoPathMsg: !path,
     config,
-    showForm: path && !loading && config,
-    showLoading: loading,
+    showNoPathMsg: !path,
+    showForm: hasBeenChecked && Boolean(config),
+    showLoading: isLoading,
     handleSubmit,
   };
 }

@@ -137,6 +137,12 @@ app.on("window-all-closed", () => {
   if (process.platform !== "darwin") app.quit();
 });
 
+ipcMain.on(Channel.RESTART_APP, () => {
+  log.warn("Restart requested by user.");
+  app.relaunch();
+  app.exit();
+});
+
 ipcMain.handle(Channel.GET_WORKSPACE_PATH, () => appPaths.workspaceDir);
 
 ipcMain.handle(Channel.GET_EXAMPLES_PATH, () => appPaths.workspaceExamplesDir);
@@ -384,6 +390,10 @@ ipcMain.handle(Channel.GET_DEFAULT_CONFIG_PATH, (_, rootPath: string): string =>
 
 ipcMain.handle(Channel.FILE_EXISTS, (_, projectPath: string): boolean =>
   fs.existsSync(projectPath)
+);
+
+ipcMain.handle(Channel.DOES_CONFIG_EXIST, (_, rootPath: string): boolean =>
+  fs.existsSync(path.resolve(rootPath, "config.json"))
 );
 
 ipcMain.handle(

@@ -1,44 +1,68 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import ValidationState from "@app/utils/types/validation-state";
 import type { RootState } from "../../../utils/store";
-import {
-  initialState as ValidationInitialState,
-  reducers as ValidationReducer,
-  State as ValidationState,
-} from "../../../utils/slices/validation-slice";
 
 // Define a type for the slice state
-type State = ValidationState & {
-  pathToConfigJson?: string;
+type State = {
+  status: ValidationState;
+  config?: any;
+  errors: string[];
 };
-
 // Define the initial state using that type
 const initialState: State = {
-  ...ValidationInitialState,
+  status: ValidationState.UNKNOWN,
+  errors: [],
 };
 
 export const configSlice = createSlice({
   name: "config",
   initialState,
   reducers: {
-    setPathToConfig: (state: State, { payload }: PayloadAction<string>) => {
-      window.api.logger.info(`[CONFIG] ${payload}`);
-      state.pathToConfigJson = payload;
+    setConfig: (state, { payload }: PayloadAction<any>) => {
+      state.config = payload;
     },
-    ...ValidationReducer,
+    resetConfig: () => initialState,
+    setErrors: (state, { payload }: PayloadAction<string[]>) => {
+      state.errors = payload;
+    },
+    setLoadingState: (state) => {
+      state.status = ValidationState.LOADING;
+    },
+    setInvalidState: (state) => {
+      state.status = ValidationState.INVALID;
+    },
+    setValidState: (state) => {
+      state.status = ValidationState.VALID;
+    },
+    setErrorState: (state) => {
+      state.status = ValidationState.ERROR;
+    },
+    setUnknownState: (state) => {
+      state.status = ValidationState.UNKNOWN;
+    },
   },
 });
 
 export const {
-  setPathToConfig,
   setLoadingState,
   setInvalidState,
   setValidState,
   setErrorState,
   setUnknownState,
+  setConfig,
+  setErrors,
+  resetConfig,
 } = configSlice.actions;
 
-// Other code such as selectors can use the imported `RootState` type
-// TODO: connect to root store
-export const selectConfigPath = (state: RootState) => state;
+export const selectConfig = (state: RootState) => state.config.config;
+export const selectConfigStatus = (state: RootState) => state.config.status;
+export const selectConfigErrors = (state: RootState) => state.config.errors;
+
+export const selectConfigLoading = (state: RootState) =>
+  state.config.status === ValidationState.LOADING;
+
+export const selectConfigHasBeenChecked = (state: RootState) =>
+  state.config.status === ValidationState.VALID ||
+  state.config.status === ValidationState.INVALID;
 
 export default configSlice.reducer;
