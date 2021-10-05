@@ -5,7 +5,6 @@ type ObjectMappings = ObjectMapping[];
 export type ObjectMapping = {
   [FieldNames.NAME]: string;
   [FieldNames.COUNT]: number;
-  [FieldNames.FILE]: string;
   [FieldNames.MAPPING]: IndividualMapping[];
 };
 
