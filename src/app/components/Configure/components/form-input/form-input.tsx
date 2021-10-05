@@ -1,15 +1,18 @@
 import * as React from "react";
-import {
-  StandardTextFieldProps,
-  TextField,
-  Tooltip,
-  withStyles,
-} from "@material-ui/core";
+import { TextField, Tooltip, withStyles } from "@material-ui/core";
+import { TextFieldProps } from "@material-ui/core/TextField/TextField";
 import useFormInput from "./form-input.hook";
 
-export type FormInputProps = { name: string } & Omit<
-  StandardTextFieldProps,
-  "fullWidth" | "id" | "value" | "onBlur" | "onChange" | "error" | "helperText"
+export type FormInputProps = { name: string; outlined?: boolean } & Omit<
+  TextFieldProps,
+  | "fullWidth"
+  | "id"
+  | "value"
+  | "onBlur"
+  | "onChange"
+  | "error"
+  | "helperText"
+  | "variant"
 >;
 
 const ErrorTooltip = withStyles((theme) => ({
@@ -19,7 +22,13 @@ const ErrorTooltip = withStyles((theme) => ({
   },
 }))(Tooltip);
 
-const FormInput = ({ name, children, ...rest }: FormInputProps) => {
+const FormInput = ({
+  name,
+  children,
+  placeholder,
+  outlined = false,
+  ...rest
+}: FormInputProps) => {
   const {
     fieldName,
     value,
@@ -37,7 +46,9 @@ const FormInput = ({ name, children, ...rest }: FormInputProps) => {
         fullWidth
         id={fieldName}
         name={fieldName}
-        label={label}
+        variant={outlined ? "outlined" : "standard"}
+        label={placeholder ? null : label}
+        placeholder={placeholder}
         value={value || ""}
         onBlur={handleBlur}
         onChange={handleChange}
