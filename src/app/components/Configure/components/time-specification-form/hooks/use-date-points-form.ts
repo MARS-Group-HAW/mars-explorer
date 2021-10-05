@@ -1,4 +1,5 @@
 import { useField } from "formik";
+import { useEffect, useState } from "react";
 import withNamespace from "../../../utils/withNamespace";
 import FieldNames from "../../globals-form/utils/fieldNames";
 import defaultValues from "../../globals-form/utils/defaultValues";
@@ -12,6 +13,7 @@ type State = {
   endPointMin: string;
   endPointDisabled: boolean;
   handleReset: () => void;
+  handleEnable: () => void;
 };
 
 function useDatePointsForm(namespace: string, isStepBased: boolean): State {
@@ -20,6 +22,14 @@ function useDatePointsForm(namespace: string, isStepBased: boolean): State {
 
   const [startPointField, , startPointHelpers] = useField(startPointNamespace);
   const [endPointField, , endPointHelpers] = useField(endPointNamespace);
+
+  const [prevStartPoint, setPrevStartPoint] = useState(startPointField.value);
+  const [prevEndPoint, setPrevEndPoint] = useState(endPointField.value);
+
+  useEffect(() => {
+    if (startPointField.value) setPrevStartPoint(startPointField.value);
+    if (endPointField.value) setPrevEndPoint(endPointField.value);
+  }, [startPointField, endPointField]);
 
   const { handleReset: startPointHandleReset } = useResetForm(
     startPointHelpers,
@@ -35,6 +45,11 @@ function useDatePointsForm(namespace: string, isStepBased: boolean): State {
     endPointHandleReset();
   };
 
+  const handleEnable = () => {
+    if (prevStartPoint) startPointHelpers.setValue(prevStartPoint);
+    if (prevEndPoint) endPointHelpers.setValue(prevEndPoint);
+  };
+
   return {
     startPointNamespace,
     endPointNamespace,
@@ -43,6 +58,7 @@ function useDatePointsForm(namespace: string, isStepBased: boolean): State {
     endPointMin: startPointField.value,
     endPointDisabled: isStepBased || !startPointField.value,
     handleReset,
+    handleEnable,
   };
 }
 

@@ -46,6 +46,7 @@ function useTimeSpecificationForm(namespace: string): State {
     endPointMin,
     endPointDisabled,
     handleReset: handleDatePointReset,
+    handleEnable,
   } = useDatePointsForm(namespace, isStepBased);
 
   useEffect(() => {
@@ -53,6 +54,7 @@ function useTimeSpecificationForm(namespace: string): State {
       handleDatePointReset();
     } else {
       stepsHandleReset();
+      handleEnable();
     }
   }, [isStepBased]);
 
