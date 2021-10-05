@@ -23,7 +23,7 @@ function useNewConfig(path: string, existingConfigFound: boolean) {
 
     await window.api.invoke<{ path: string; content: string }, void>(
       Channel.WRITE_CONTENT_TO_FILE,
-      { path, content: defaultConfig }
+      { path, content: JSON.stringify(defaultConfig, null, "\t") }
     );
 
     return defaultConfig;

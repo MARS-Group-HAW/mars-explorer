@@ -6,6 +6,7 @@ import { HashRouter } from "react-router-dom";
 import { Provider } from "react-redux";
 import App from "./components/App";
 import store from "./utils/store";
+import "./utils/native-overwrites";
 
 ReactDOM.render(
   <HashRouter>

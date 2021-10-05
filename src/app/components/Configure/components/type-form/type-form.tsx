@@ -3,15 +3,15 @@ import { useCallback, useState } from "react";
 import AgentsForm from "@app/components/Configure/components/agents-form";
 import { AppBar, Divider, Grid, Tab, Tabs } from "@material-ui/core";
 import FormPaper from "../form-paper";
-import useObjectsForm, { TabIndizes } from "./use-objects-form.hook";
-import useStyles from "./objects-form-styles";
-import ObjectList from "../object-list";
+import useTypeForm, { TabIndizes } from "./use-type-form.hook";
+import useStyles from "./type-form-styles";
+import TypeList from "../type-list";
 import { SharedMappingsProvider } from "../../hooks/use-shared-mappings";
 import useNodeHeight from "../../../../utils/hooks/use-node-height";
 
-const ObjectsForm = () => {
+const TypeForm = () => {
   const classes = useStyles();
-  const { tab, handleTabChange, tabs } = useObjectsForm();
+  const { tab, handleTabChange, tabs } = useTypeForm();
 
   const { ref, height } = useNodeHeight();
 
@@ -39,7 +39,7 @@ const ObjectsForm = () => {
             style={{ height: "100%" }}
           >
             <Grid style={{ height }} item xs={2}>
-              <ObjectList />
+              <TypeList />
             </Grid>
             <Divider orientation="vertical" flexItem />
             <Grid item xs={9}>
@@ -58,4 +58,4 @@ const ObjectsForm = () => {
   );
 };
 
-export default ObjectsForm;
+export default TypeForm;

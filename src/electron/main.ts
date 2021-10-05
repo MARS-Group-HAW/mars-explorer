@@ -18,7 +18,6 @@ import { IFileRef } from "@shared/types/File";
 import { ObjectCreationMessage } from "@shared/types/object-creation-message";
 import SimObjects from "@shared/types/sim-objects";
 import NotImplementedError from "@shared/errors/not-implemented-error";
-import { Files } from "vscode-languageserver/node";
 import { fileURLToPath } from "url";
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
@@ -383,19 +382,17 @@ ipcMain.handle(Channel.GET_DEFAULT_CONFIG_PATH, (_, rootPath: string): string =>
   path.resolve(rootPath, "config.json")
 );
 
-ipcMain.handle(Channel.CONFIG_EXISTS, (_, path: string): boolean =>
-  fs.existsSync(path)
+ipcMain.handle(Channel.FILE_EXISTS, (_, projectPath: string): boolean =>
+  fs.existsSync(projectPath)
 );
 
 ipcMain.handle(
   Channel.GET_CONFIG_IN_PROJECT,
-  (_, rootPath: string): unknown | null => {
+  (_, rootPath: string): string | null => {
     const pathToDefaultConfig = path.resolve(rootPath, "config.json");
 
-    console.log(rootPath, pathToDefaultConfig);
-
     if (fs.existsSync(pathToDefaultConfig)) {
-      return fs.readJsonSync(pathToDefaultConfig);
+      return fs.readFileSync(pathToDefaultConfig, "utf-8");
     }
     return null;
   }
@@ -403,8 +400,11 @@ ipcMain.handle(
 
 ipcMain.handle(
   Channel.WRITE_CONTENT_TO_FILE,
-  (_, { path, content }: { path: string; content: string }): void =>
-    fs.writeJSONSync(path, content)
+  (
+    _,
+    { path: pathToProject, content }: { path: string; content: string }
+  ): void =>
+    fs.writeFileSync(path.resolve(pathToProject, "config.json"), content)
 );
 
 /*
