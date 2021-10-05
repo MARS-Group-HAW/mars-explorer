@@ -5,6 +5,11 @@ import { OutputSpecification } from "@app/components/Configure/components/output
 import validationSchema from "./validationSchema";
 import { GlobalsValidationSchema } from "../components/globals-form/utils/validationSchema";
 
+type SimFlags = {
+  pythonVisualization: boolean;
+  console: boolean;
+};
+
 export type FormSchema = TypeOf<typeof validationSchema>;
 
 class FormTransformer {
@@ -30,7 +35,14 @@ class FormTransformer {
 
   public static formToConfig(schema: FormSchema): any {
     const globals = schema.globals as GlobalsValidationSchema &
-      OutputsValidationSchema;
+      OutputsValidationSchema &
+      SimFlags;
+
+    // FIXME: output options currently not in use
+    globals.output = OutputSpecification.CSV;
+    delete globals.options;
+    globals.pythonVisualization = true;
+    globals.console = true;
 
     if (globals.timeSpecification) {
       if (globals.timeSpecification === TimeSpecification.STEP) {

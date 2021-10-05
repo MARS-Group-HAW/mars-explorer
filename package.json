@@ -24,6 +24,7 @@
     "@material-ui/lab": "^4.0.0-alpha.60",
     "@reduxjs/toolkit": "^1.6.1",
     "chart.js": "^3.5.1",
+    "date-fns": "^2.25.0",
     "electron-log": "^4.4.0",
     "electron-squirrel-startup": "^1.0.0",
     "electron-util": "^0.17.0",

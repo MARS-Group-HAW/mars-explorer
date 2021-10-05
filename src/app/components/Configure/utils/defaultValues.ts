@@ -5,4 +5,7 @@ import Config from "./types";
 
 export default {
   [FieldNames.GLOBALS]: globalsDefaultValues,
+  [FieldNames.AGENTS]: [],
+  [FieldNames.LAYERS]: [],
+  [FieldNames.ENTITIES]: [],
 } as Config;

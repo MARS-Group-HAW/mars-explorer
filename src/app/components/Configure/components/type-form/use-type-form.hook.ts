@@ -32,7 +32,7 @@ const tabs: Tabs = [
   },
 ];
 
-function useObjectsForm(): State {
+function useTypeForm(): State {
   const { tab, handleTabChange } = useTabBar<TabIndizes>(TabIndizes.AGENTS);
 
   return {
@@ -42,4 +42,4 @@ function useObjectsForm(): State {
   };
 }
 
-export default useObjectsForm;
+export default useTypeForm;

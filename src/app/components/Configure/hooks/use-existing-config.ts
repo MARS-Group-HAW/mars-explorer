@@ -18,12 +18,12 @@ function useExistingConfig(path: string): State {
   } = useAsync(async () => {
     if (!path) return null;
 
-    const config = await window.api.invoke<string, unknown>(
+    const config = await window.api.invoke<string, string>(
       Channel.GET_CONFIG_IN_PROJECT,
       path
     );
 
-    return FormTransformer.configToForm(config);
+    return FormTransformer.configToForm(JSON.parse(config));
   }, [path]);
   return { existingConfig, configSearchLoading, configSearchError };
 }
