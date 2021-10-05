@@ -31,12 +31,18 @@ const ObjectsForm = () => {
           </Tabs>
         </AppBar>
         <FormPaper className={classes.content}>
-          <Grid ref={ref} container spacing={2} style={{ height: "100%" }}>
+          <Grid
+            ref={ref}
+            container
+            justifyContent="space-between"
+            spacing={2}
+            style={{ height: "100%" }}
+          >
             <Grid style={{ height }} item xs={2}>
               <ObjectList />
             </Grid>
             <Divider orientation="vertical" flexItem />
-            <Grid item>
+            <Grid item xs={9}>
               {tab === TabIndizes.AGENTS && <AgentsForm />}
               {tab === TabIndizes.LAYERS && (
                 <div>Layers: Not supported yet</div>
