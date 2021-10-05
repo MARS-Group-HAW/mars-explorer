@@ -9,6 +9,7 @@ import validationSchema from "./utils/validationSchema";
 import FieldNames from "./utils/fieldNames";
 import useConfigure from "./hooks";
 import useStyles from "./configure-styles";
+import NoDataMessage from "../shared/no-data-message/no-data-message";
 
 export default function Configure() {
   const classes = useStyles();
@@ -17,17 +18,15 @@ export default function Configure() {
 
   return (
     <div className={classes.root}>
-      {showNoPathMsg ||
-        (showLoading && (
-          <Box>
-            {showNoPathMsg && (
-              <Typography color="textSecondary" variant="h6">
-                No project selected.
-              </Typography>
-            )}
-            {showLoading && <CircularProgress />}
-          </Box>
-        ))}
+      {showNoPathMsg && <NoDataMessage msg="No project selected" />}
+      {showLoading && (
+        <Box className={classes.loadingContainer}>
+          <CircularProgress size={50} />
+          <Typography color="textSecondary">
+            Loading your configuration ...
+          </Typography>
+        </Box>
+      )}
       {showForm && (
         <Formik
           onSubmit={handleSubmit}

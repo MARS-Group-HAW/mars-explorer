@@ -6,4 +6,11 @@ export default makeStyles((theme) => ({
     flexGrow: 1,
     padding: theme.spacing(2),
   },
+  loadingContainer: {
+    height: "100%",
+    width: "100%",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
+  },
 }));
