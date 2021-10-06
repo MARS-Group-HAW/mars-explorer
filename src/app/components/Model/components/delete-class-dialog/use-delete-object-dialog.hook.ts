@@ -17,7 +17,7 @@ type State = {
   onDialogConfirm: () => void;
 };
 
-function useDeleteObjectDialog(): State {
+function useDeleteClassDialog(): State {
   const dispatch = useAppDispatch();
   const [{ isDeleteDialogOpen, processedModel }, sharedModelDispatch] =
     useSharedModels();
@@ -32,7 +32,7 @@ function useDeleteObjectDialog(): State {
 
   const onDialogConfirm = async () => {
     if (!processedModel) {
-      window.api.logger.warn("No object to delete.");
+      window.api.logger.warn("No class to delete.");
       return;
     }
 
@@ -67,4 +67,4 @@ function useDeleteObjectDialog(): State {
   };
 }
 
-export default useDeleteObjectDialog;
+export default useDeleteClassDialog;

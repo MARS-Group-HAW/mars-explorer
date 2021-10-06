@@ -11,6 +11,20 @@ const options = (
   onLabelClick: (legendItem: LegendItem) => void
 ): ChartOptions => ({
   maintainAspectRatio: false,
+  scales: {
+    x: {
+      title: {
+        display: true,
+        text: "Position X in Grid",
+      },
+    },
+    y: {
+      title: {
+        display: true,
+        text: "Position Y in Grid",
+      },
+    },
+  },
   plugins: {
     legend: {
       onClick: (e, legendItem) => onLabelClick(legendItem),

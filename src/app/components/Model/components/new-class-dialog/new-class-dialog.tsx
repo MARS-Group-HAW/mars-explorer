@@ -49,16 +49,16 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function NewObjectDialog() {
+function NewClassDialog() {
   const classes = useStyles();
 
   const {
     loadConfirmButton,
     disableConfirmButton,
-    newObjectName,
-    setNewObjectName,
-    selectedObject,
-    onObjectTypeClick,
+    newClassName,
+    setNewClassName,
+    selectedType,
+    onTypeClick,
     isOpen,
     onDialogConfirm,
     onDialogClose,
@@ -76,21 +76,21 @@ function NewObjectDialog() {
             <ObjectButton
               key={obj}
               object={obj}
-              selected={obj === selectedObject}
-              onClick={() => onObjectTypeClick(obj)}
+              selected={obj === selectedType}
+              onClick={() => onTypeClick(obj)}
             />
           ))}
         </Box>
         <Box className={classes.objectDescription}>
-          {!selectedObject && (
+          {!selectedType && (
             <div className={classes.noSelectedText}>
               <Typography variant="caption" color="textSecondary">
                 Select an object type to see some information about it.
               </Typography>
             </div>
           )}
-          {selectedObject && (
-            <DialogContentText>{description[selectedObject]}</DialogContentText>
+          {selectedType && (
+            <DialogContentText>{description[selectedType]}</DialogContentText>
           )}
         </Box>
         <TextField
@@ -99,10 +99,10 @@ function NewObjectDialog() {
           id="class-name"
           type="text"
           fullWidth
-          value={newObjectName}
+          value={newClassName}
           label="Class Name"
           helperText="The name should be unique and contain only letters"
-          onChange={(ev) => setNewObjectName(ev.target.value)}
+          onChange={(ev) => setNewClassName(ev.target.value)}
         />
       </DialogContent>
       <DialogActions>
@@ -134,4 +134,4 @@ function NewObjectDialog() {
   );
 }
 
-export default NewObjectDialog;
+export default NewClassDialog;
