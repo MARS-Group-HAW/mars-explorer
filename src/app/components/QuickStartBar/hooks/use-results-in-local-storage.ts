@@ -28,11 +28,11 @@ function useResultsInLocalStorage(): State {
     }
   };
 
-  const dispatchRestoreResults = () =>
-    path && dispatch(restoreDataFromLocalStorage(path));
+  const dispatchRestoreResults = (projectPath?: string) =>
+    path && dispatch(restoreDataFromLocalStorage(projectPath));
 
   useEffect(() => {
-    dispatchRestoreResults();
+    dispatchRestoreResults(path);
   }, [path]);
   useEffect(dispatchSaveResults, [simEndedWithSuccess]);
 }
