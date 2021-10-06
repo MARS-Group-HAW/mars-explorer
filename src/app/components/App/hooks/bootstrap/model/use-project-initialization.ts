@@ -29,7 +29,6 @@ function useProjectInitialization(path?: string) {
   useCustomCompareEffect(
     () => {
       if (!initialized) return;
-      console.log("models changed");
       // reinitialize if on model added
       setInitialized(false);
     },
