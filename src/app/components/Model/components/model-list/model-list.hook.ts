@@ -39,7 +39,7 @@ function useModelList(): State {
 
   const isModelInvalid = (model: IModelFile) => errorNames.includes(model.name);
   const isModelSelected = (model: IModelFile) => model === selectedModel;
-  const isModelDirty = (model: IModelFile) => dirtyNames.includes(model.name);
+  const isModelDirty = (model: IModelFile) => dirtyNames.includes(model.path);
 
   return {
     isProjectView,
