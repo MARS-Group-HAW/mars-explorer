@@ -102,9 +102,6 @@ const MappingsForm = ({ namespace }: Props) => {
                 >
                   <Grid item xs={7}>
                     <FormInput
-                      autoFocus={
-                        index === individualMappingNamespaces.length - 1
-                      }
                       className={classes.mappingInput}
                       placeholder="Parameter"
                       size="small"
