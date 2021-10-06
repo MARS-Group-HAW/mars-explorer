@@ -170,6 +170,7 @@ export function launchLanguageServer(
         method: message.method,
       });
       switch (message.method) {
+        /*
         case DidOpenTextDocumentNotification.type.method: {
           const didOpenParams = message.params as DidOpenTextDocumentParams;
           const { uri, text } = didOpenParams.textDocument;
@@ -178,6 +179,7 @@ export function launchLanguageServer(
           if (uri) fs.writeFileSync(uriAsPath, text);
           break;
         }
+         */
         default:
           lspLogger.warn(
             `Handle for notification method "${message.method}" not found.`
