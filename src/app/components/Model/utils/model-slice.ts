@@ -39,8 +39,13 @@ export const modelSlice = createSlice({
     setModel: (state, { payload }: PayloadAction<WorkingModel>) => {
       state.models = payload;
     },
-    setDirtyModels: (state, { payload }: PayloadAction<string[]>) => {
-      state.dirtyModels = payload.sort();
+    addToDirtyFiles: (state, { payload }: PayloadAction<string>) => {
+      state.dirtyModels.push(payload);
+    },
+    removeFromDirtyFiles: (state, { payload }: PayloadAction<string>) => {
+      state.dirtyModels = state.dirtyModels.filter(
+        (modelPath) => modelPath !== payload
+      );
     },
     resetDirtyModels: (state) => {
       state.dirtyModels = initialState.dirtyModels;
@@ -68,10 +73,11 @@ export const {
   setErrorsInPath,
   finishLoadingStep,
   resetLoadingStep,
-  setDirtyModels,
   addModel,
   removeModel,
   setModel,
+  addToDirtyFiles,
+  removeFromDirtyFiles,
 } = modelSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type

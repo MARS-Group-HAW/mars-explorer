@@ -41,7 +41,7 @@ function useConfigure(): State {
 
         window.api
           .invoke<{ path: string; content: string }, void>(
-            Channel.WRITE_CONTENT_TO_FILE,
+            Channel.WRITE_CONFIG_TO_FILE,
             {
               path: latestPath.current,
               content: JSON.stringify(transformedConfig, null, "\t"),

@@ -34,7 +34,7 @@ function useConfigBootstrap() {
   const createDefaultConfig = (projectRoot: string) => {
     const defaultConfig = FormTransformer.formToConfig(defaultValues);
     return window.api.invoke<{ path: string; content: string }, void>(
-      Channel.WRITE_CONTENT_TO_FILE,
+      Channel.WRITE_CONFIG_TO_FILE,
       { path: projectRoot, content: JSON.stringify(defaultConfig, null, "\t") }
     );
   };

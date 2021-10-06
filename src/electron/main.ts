@@ -410,6 +410,12 @@ ipcMain.handle(
 
 ipcMain.handle(
   Channel.WRITE_CONTENT_TO_FILE,
+  (_, { path: pathToFile, content }: { path: string; content: string }): void =>
+    fs.writeFileSync(pathToFile, content)
+);
+
+ipcMain.handle(
+  Channel.WRITE_CONFIG_TO_FILE,
   (
     _,
     { path: pathToProject, content }: { path: string; content: string }
