@@ -446,16 +446,25 @@ ipcMain.handle(
     fs.readFileSync(path, "utf-8")
 );
 
-let languageServerChannel: string;
-
 ipcMain.handle(
   Channel.START_LANGUAGE_SERVER,
   (_, projectPath: string): string => {
-    if (languageServerChannel) {
-      log.info(`Reusing LSP running at ${languageServerChannel}`);
-      return languageServerChannel;
-    }
-    return launchLanguageServer(mainWindow, projectPath);
+    const { lspChannel, killServer } = launchLanguageServer(
+      mainWindow,
+      projectPath
+    );
+
+    const kill = () => {
+      if (!killServer) return;
+      log.info(`Stopping Language Server (${lspChannel})`);
+      killServer();
+    };
+
+    mainWindow.once("close", kill);
+    mainWindow.webContents.once("did-start-loading", kill);
+    ipcMain.once(Channel.STOP_LANGUAGE_SERVER, kill);
+
+    return lspChannel;
   }
 );
 

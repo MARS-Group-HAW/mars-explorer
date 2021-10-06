@@ -1,4 +1,4 @@
-import { useBoolean, useCustomCompareEffect } from "react-use";
+import { useBoolean, useCustomCompareEffect, useUnmount } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { createMessageConnection } from "vscode-jsonrpc";
 import { useEffect } from "react";
@@ -29,6 +29,7 @@ function useLanguageClient(path: string) {
   const [isLoading, setIsLoading] = useBoolean(true);
 
   const startLanguageServer = async () => {
+    window.api.send(Channel.STOP_LANGUAGE_SERVER);
     setIsLoading(true);
     const ipcChannel = await window.api.invoke<string, string>(
       Channel.START_LANGUAGE_SERVER,

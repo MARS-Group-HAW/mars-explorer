@@ -5,8 +5,6 @@ import {
   StreamMessageReader,
   StreamMessageWriter,
 } from "vscode-jsonrpc/lib/node/main";
-import { getServer } from "./server-config";
-import { Logger } from "./logger";
 import * as rpc from "@codingame/monaco-jsonrpc";
 import {
   DidOpenTextDocumentNotification,
@@ -22,13 +20,15 @@ import {
 } from "vscode-languageserver";
 import { LoggerLabel } from "@shared/types/Logger";
 import { fileURLToPath } from "url";
+import { Channel } from "@shared/types/Channel";
+import fs = require("fs-extra");
 import {
   OmnisharpErrorMessage,
   OmnisharpErrorNotificationParams,
   OmnisharpNotification,
 } from "./Omnisharp";
-import { Channel } from "@shared/types/Channel";
-import fs = require("fs-extra");
+import { Logger } from "./logger";
+import { getServer } from "./server-config";
 
 type Test = {
   msgType: string;
@@ -59,17 +59,17 @@ function setLabels(labels: Partial<Test>) {
 
   x.push({
     key: "msgType",
-    value: labels["msgType"] || "/",
+    value: labels.msgType || "/",
   });
 
   x.push({
     key: "method",
-    value: labels["method"] || "/",
+    value: labels.method || "/",
   });
 
   x.push({
     key: "classpath",
-    value: labels["classpath"] || "/",
+    value: labels.classpath || "/",
   });
 
   lspLogger.labels = x;
@@ -78,7 +78,7 @@ function setLabels(labels: Partial<Test>) {
 export function launchLanguageServer(
   mainWindow: BrowserWindow,
   projectPath: string
-): string {
+): { lspChannel: string; killServer: () => void } {
   const connectTo = getServer(projectPath);
   launcherLogger.info("Spawning Server");
   launcherLogger.info("Project Path: ", projectPath);
@@ -103,9 +103,8 @@ export function launchLanguageServer(
       setLabels({});
       lspLogger.log("DUPLICATION OF ABOVE");
       return;
-    } else {
-      lastMessage = msg;
     }
+    lastMessage = msg;
 
     if (rpc.isNotificationMessage(msg)) {
       setLabels({
@@ -152,8 +151,7 @@ export function launchLanguageServer(
     mainWindow.webContents.send(ipcChannel, msg);
   });
 
-  // listen to incoming messages and forward them to the language server process
-  ipcMain.on(ipcChannel, (event: unknown, message: Message) => {
+  const ipcChannelHandler = (event: unknown, message: Message) => {
     lspLogger.scope = "Client => LSP";
 
     if (rpc.isRequestMessage(message)) {
@@ -174,13 +172,16 @@ export function launchLanguageServer(
       switch (message.method) {
         case DidOpenTextDocumentNotification.type.method: {
           const didOpenParams = message.params as DidOpenTextDocumentParams;
-          const uri = didOpenParams.textDocument.uri;
-          const text = didOpenParams.textDocument.text;
+          const { uri, text } = didOpenParams.textDocument;
           const uriAsPath = fileURLToPath(uri);
 
           if (uri) fs.writeFileSync(uriAsPath, text);
           break;
         }
+        default:
+          lspLogger.warn(
+            `Handle for notification method "${message.method}" not found.`
+          );
       }
     } else {
       // FIXME LOG BY METHOD
@@ -191,12 +192,24 @@ export function launchLanguageServer(
       lspLogger.log(message);
     }
 
-    void writer.write(message);
-    return;
-  });
+    writer.write(message);
+  };
+
+  // listen to incoming messages and forward them to the language server process
+  ipcMain.on(ipcChannel, ipcChannelHandler);
+
+  const killServer = () => {
+    reader.dispose();
+    writer.dispose();
+    lsProcess.kill("SIGINT");
+    ipcMain.removeListener(ipcChannel, ipcChannelHandler);
+  };
 
   launcherLogger.info("Server spawned successfully!");
-  return ipcChannel;
+  return {
+    lspChannel: ipcChannel,
+    killServer,
+  };
 }
 
 function logMessageByType(params: { type: MessageType; message: string }) {
