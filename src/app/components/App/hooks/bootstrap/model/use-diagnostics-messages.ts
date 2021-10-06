@@ -14,6 +14,7 @@ import {
   removeErrorsInPath,
   resetErrors,
   selectErrors,
+  selectModelFullyInitialized,
   setErrorsInPath,
 } from "../../../../Model/utils/model-slice";
 import useProjectInitializationStatus from "./use-project-initialization-status";
@@ -37,12 +38,8 @@ function useDiagnosticsMessages(): State {
   const errors = useAppSelector(selectErrors);
   const latestErrors = useLatest(errors);
 
-  const { isProjectFullyInitialized } = useProjectInitializationStatus();
-
-  const initRef = useRef(false);
-  useEffect(() => {
-    initRef.current = isProjectFullyInitialized;
-  }, []);
+  const initialized = useAppSelector(selectModelFullyInitialized);
+  const latestInitialized = useLatest(initialized);
 
   const dispatch = useAppDispatch();
 
@@ -53,7 +50,7 @@ function useDiagnosticsMessages(): State {
   useEffect(resetDiagnostics, [path]);
 
   async function handleMessage(msg: Message) {
-    if (!initRef) return;
+    if (!latestInitialized.current) return;
 
     if (isNotificationMessage(msg) && isDiagnosticMessage(msg)) {
       const diagnosticParams = msg.params as PublishDiagnosticsParams;
