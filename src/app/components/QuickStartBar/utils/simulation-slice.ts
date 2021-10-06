@@ -167,7 +167,13 @@ export const simulationSlice = createSlice({
         return;
       }
 
-      if (restoredData && restoredData.projectPath !== action.payload) {
+      if (
+        restoredData?.projectPath !== action.payload ||
+        (restoredData?.results &&
+          Object.values(restoredData.results).some(
+            (result) => result.data.length === 0
+          ))
+      ) {
         window.api.logger.info(
           "Overwriting result data of ",
           restoredData.projectPath

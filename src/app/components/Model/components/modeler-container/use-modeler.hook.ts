@@ -51,7 +51,6 @@ function useModeler({ containerRef }: Props): State {
   // TODO: Temp workaround to validate all files
   useEffect(() => {
     if (!isProjectFullyInitialized || !models) return;
-    console.log("running effect");
 
     const currentSelectedModel = selectedModel;
 
