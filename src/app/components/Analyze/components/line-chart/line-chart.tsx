@@ -9,6 +9,7 @@ function LineChart() {
     <Line
       data={data}
       options={{
+        maintainAspectRatio: false,
         scales: {
           x: {
             title: {

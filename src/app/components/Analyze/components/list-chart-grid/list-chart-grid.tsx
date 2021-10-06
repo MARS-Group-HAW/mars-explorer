@@ -20,6 +20,7 @@ const useStyles = makeStyles((theme) => ({
     padding: theme.spacing(2),
     width: "80%",
     maxWidth: "unset",
+    height: "30%",
   },
   rowContainer: {
     width: "100%",
@@ -33,8 +34,10 @@ const useStyles = makeStyles((theme) => ({
   },
   chartContainer: {
     padding: theme.spacing(2),
+    position: "relative",
     width: "90%",
     maxWidth: "unset",
+    height: "60%",
   },
 }));
 
@@ -59,7 +62,7 @@ function ListChartGrid() {
           justifyContent="space-around"
           alignItems="center"
         >
-          <Grid className={classes.inputContainer} item xs={4}>
+          <Grid className={classes.inputContainer} item>
             <Grid
               container
               className={classes.rowContainer}
@@ -86,12 +89,7 @@ function ListChartGrid() {
               </Grid>
             </Grid>
           </Grid>
-          <Grid
-            className={classes.chartContainer}
-            item
-            xs={7}
-            component={Paper}
-          >
+          <Grid className={classes.chartContainer} item component={Paper}>
             {showChartSkeleton && <Skeleton style={{ height: "100%" }} />}
             {!showChartSkeleton && chartType === ChartType.LINE && (
               <LineChart />
