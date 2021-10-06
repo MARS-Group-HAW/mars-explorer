@@ -164,7 +164,7 @@ export const simulationSlice = createSlice({
 
       if (!restoredData) {
         window.api.logger.info("No result data for this project found.");
-        return;
+        return initialState;
       }
 
       if (
@@ -179,7 +179,7 @@ export const simulationSlice = createSlice({
           restoredData.projectPath
         );
         localStorageService.removeItem(CacheKey.RESULTS_BY_KEY);
-        return;
+        return initialState;
       }
 
       const restoredDataWithFlag = restoredData.results.map((result) => ({
@@ -189,13 +189,15 @@ export const simulationSlice = createSlice({
 
       window.api.logger.info("Successfully restored old results.");
 
-      state.resultData = restoredDataWithFlag;
-
       const maxProgressArr = restoredDataWithFlag.map(
         (value) => _.maxBy(value.data, (datum) => datum.progress).progress
       );
 
-      state.maxProgress = _.max(maxProgressArr);
+      return {
+        resultData: restoredDataWithFlag,
+        maxProgress: _.max(maxProgressArr),
+        simulationState: SimulationStates.NONE,
+      };
     },
   },
   extraReducers: (builder) =>
