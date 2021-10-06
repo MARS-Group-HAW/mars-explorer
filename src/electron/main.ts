@@ -454,15 +454,16 @@ ipcMain.handle(
       projectPath
     );
 
-    const kill = () => {
+    const kill = (reason: string) => {
       if (!killServer) return;
-      log.info(`Stopping Language Server (${lspChannel})`);
+      log.info(`Stopping Language Server (${lspChannel}) because of ${reason}`);
       killServer();
     };
 
-    mainWindow.once("close", kill);
-    mainWindow.webContents.once("did-start-loading", kill);
-    ipcMain.once(Channel.STOP_LANGUAGE_SERVER, kill);
+    mainWindow.once("close", () => kill("Close-Event"));
+    ipcMain.once(Channel.STOP_LANGUAGE_SERVER, () =>
+      kill("Channel.STOP_LANGUAGE_SERVER")
+    );
 
     return lspChannel;
   }

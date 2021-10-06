@@ -32,19 +32,7 @@ function useModeler({ containerRef }: Props): State {
 
   const { models, areModelsLoading } = useModels();
 
-  const { setModel } = useEditor(containerRef);
-
-  function setModelInEditor() {
-    if (!selectedModel) return;
-
-    const { path, content } = selectedModel;
-    setModel(path, content);
-  }
-
-  useEffect(() => {
-    if (areModelsLoading) return;
-    setModelInEditor();
-  }, [selectedModel, areModelsLoading]);
+  useEditor(containerRef);
 
   const { isProjectFullyInitialized } = useProjectInitializationStatus();
 

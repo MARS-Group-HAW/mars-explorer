@@ -12,12 +12,14 @@ import LoadingSteps from "./LoadingSteps";
 type ModelState = LoadingState<LoadingSteps> & {
   models: WorkingModel;
   namesWithError: string[];
+  dirtyModels: string[];
 };
 
 // Define the initial state using that type
 const initialState: ModelState = {
   models: [],
   namesWithError: [],
+  dirtyModels: [],
   ...initialLoadingState,
   maxSteps: Object.keys(LoadingSteps).length,
 };
@@ -36,6 +38,12 @@ export const modelSlice = createSlice({
     },
     setModel: (state, { payload }: PayloadAction<WorkingModel>) => {
       state.models = payload;
+    },
+    setDirtyModels: (state, { payload }: PayloadAction<string[]>) => {
+      state.dirtyModels = payload.sort();
+    },
+    resetDirtyModels: (state) => {
+      state.dirtyModels = initialState.dirtyModels;
     },
     resetErrors: (state) => {
       state.namesWithError = initialState.namesWithError;
@@ -60,7 +68,7 @@ export const {
   setErrorsInPath,
   finishLoadingStep,
   resetLoadingStep,
-  resetLoadingSteps,
+  setDirtyModels,
   addModel,
   removeModel,
   setModel,
@@ -70,6 +78,7 @@ export const {
 export const selectModel = (state: RootState) => state.model;
 export const selectModels = (state: RootState) => state.model.models;
 export const selectErrors = (state: RootState) => state.model.namesWithError;
+export const selectDirtyModels = (state: RootState) => state.model.dirtyModels;
 export const selectMonacoServicesInstalled = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MONACO_SERVICES_INSTALLED);
 export const selectStepWithStatus = (

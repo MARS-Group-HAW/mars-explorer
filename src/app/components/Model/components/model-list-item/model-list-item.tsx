@@ -1,5 +1,6 @@
 import * as React from "react";
 import {
+  Badge,
   ListItem,
   ListItemIcon,
   ListItemText,
@@ -17,6 +18,7 @@ const useStyles = makeStyles((theme) => ({
     whiteSpace: "nowrap",
     overflow: "hidden",
     textOverflow: "ellipsis",
+    paddingLeft: 10,
   },
   error: {
     backgroundColor: theme.palette.error.light,
@@ -27,6 +29,7 @@ type Props = {
   name: string;
   selected: boolean;
   invalid: boolean;
+  dirty: boolean;
   onClick: () => void;
   onDeleteClick: () => void;
 };
@@ -35,6 +38,7 @@ function ModelListItem({
   name,
   selected,
   invalid,
+  dirty,
   onClick,
   onDeleteClick,
 }: Props) {
@@ -42,19 +46,30 @@ function ModelListItem({
 
   const { listItemRef, isMenuOpen, closeMenu } = useModelListItem();
 
+  const colorByStatus = () => {
+    if (dirty) return "primary";
+    if (invalid) return "error";
+
+    return "default";
+  };
+
   return (
     <>
-      <ListItem
-        className={invalid ? classes.error : ""}
-        ref={listItemRef}
-        button
-        selected={selected}
-        onClick={onClick}
-      >
-        <ListItemText
-          primary={name}
-          primaryTypographyProps={{ className: classes.primaryText }}
-        />
+      <ListItem ref={listItemRef} button selected={selected} onClick={onClick}>
+        <Badge
+          color={colorByStatus()}
+          variant="dot"
+          invisible={!dirty && !invalid}
+          anchorOrigin={{
+            vertical: "top",
+            horizontal: "left",
+          }}
+        >
+          <ListItemText
+            primary={name}
+            primaryTypographyProps={{ className: classes.primaryText }}
+          />
+        </Badge>
       </ListItem>
       <Menu
         anchorEl={listItemRef.current}
