@@ -66,6 +66,8 @@ function stepToLabel(step: LoadingSteps) {
       return "Installing Monaco Services";
     case LoadingSteps.LANGUAGE_SERVER_INITIALIZED:
       return "Initializing Language Server";
+    case LoadingSteps.MODELS_READ:
+      return "Reading Models";
     case LoadingSteps.MARS_FRAMEWORK_ADDED:
       return "Installing MARS-Framework";
     default:

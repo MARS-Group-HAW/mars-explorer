@@ -1,11 +1,7 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IModelFile, WorkingModel } from "@shared/types/Model";
 import type { RootState } from "../../../utils/store";
-import {
-  initialLoadingState,
-  loadingReducers,
-  LoadingState,
-} from "../../../utils/slices/loading-slice";
+import { initialLoadingState, loadingReducers, LoadingState } from "../../../utils/slices/loading-slice";
 import LoadingSteps from "./LoadingSteps";
 
 // Define a type for the slice state
@@ -85,6 +81,10 @@ export const selectModel = (state: RootState) => state.model;
 export const selectModels = (state: RootState) => state.model.models;
 export const selectErrors = (state: RootState) => state.model.namesWithError;
 export const selectDirtyModels = (state: RootState) => state.model.dirtyModels;
+export const selectModelsRead = (state: RootState) =>
+  state.model.finishedSteps.includes(LoadingSteps.MODELS_READ);
+export const selectLoadingSteps = (state: RootState) =>
+  state.model.finishedSteps;
 export const selectMonacoServicesInstalled = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MONACO_SERVICES_INSTALLED);
 export const selectStepWithStatus = (
@@ -94,6 +94,7 @@ export const selectStepWithStatus = (
     step: step as LoadingSteps,
     isLoading: !state.model.finishedSteps.includes(step as LoadingSteps),
   }));
+
 export const selectModelFullyInitialized = (state: RootState): boolean =>
   state.model.finishedSteps.length === state.model.maxSteps;
 

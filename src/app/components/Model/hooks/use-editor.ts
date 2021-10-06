@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { editor } from "monaco-editor";
 import monaco from "@app/standalone/monaco-editor/monaco";
 import { useLatest, useMount, useUnmount } from "react-use";
