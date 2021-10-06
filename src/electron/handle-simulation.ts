@@ -33,8 +33,8 @@ type VisWebsocketMessage = {
 
 const options: Options = {
   WebSocket: WS, // custom WebSocket constructor
-  maxRetries: 50,
-  connectionTimeout: 100,
+  maxRetries: 4000,
+  maxReconnectionDelay: 100,
 };
 
 type Props = {
@@ -204,7 +204,9 @@ class SimulationHandler {
     // see codes at https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
     switch (evt.code) {
       case WebSocketCloseCodes.RETRYING:
-        this.logger.info("Could not connect to WebSocket. Retrying ...");
+        if (retryCount <= 1) {
+          this.logger.info("Could not connect to WebSocket. Retrying ...");
+        }
         break;
       case WebSocketCloseCodes.EXITING:
         this.logger.info("WebSocket closed by simulation end.");
