@@ -1,8 +1,13 @@
-import { useBoolean } from "react-use";
+import { useBoolean, useLatest } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { useContext } from "react";
 import { IFileRef } from "@shared/types/File";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../utils/hooks/use-store";
+import { resetProject, selectProject } from "../../utils/project-slice";
 
 type State = {
   loadConfirmButton: boolean;
@@ -11,6 +16,9 @@ type State = {
 };
 
 function useDeleteProjectDialog(onClose: () => void): State {
+  const dispatch = useAppDispatch();
+  const { path } = useAppSelector(selectProject);
+  const latestPath = useLatest(path);
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isDeleting, setIsDeleting] = useBoolean(false);
 
@@ -32,6 +40,11 @@ function useDeleteProjectDialog(onClose: () => void): State {
         msg: `Project "${ref.name}" could not be deleted.`,
       });
     }
+
+    if (ref.path === latestPath.current) {
+      dispatch(resetProject());
+    }
+
     handleNewProjectDialogClose();
   };
 

@@ -8,8 +8,6 @@ import {
   Menu,
 } from "electron";
 import { Channel } from "@shared/types/Channel";
-import { ExampleProject } from "@shared/types/ExampleProject";
-import { Project } from "@shared/types/Project";
 import fixPath from "fix-path";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import * as child_process from "child_process";
@@ -23,7 +21,6 @@ import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
-import { ModelsJson } from "./types/ModelsJson";
 import { launchLanguageServer } from "./server-launcher";
 import { Logger } from "./logger";
 import appPaths from "./app-paths";
@@ -147,25 +144,21 @@ ipcMain.handle(Channel.GET_WORKSPACE_PATH, () => appPaths.workspaceDir);
 
 ipcMain.handle(Channel.GET_EXAMPLES_PATH, () => appPaths.workspaceExamplesDir);
 
-ipcMain.handle(Channel.GET_EXAMPLE_PROJECTS, (): ModelRef[] => {
-  const modelsJson = fs.readJsonSync(appPaths.modelsJson) as ModelsJson;
-  return modelsJson.map(({ name, path }) => ({
-    name,
-    path,
-  }));
-});
-
 ipcMain.handle(Channel.URI_TO_NAME, (_, uri: string) =>
   path.basename(fileURLToPath(uri))
 );
 
-ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
-  const userProjects = fs
-    .readdirSync(appPaths.workspaceDir)
-    .filter((file) => file !== appPaths.workspaceExamplesDir) // no example dir
+function getProjectsInDir(dir: string): string[] {
+  return fs
+    .readdirSync(dir)
     .filter((item) => !/(^|\/)\.[^/.]/g.test(item)) // remove hidden dirs
-    .map((file) => path.join(appPaths.workspaceDir, file)) // to full path
-    .filter((file) => fs.lstatSync(file).isDirectory())
+    .map((file) => path.join(dir, file)) // to full path
+    .filter((file) => fs.lstatSync(file).isDirectory());
+}
+
+ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
+  const userProjects = getProjectsInDir(appPaths.workspaceDir)
+    .filter((file) => file !== appPaths.workspaceExamplesDir) // no example dir
     .map((file) => ({
       file,
       time: fs.statSync(file).mtime.getTime(),
@@ -176,12 +169,31 @@ ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
   return userProjects.map((file) => new FileRef(file));
 });
 
+ipcMain.handle(Channel.GET_EXAMPLE_PROJECTS, (): ModelRef[] => {
+  const userProjects = getProjectsInDir(appPaths.workspaceExamplesDir);
+  return userProjects.map((file) => new FileRef(file));
+});
+
 ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
   if (fs.pathExistsSync(path)) {
     return new FileRef(path);
   }
   return null;
 });
+
+ipcMain.handle(
+  Channel.COPY_EXAMPLE_PROJECT,
+  (_, exampleProjectPath: string): ModelRef => {
+    const nameOfProject = path.basename(exampleProjectPath);
+    const newPath = path.resolve(appPaths.workspaceDir, nameOfProject);
+    fs.emptyDirSync(newPath);
+    fs.copySync(exampleProjectPath, newPath);
+    return {
+      name: nameOfProject,
+      path: newPath,
+    };
+  }
+);
 
 async function remove(pathTo: string): Promise<boolean> {
   try {
@@ -433,18 +445,6 @@ ipcMain.handle(Channel.OPEN_PROJECT, (_, modelRef: ModelRef): Model => {
   }));
 });
  */
-
-ipcMain.handle(
-  Channel.GET_EXAMPLE_PROJECT,
-  (_, project: ExampleProject): Project => {
-    const root = path.join(appPaths.workspaceExamplesDir, project);
-    return {
-      name: project,
-      rootPath: root,
-      entryFilePath: path.join(root, "Program.cs"),
-    };
-  }
-);
 
 ipcMain.handle(
   Channel.READ_FILE,

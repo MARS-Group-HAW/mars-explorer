@@ -22,10 +22,14 @@ export const projectSlice = createSlice({
       state.name = action.payload.name;
       state.path = action.payload.path;
     },
+    resetProject: () => {
+      LocalStorageService.removeItem(CacheKey.LAST_PATH);
+      return initialState;
+    },
   },
 });
 
-export const { setProject } = projectSlice.actions;
+export const { setProject, resetProject } = projectSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectProject = (state: RootState) => state.project;

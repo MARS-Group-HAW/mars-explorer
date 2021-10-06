@@ -1,0 +1,54 @@
+{
+  "globals": {
+    "steps": 250,
+    "output": "csv",
+    "pythonVisualization": true,
+    "console": true
+  },
+  "layers": [
+    {
+      "name": "GrasslandLayer",
+      "file": "Resources/grid.csv"
+    }
+  ],
+  "agents": [
+    {
+      "name": "Sheep",
+      "count": 30,
+      "mapping": [
+        {
+          "parameter": "SheepGainFromFood",
+          "value": 4
+        },
+        {
+          "parameter": "SheepReproduce",
+          "value": 2
+        }
+      ]
+    },
+    {
+      "name": "Wolf",
+      "count": 5,
+      "mapping": [
+        {
+          "parameter": "WolfGainFromFood",
+          "value": 20
+        },
+        {
+          "parameter": "WolfReproduce",
+          "value": 1
+        }
+      ]
+    },
+    {
+      "name": "GrassGrowthAgent",
+      "count": 1,
+      "mapping": [
+        {
+          "parameter": "GrassRegrowthPerStep",
+          "value": 1
+        }
+      ]
+    }
+  ]
+}

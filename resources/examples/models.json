@@ -1,12 +1,7 @@
 [
   {
-    "name": "My Test App",
-    "path": "MyTestApp",
-    "mainFile": "Program.cs"
-  },
-  {
     "name": "Wolf Sheep Predation",
-    "path": "WolfSheepModel",
-    "mainFile": "ModelMyWolfSheepPredation.cs"
+    "path": "WolfSheepPredation",
+    "mainFile": "Programm.cs"
   }
 ]
