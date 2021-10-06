@@ -10,6 +10,7 @@ import useBubbleChart from "./bubble-chart.hook";
 const options = (
   onLabelClick: (legendItem: LegendItem) => void
 ): ChartOptions => ({
+  maintainAspectRatio: false,
   plugins: {
     legend: {
       onClick: (e, legendItem) => onLabelClick(legendItem),
@@ -54,7 +55,9 @@ function BubbleChart() {
       justifyContent="space-around"
       style={{ height: "100%" }}
     >
-      <Bubble data={data} options={options(onLabelClick)} />
+      <div style={{ position: "relative", height: "80%" }}>
+        <Bubble data={data} options={options(onLabelClick)} />
+      </div>
       <Grid
         container
         justifyContent="space-between"
