@@ -22,7 +22,7 @@ const TimeSpecificationForm = ({ namespace }: { namespace: string }) => {
     endPointDisabled,
     optionLeft,
     optionRight,
-  } = useTimeSpecificationForm(namespace);
+  } = useTimeSpecificationForm();
 
   return (
     <Grid

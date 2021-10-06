@@ -1,11 +1,13 @@
 import { useField } from "formik";
 import { useEffect } from "react";
+import { useBoolean } from "react-use";
 import { FormSwitchOption } from "../../form-switch/types";
 import { TimeSpecification } from "../../globals-form/utils/types";
 import withNamespace from "../../../utils/withNamespace";
 import useStepForm from "./use-step-form";
 import useDatePointsForm from "./use-date-points-form";
-import FieldNames from "../../globals-form/utils/fieldNames";
+import FieldNames from "../../../utils/fieldNames";
+import GlobalFieldNames from "../../globals-form/utils/fieldNames";
 
 type State = {
   timeSpecNamespace: string;
@@ -22,14 +24,25 @@ type State = {
   endPointDisabled: boolean;
 };
 
-function useTimeSpecificationForm(namespace: string): State {
+const namespace = FieldNames.GLOBALS;
+
+function useTimeSpecificationForm(): State {
   const timeSpecNamespace = withNamespace(
-    FieldNames.TIME_SPECIFICATION,
+    GlobalFieldNames.TIME_SPECIFICATION,
     namespace
   );
+
   const [timeSpecField] = useField(timeSpecNamespace);
 
-  const isStepBased = timeSpecField.value === TimeSpecification.STEP;
+  const val = timeSpecField.value;
+
+  const [isStepBased, setStepBased] = useBoolean(true);
+
+  useEffect(() => {
+    if (val === undefined) return;
+
+    setStepBased(val === TimeSpecification.STEP);
+  }, [val]);
 
   const {
     namespace: stepsNamespace,
@@ -53,7 +66,6 @@ function useTimeSpecificationForm(namespace: string): State {
     if (isStepBased) {
       handleDatePointReset();
     } else {
-      stepsHandleReset();
       handleEnable();
     }
   }, [isStepBased]);
