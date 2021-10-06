@@ -3,7 +3,7 @@ import { selectProject } from "@app/components/Home/utils/project-slice";
 import { useContext } from "react";
 import { Channel } from "@shared/types/Channel";
 import { useLatest } from "react-use";
-import { useAppSelector } from "../../../utils/hooks/use-store";
+import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import validationSchema from "../utils/validationSchema";
 import { SnackBarContext } from "../../shared/snackbar/snackbar-provider";
 import FormTransformer, { FormSchema } from "../utils/transform";
@@ -11,6 +11,9 @@ import {
   selectConfig,
   selectConfigHasBeenChecked,
   selectConfigLoading,
+  setConfig,
+  setErrorState,
+  setValidState,
 } from "../utils/config-slice";
 
 type State = {
@@ -22,6 +25,7 @@ type State = {
 };
 
 function useConfigure(): State {
+  const dispatch = useAppDispatch();
   const hasBeenChecked = useAppSelector(selectConfigHasBeenChecked);
   const isLoading = useAppSelector(selectConfigLoading);
   const config = useAppSelector(selectConfig);
@@ -43,19 +47,25 @@ function useConfigure(): State {
               content: JSON.stringify(transformedConfig, null, "\t"),
             }
           )
-          .then(() => addSuccessAlert({ msg: "Your config was saved." }))
-          .catch((err) =>
+          .then(() => {
+            addSuccessAlert({ msg: "Your config was saved." });
+            dispatch(setValidState());
+            dispatch(setConfig(values));
+          })
+          .catch((err) => {
             addErrorAlert({
               msg: `An error occurred while parsing your config: ${err}`,
               timeout: 10000,
-            })
-          );
+            });
+            dispatch(setErrorState());
+          });
       })
       .catch((err) => {
         addErrorAlert({
           msg: `An error occurred while parsing your config: ${err}`,
           timeout: 10000,
         });
+        dispatch(setErrorState());
       });
   };
 

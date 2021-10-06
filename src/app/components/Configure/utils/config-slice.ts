@@ -34,6 +34,9 @@ export const configSlice = createSlice({
     setValidState: (state) => {
       state.status = ValidationState.VALID;
     },
+    setDirtyState: (state) => {
+      state.status = ValidationState.DIRTY;
+    },
     setErrorState: (state) => {
       state.status = ValidationState.ERROR;
     },
@@ -48,6 +51,7 @@ export const {
   setInvalidState,
   setValidState,
   setErrorState,
+  setDirtyState,
   setUnknownState,
   setConfig,
   setErrors,
@@ -63,6 +67,7 @@ export const selectConfigLoading = (state: RootState) =>
 
 export const selectConfigHasBeenChecked = (state: RootState) =>
   state.config.status === ValidationState.VALID ||
-  state.config.status === ValidationState.INVALID;
+  state.config.status === ValidationState.INVALID ||
+  state.config.status === ValidationState.DIRTY;
 
 export default configSlice.reducer;
