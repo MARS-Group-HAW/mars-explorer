@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Channel } from "@shared/types/Channel";
 import { ObjectCreationMessage } from "@shared/types/object-creation-message";
 import SimObjects from "@shared/types/sim-objects";
@@ -11,7 +11,7 @@ import {
   useAppSelector,
 } from "../../../../utils/hooks/use-store";
 import { selectProject } from "../../../Home/utils/project-slice";
-import { addModel } from "../../utils/model-slice";
+import { addModel, selectModels } from "../../utils/model-slice";
 import {
   closeModelCreation,
   selectModel,
@@ -31,13 +31,33 @@ type State = {
 };
 
 function useNewObjectDialog(): State {
+  const models = useAppSelector(selectModels);
   const { path, name } = useAppSelector(selectProject);
   const [{ isCreateDialogOpen }, sharedModelDispatch] = useSharedModels();
   const dispatch = useAppDispatch();
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isLoading, setIsLoading] = useBoolean(false);
-  const [newObjectName, setNewObjectName] = useCapitalizedValue();
+  const [newObjectName, setNewObjectName] = useCapitalizedValue("");
   const [selectedObject, setSelectedObject] = useState<SimObjects>();
+  const [disable, setDisable] = useBoolean(false);
+
+  useEffect(() => {
+    if (newObjectName.length === 0 || !selectedObject || isLoading) {
+      setDisable(true);
+      return;
+    }
+
+    const isUnique =
+      !models ||
+      !models.map((model) => model.name.split(".")[0]).includes(newObjectName);
+
+    if (!isUnique) {
+      setDisable(true);
+      return;
+    }
+
+    setDisable(false);
+  }, [newObjectName, selectedObject, isLoading, models]);
 
   const onDialogClose = () => {
     setNewObjectName("");
@@ -71,8 +91,7 @@ function useNewObjectDialog(): State {
   };
 
   return {
-    disableConfirmButton:
-      newObjectName.length === 0 || !selectedObject || isLoading,
+    disableConfirmButton: disable,
     loadConfirmButton: isLoading,
     newObjectName,
     setNewObjectName,

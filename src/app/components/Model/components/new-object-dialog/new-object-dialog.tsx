@@ -15,6 +15,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import SimObjects from "@shared/types/sim-objects";
 import useNewObjectDialog from "./use-new-object-dialog.hook";
 import ObjectButton from "../object-button";
+import ConditionalTooltip from "../../../shared/conditional-tooltip";
 
 const description: { [key in SimObjects]: string } = {
   [SimObjects.AGENT]:
@@ -65,10 +66,10 @@ function NewObjectDialog() {
 
   return (
     <Dialog open={isOpen} onClose={onDialogClose}>
-      <DialogTitle id="form-dialog-title">Create new Object</DialogTitle>
+      <DialogTitle id="form-dialog-title">Create new Class</DialogTitle>
       <DialogContent className={classes.dialogContent}>
         <DialogContentText>
-          To create a new object, select a type below.
+          To create a new class, select a type below.
         </DialogContentText>
         <Box className={classes.buttonGroup}>
           {Object.values(SimObjects).map((obj: SimObjects) => (
@@ -95,11 +96,11 @@ function NewObjectDialog() {
         <TextField
           margin="dense"
           variant="outlined"
-          id="object-name"
+          id="class-name"
           type="text"
           fullWidth
           value={newObjectName}
-          label="Object Name"
+          label="Class Name"
           helperText="The name should be unique and contain only letters"
           onChange={(ev) => setNewObjectName(ev.target.value)}
         />
@@ -108,17 +109,26 @@ function NewObjectDialog() {
         <Button onClick={onDialogClose} color="primary">
           Cancel
         </Button>
-        <Button
-          onClick={onDialogConfirm}
-          color="primary"
-          disabled={disableConfirmButton}
+        <ConditionalTooltip
+          show={disableConfirmButton && !loadConfirmButton}
+          title={
+            "Make sure that your name is unique and that you've selected a type."
+          }
         >
-          {loadConfirmButton ? (
-            <CircularProgress variant="indeterminate" size={15} />
-          ) : (
-            "Create"
-          )}
-        </Button>
+          <span>
+            <Button
+              onClick={onDialogConfirm}
+              color="primary"
+              disabled={disableConfirmButton}
+            >
+              {loadConfirmButton ? (
+                <CircularProgress variant="indeterminate" size={15} />
+              ) : (
+                "Create"
+              )}
+            </Button>
+          </span>
+        </ConditionalTooltip>
       </DialogActions>
     </Dialog>
   );
