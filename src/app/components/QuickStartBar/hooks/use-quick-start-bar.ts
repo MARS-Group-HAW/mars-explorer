@@ -62,10 +62,10 @@ function useQuickStartBar(): State {
       setStateFn(ValidationState.UNKNOWN);
     } else if (!isProjectFullyInitialized) {
       setStateFn(ValidationState.LOADING);
-    } else if (hasErrors) {
-      setStateFn(ValidationState.INVALID);
     } else if (hasDirtyFiles) {
       setStateFn(ValidationState.DIRTY);
+    } else if (hasErrors) {
+      setStateFn(ValidationState.INVALID);
     } else {
       setStateFn(ValidationState.VALID);
     }
