@@ -1,8 +1,18 @@
-import React, { useState } from "react";
-import { editor, languages } from "monaco-editor";
+import React, { useEffect, useState } from "react";
+import { editor } from "monaco-editor";
 import monaco from "@app/standalone/monaco-editor/monaco";
-import { useMount } from "react-use";
+import {
+  useCustomCompareEffect,
+  useLatest,
+  useMount,
+  useSet,
+  useUnmount,
+} from "react-use";
+import _ from "lodash";
 import CSHARP from "../../../standalone/monaco-editor/types";
+import { useSharedModels } from "./use-shared-models";
+import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
+import { selectDirtyModels, setDirtyModels } from "../utils/model-slice";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import ITextModel = editor.ITextModel;
 import IStandaloneEditorConstructionOptions = editor.IStandaloneEditorConstructionOptions;
@@ -18,18 +28,20 @@ const monacoOptions: IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
 };
 
-type State = {
-  setModel: (path: string, content: string) => void;
-};
+type State = {};
 
 function useEditor(containerRef: React.RefObject<HTMLDivElement>): State {
+  const dispatch = useAppDispatch();
+  const dirtyModels = useAppSelector(selectDirtyModels);
+  const [{ selectedModel }] = useSharedModels();
   const [monacoEditor, setMonacoEditor] = useState<IStandaloneCodeEditor>();
 
-  useMount(
-    () =>
-      containerRef.current &&
-      setMonacoEditor(monaco.editor.create(containerRef.current, monacoOptions))
-  );
+  const [set, { add, remove }] = useSet(new Set([]));
+
+  useMount(() => dirtyModels && dirtyModels.forEach((model) => add(model)));
+
+  const latestAdd = useLatest(add);
+  const latestRemove = useLatest(remove);
 
   function createOrGetModel(path: string, content: string): ITextModel {
     const modelUri = monaco.Uri.file(path);
@@ -43,14 +55,52 @@ function useEditor(containerRef: React.RefObject<HTMLDivElement>): State {
     return textModel;
   }
 
-  function setModel(path: string, content: string) {
+  useEffect(() => {
+    if (!selectedModel) return () => {};
+
+    const { name, path, content } = selectedModel;
+
     const newModel = createOrGetModel(path, content);
     monacoEditor?.setModel(newModel);
-  }
+    const versionId = newModel.getAlternativeVersionId();
 
-  return {
-    setModel,
-  };
+    const disposeable = newModel.onDidChangeContent(() => {
+      if (newModel.getAlternativeVersionId() === versionId) {
+        latestRemove.current(name);
+      } else {
+        latestAdd.current(name);
+      }
+    });
+
+    return () => disposeable.dispose();
+  }, [selectedModel]);
+
+  useCustomCompareEffect(
+    () => {
+      dispatch(setDirtyModels(Array.from(set)));
+    },
+    [set],
+    (prevDeps, nextDeps) => {
+      const prevSet = prevDeps[0];
+      const nextSet = nextDeps[0];
+
+      if (!prevSet || !nextSet || prevSet.size !== nextSet.size) return false;
+
+      return (
+        _.difference(Array.from(prevSet), Array.from(nextSet)).length === 0
+      );
+    }
+  );
+
+  useMount(
+    () =>
+      containerRef.current &&
+      setMonacoEditor(monaco.editor.create(containerRef.current, monacoOptions))
+  );
+
+  useUnmount(() => monacoEditor.dispose());
+
+  return {};
 }
 
 export default useEditor;

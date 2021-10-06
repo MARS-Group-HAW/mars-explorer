@@ -5,7 +5,7 @@ import { useEffect, useState } from "react";
 import { useBoolean } from "react-use";
 import { useAppSelector } from "../../../utils/hooks/use-store";
 import useSimulation from "./use-simulation";
-import { selectModel } from "../../Model/utils/model-slice";
+import { selectDirtyModels, selectErrors } from "../../Model/utils/model-slice";
 import useProjectInitializationStatus from "../../App/hooks/bootstrap/model/use-project-initialization-status";
 import useResultsInLocalStorage from "./use-results-in-local-storage";
 import {
@@ -41,7 +41,9 @@ function useQuickStartBar(): State {
 
   const isProjectDefined = Boolean(path);
 
-  const { namesWithError } = useAppSelector(selectModel);
+  const modelErrors = useAppSelector(selectErrors);
+  const modelDirtyFiles = useAppSelector(selectDirtyModels);
+
   const configErrors = useAppSelector(selectConfigErrors);
   const configStatus = useAppSelector(selectConfigStatus);
 
@@ -53,7 +55,8 @@ function useQuickStartBar(): State {
 
   const handleValidation = (
     setStateFn: (valState: ValidationState) => void,
-    hasErrors: boolean
+    hasErrors: boolean,
+    hasDirtyFiles: boolean
   ) => {
     if (!isProjectDefined) {
       setStateFn(ValidationState.UNKNOWN);
@@ -61,14 +64,20 @@ function useQuickStartBar(): State {
       setStateFn(ValidationState.LOADING);
     } else if (hasErrors) {
       setStateFn(ValidationState.INVALID);
+    } else if (hasDirtyFiles) {
+      setStateFn(ValidationState.DIRTY);
     } else {
       setStateFn(ValidationState.VALID);
     }
   };
 
   useEffect(() => {
-    handleValidation(setModelValidationState, namesWithError.length > 0);
-  }, [path, namesWithError, isProjectFullyInitialized]);
+    handleValidation(
+      setModelValidationState,
+      modelErrors.length > 0,
+      modelDirtyFiles.length > 0
+    );
+  }, [path, modelErrors, modelDirtyFiles, isProjectFullyInitialized]);
 
   useEffect(() => {
     setShowErrorDialog(Boolean(errorMsg));
@@ -98,8 +107,7 @@ function useQuickStartBar(): State {
     showErrorDialog,
     openErrorDialog: () => setShowErrorDialog(true),
     closeErrorDialog: () => setShowErrorDialog(false),
-    modelErrorFiles:
-      modelValidationState === ValidationState.INVALID && namesWithError,
+    modelErrorFiles: modelErrors || [],
     configErrors,
     disableStart,
     disableStop,

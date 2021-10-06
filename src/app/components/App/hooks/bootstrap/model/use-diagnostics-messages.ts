@@ -4,6 +4,7 @@ import { isNotificationMessage } from "vscode-jsonrpc/lib/common/messages";
 import { Diagnostic, PublishDiagnosticsParams } from "monaco-languageclient";
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { Channel } from "@shared/types/Channel";
+import { useLatest } from "react-use";
 import {
   useAppDispatch,
   useAppSelector,
@@ -12,6 +13,7 @@ import { selectProject } from "../../../../Home/utils/project-slice";
 import {
   removeErrorsInPath,
   resetErrors,
+  selectErrors,
   setErrorsInPath,
 } from "../../../../Model/utils/model-slice";
 import useProjectInitializationStatus from "./use-project-initialization-status";
@@ -32,6 +34,9 @@ const diagnosticIsError = (diagnostic: Diagnostic): boolean =>
 
 function useDiagnosticsMessages(): State {
   const { path } = useAppSelector(selectProject);
+  const errors = useAppSelector(selectErrors);
+  const latestErrors = useLatest(errors);
+
   const { isProjectFullyInitialized } = useProjectInitializationStatus();
 
   const initRef = useRef(false);
@@ -64,9 +69,14 @@ function useDiagnosticsMessages(): State {
         uri
       );
 
-      if (diagnosticErrors.length > 0) {
+      const isInErrors = latestErrors.current.includes(pathFromUri);
+
+      if (diagnosticErrors.length > 0 && !isInErrors) {
         dispatch(setErrorsInPath(pathFromUri));
-      } else {
+        return;
+      }
+
+      if (diagnosticErrors.length === 0 && isInErrors) {
         dispatch(removeErrorsInPath(pathFromUri));
       }
     }

@@ -4,11 +4,13 @@ import {
   Backdrop,
   Box,
   CircularProgress,
+  Fab,
   Grid,
   makeStyles,
   Typography,
 } from "@material-ui/core";
 import DoneIcon from "@material-ui/icons/Done";
+import SaveIcon from "@material-ui/icons/Save";
 import useModeler from "./use-modeler.hook";
 import NewClassDialog from "../new-class-dialog";
 import DeleteClassDialog from "../delete-class-dialog";
@@ -47,8 +49,18 @@ const useStyles = makeStyles((theme) => ({
     width: listContainerWidth,
     height: "100%",
   },
-  monacoContainer: {
+  editorContainer: {
+    position: "relative",
     width: `calc(100% - ${listContainerWidth}px)`,
+  },
+  monacoContainer: {
+    height: "100%",
+    width: "100%",
+  },
+  saveButton: {
+    position: "absolute",
+    bottom: theme.spacing(2),
+    right: theme.spacing(2),
   },
 }));
 
@@ -113,11 +125,22 @@ function ModelerContainer() {
         <div className={classes.listContainer}>
           <ModelList models={models} isLoading={showModelListLoading} />
         </div>
-        <div
-          className={classes.monacoContainer}
-          id="monaco-container"
-          ref={ref}
-        />
+        <div className={classes.editorContainer}>
+          <div
+            className={classes.monacoContainer}
+            ref={ref}
+            id="monaco-container"
+          />
+          <Fab
+            className={classes.saveButton}
+            color="secondary"
+            aria-label="save"
+            type="submit"
+            onClick={console.log}
+          >
+            <SaveIcon />
+          </Fab>
+        </div>
       </Grid>
       <NewClassDialog />
       <DeleteClassDialog />

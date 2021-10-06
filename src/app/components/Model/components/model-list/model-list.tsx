@@ -45,6 +45,7 @@ function ModelList({ models, isLoading }: Props) {
     isExampleView,
     isModelInvalid,
     isModelSelected,
+    isModelDirty,
     showAddButton,
     onModelClick,
     onExamplesButtonClick,
@@ -87,6 +88,7 @@ function ModelList({ models, isLoading }: Props) {
             name={model.name}
             selected={isModelSelected(model)}
             invalid={isModelInvalid(model)}
+            dirty={isModelDirty(model)}
             onClick={() => onModelClick(model)}
             onDeleteClick={() => onDeleteObjectClick(model)}
           />
