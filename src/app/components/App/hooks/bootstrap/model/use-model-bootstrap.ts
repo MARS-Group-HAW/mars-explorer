@@ -4,6 +4,7 @@ import useMarsFramework from "./use-mars-framework";
 import useMonacoServices from "./use-monaco-services";
 import useLanguageClient from "./use-language-client";
 import useProjectInitialization from "./use-project-initialization";
+import useModels from "./use-models";
 
 type State = void;
 
@@ -14,6 +15,7 @@ function useModelBootstrap(): State {
   useMonacoServices(path);
   useLanguageClient(path);
   useProjectInitialization(path);
+  useModels();
 }
 
 export default useModelBootstrap;
