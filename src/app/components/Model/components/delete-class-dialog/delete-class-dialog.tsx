@@ -8,15 +8,15 @@ import {
   DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
-import useDeleteObjectDialog from "./use-delete-object-dialog.hook";
+import useDeleteClassDialog from "./use-delete-object-dialog.hook";
 
-function DeleteObjectDialog() {
+function DeleteClassDialog() {
   const { name, isLoading, isOpen, onDialogConfirm, onDialogClose } =
-    useDeleteObjectDialog();
+    useDeleteClassDialog();
 
   return (
     <Dialog open={isOpen} onClose={onDialogClose}>
-      <DialogTitle>{`Delete ${name} ?`}</DialogTitle>
+      <DialogTitle>{`Delete Class "${name}"?`}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
           This action cannot be undone.
@@ -43,4 +43,4 @@ function DeleteObjectDialog() {
   );
 }
 
-export default DeleteObjectDialog;
+export default DeleteClassDialog;

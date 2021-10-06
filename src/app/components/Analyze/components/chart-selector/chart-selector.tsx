@@ -27,9 +27,9 @@ type Props = {
 const chartTypeToLabel = (type: ChartType) => {
   switch (type) {
     case ChartType.LINE:
-      return "Number of agents per tick (Line-Chart)";
+      return "Number of agents per progress (Line-Chart)";
     case ChartType.BUBBLE:
-      return "Positions of agent at tick (Bubble-Chart)";
+      return "Positions of agent at progress (Bubble-Chart)";
     default:
       return "No Label";
   }

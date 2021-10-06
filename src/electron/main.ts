@@ -15,7 +15,7 @@ import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import * as child_process from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import { IFileRef } from "@shared/types/File";
-import { ObjectCreationMessage } from "@shared/types/object-creation-message";
+import { ClassCreationMessage } from "@shared/types/class-creation-message";
 import SimObjects from "@shared/types/sim-objects";
 import NotImplementedError from "@shared/errors/not-implemented-error";
 import { fileURLToPath } from "url";
@@ -206,7 +206,7 @@ enum Templates {
 }
 
 const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
-const OBJECT_NAME_PLACEHOLDER = /\$OBJECT_NAME/g;
+const CLASS_NAME_PLACEHOLDER = /\$OBJECT_NAME/g;
 
 type Replaceable = {
   placeholder: RegExp;
@@ -287,14 +287,14 @@ ipcMain.on(Channel.CREATE_PROJECT, (_, projectName: string) => {
 });
 
 ipcMain.handle(
-  Channel.CREATE_OBJECT,
+  Channel.CREATE_CLASS,
   async (
     _,
-    { projectPath, projectName, objectType, objectName }: ObjectCreationMessage
+    { projectPath, projectName, type, className }: ClassCreationMessage
   ): Promise<IModelFile> => {
     let template: Templates;
 
-    switch (objectType) {
+    switch (type) {
       case SimObjects.AGENT:
         template = Templates.AGENT_CS;
         break;
@@ -306,8 +306,8 @@ ipcMain.handle(
         throw new NotImplementedError("Entity");
     }
 
-    const objectFile = `${objectName}.cs`;
-    const filePath = path.resolve(projectPath, objectFile);
+    const classFile = `${className}.cs`;
+    const filePath = path.resolve(projectPath, classFile);
 
     const content = await copyAndReplaceTemplate(template, filePath, [
       {
@@ -315,13 +315,13 @@ ipcMain.handle(
         value: projectName,
       },
       {
-        placeholder: OBJECT_NAME_PLACEHOLDER,
-        value: objectName,
+        placeholder: CLASS_NAME_PLACEHOLDER,
+        value: className,
       },
     ]);
 
     return {
-      name: objectFile,
+      name: classFile,
       path: filePath,
       content,
     };

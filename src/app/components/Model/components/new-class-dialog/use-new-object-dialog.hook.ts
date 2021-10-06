@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Channel } from "@shared/types/Channel";
-import { ObjectCreationMessage } from "@shared/types/object-creation-message";
-import SimObjects from "@shared/types/sim-objects";
+import { ClassCreationMessage } from "@shared/types/class-creation-message";
+import SimTypes from "@shared/types/sim-objects";
 import { useBoolean } from "react-use";
 import { IModelFile } from "@shared/types/Model";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
@@ -21,10 +21,10 @@ import {
 type State = {
   disableConfirmButton: boolean;
   loadConfirmButton: boolean;
-  newObjectName: string;
-  setNewObjectName: (value: string) => void;
-  selectedObject: SimObjects;
-  onObjectTypeClick: (objectType: SimObjects) => void;
+  newClassName: string;
+  setNewClassName: (value: string) => void;
+  selectedType: SimTypes;
+  onTypeClick: (type: SimTypes) => void;
   isOpen: boolean;
   onDialogClose: () => void;
   onDialogConfirm: () => void;
@@ -37,19 +37,19 @@ function useNewObjectDialog(): State {
   const dispatch = useAppDispatch();
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isLoading, setIsLoading] = useBoolean(false);
-  const [newObjectName, setNewObjectName] = useCapitalizedValue("");
-  const [selectedObject, setSelectedObject] = useState<SimObjects>();
+  const [newClassName, setNewClassName] = useCapitalizedValue("");
+  const [selectedType, setSelectedType] = useState<SimTypes>();
   const [disable, setDisable] = useBoolean(false);
 
   useEffect(() => {
-    if (newObjectName.length === 0 || !selectedObject || isLoading) {
+    if (newClassName.length === 0 || !selectedType || isLoading) {
       setDisable(true);
       return;
     }
 
     const isUnique =
       !models ||
-      !models.map((model) => model.name.split(".")[0]).includes(newObjectName);
+      !models.map((model) => model.name.split(".")[0]).includes(newClassName);
 
     if (!isUnique) {
       setDisable(true);
@@ -57,10 +57,10 @@ function useNewObjectDialog(): State {
     }
 
     setDisable(false);
-  }, [newObjectName, selectedObject, isLoading, models]);
+  }, [newClassName, selectedType, isLoading, models]);
 
   const onDialogClose = () => {
-    setNewObjectName("");
+    setNewClassName("");
     sharedModelDispatch(closeModelCreation);
   };
 
@@ -68,20 +68,20 @@ function useNewObjectDialog(): State {
     setIsLoading(true);
 
     window.api
-      .invoke<ObjectCreationMessage, IModelFile>(Channel.CREATE_OBJECT, {
+      .invoke<ClassCreationMessage, IModelFile>(Channel.CREATE_CLASS, {
         projectPath: path,
         projectName: name,
-        objectType: selectedObject,
-        objectName: newObjectName,
+        type: selectedType,
+        className: newClassName,
       })
       .then((model) => {
-        addSuccessAlert({ msg: `Object "${newObjectName}" has been created.` });
+        addSuccessAlert({ msg: `Class "${newClassName}" has been created.` });
         dispatch(addModel(model));
         sharedModelDispatch(selectModel({ model }));
       })
       .catch((e: unknown) =>
         addErrorAlert({
-          msg: `An error occurred while creating Object "${newObjectName}": ${e}`,
+          msg: `An error occurred while creating Class "${newClassName}": ${e}`,
         })
       )
       .finally(() => {
@@ -93,10 +93,10 @@ function useNewObjectDialog(): State {
   return {
     disableConfirmButton: disable,
     loadConfirmButton: isLoading,
-    newObjectName,
-    setNewObjectName,
-    selectedObject,
-    onObjectTypeClick: setSelectedObject,
+    newClassName,
+    setNewClassName,
+    selectedType,
+    onTypeClick: setSelectedType,
     isOpen: isCreateDialogOpen,
     onDialogClose,
     onDialogConfirm,

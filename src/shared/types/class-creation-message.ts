@@ -1,8 +1,8 @@
 import SimObjects from "./sim-objects";
 
-export type ObjectCreationMessage = {
+export type ClassCreationMessage = {
   projectPath: string;
   projectName: string;
-  objectType: SimObjects;
-  objectName: string;
+  type: SimObjects;
+  className: string;
 };

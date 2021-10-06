@@ -10,8 +10,8 @@ import {
 } from "@material-ui/core";
 import DoneIcon from "@material-ui/icons/Done";
 import useModeler from "./use-modeler.hook";
-import NewObjectDialog from "../new-object-dialog";
-import DeleteObjectDialog from "../delete-object-dialog";
+import NewClassDialog from "../new-class-dialog";
+import DeleteClassDialog from "../delete-class-dialog";
 import ModelList from "../model-list/model-list";
 import LoadingSteps from "../../utils/LoadingSteps";
 
@@ -119,8 +119,8 @@ function ModelerContainer() {
           ref={ref}
         />
       </Grid>
-      <NewObjectDialog />
-      <DeleteObjectDialog />
+      <NewClassDialog />
+      <DeleteClassDialog />
     </>
   );
 }
