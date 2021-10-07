@@ -17,7 +17,6 @@ import {
   selectModelFullyInitialized,
   setErrorsInPath,
 } from "../../../../Model/utils/model-slice";
-import useProjectInitializationStatus from "./use-project-initialization-status";
 
 type State = {
   handleMessage: (msg: Message) => void;
