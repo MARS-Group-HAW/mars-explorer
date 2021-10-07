@@ -3,6 +3,7 @@ import ILanguageExtensionPoint = languages.ILanguageExtensionPoint;
 
 enum Language {
   CSHARP = "csharp",
+  MARKDOWN = "markdown",
 }
 
 const CSHARP: ILanguageExtensionPoint = {
@@ -11,4 +12,9 @@ const CSHARP: ILanguageExtensionPoint = {
   aliases: ["C#", "csharp"],
 };
 
-export default CSHARP;
+const MARKDOWN: ILanguageExtensionPoint = {
+  id: Language.MARKDOWN,
+  extensions: [".md"],
+};
+
+export { CSHARP, MARKDOWN };

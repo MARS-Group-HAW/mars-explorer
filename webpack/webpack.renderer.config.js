@@ -18,7 +18,7 @@ rules.push({
 });
 
 plugins.push(new MonacoWebpackPlugin({
-  languages: ["csharp"],
+  languages: ["csharp", "markdown"],
   publicPath: ".webpack/renderer"
 }));
 
@@ -38,7 +38,8 @@ if (!IS_DEVELOPMENT) {
         }
       ],
       exclude: [
-        path.join(folderPath, "node_modules_monaco-editor_esm_vs_basic-languages_csharp_csharp_js")
+        path.join(folderPath, "node_modules_monaco-editor_esm_vs_basic-languages_csharp_csharp_js"),
+        path.join(folderPath, "node_modules_monaco-editor_esm_vs_basic-languages_markdown_markdown_js")
       ],
       log: false,
       logWarning: true,
