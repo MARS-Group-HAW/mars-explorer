@@ -1,7 +1,11 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IModelFile, WorkingModel } from "@shared/types/Model";
 import type { RootState } from "../../../utils/store";
-import { initialLoadingState, loadingReducers, LoadingState } from "../../../utils/slices/loading-slice";
+import {
+  initialLoadingState,
+  loadingReducers,
+  LoadingState,
+} from "../../../utils/slices/loading-slice";
 import LoadingSteps from "./LoadingSteps";
 
 // Define a type for the slice state
@@ -85,6 +89,10 @@ export const selectModelsRead = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MODELS_READ);
 export const selectLoadingSteps = (state: RootState) =>
   state.model.finishedSteps;
+export const selectLanguageServerStartStatus = (state: RootState) =>
+  state.model.finishedSteps.includes(LoadingSteps.LANGUAGE_CLIENT_STARTED);
+export const selectLanguageServerInitializeStatus = (state: RootState) =>
+  state.model.finishedSteps.includes(LoadingSteps.LANGUAGE_SERVER_INITIALIZED);
 export const selectMonacoServicesInstalled = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MONACO_SERVICES_INSTALLED);
 export const selectStepWithStatus = (

@@ -364,6 +364,15 @@ ipcMain.on(Channel.INSTALL_MARS, (_, path: string) => {
   });
 });
 
+ipcMain.handle(Channel.CLEAN_PROJECT, (_, projectPath: string) => {
+  log.warn("Starting to clean ", projectPath);
+
+  child_process.execSync(`dotnet clean`, {
+    cwd: projectPath,
+  });
+  log.warn("Cleaning successful.");
+});
+
 enum FileExtensions {
   CSHARP = ".cs",
   CSV = ".csv",
