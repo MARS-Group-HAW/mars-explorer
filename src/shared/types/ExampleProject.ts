@@ -1,6 +1,10 @@
-enum ExampleProjects {
-  MyTestApp = "MyTestApp",
-  WolfSheepModel = "WolfSheepModel",
-}
+import { IModelFile } from "./Model";
 
-export type ExampleProject = "MyTestApp";
+type ExampleProject = {
+  name: string;
+  path: string;
+  readme?: IModelFile;
+  models: IModelFile[];
+};
+
+export default ExampleProject;

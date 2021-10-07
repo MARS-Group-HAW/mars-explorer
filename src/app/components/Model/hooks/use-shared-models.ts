@@ -1,9 +1,18 @@
 import { createAction, createReducer } from "@reduxjs/toolkit";
 import { createReducerContext } from "react-use";
 import { IModelFile } from "@shared/types/Model";
+import ExampleProject from "@shared/types/ExampleProject";
 
-export const selectModel = createAction<{ model: IModelFile }, "selectModel">(
+export const selectModel = createAction<
+  { model: IModelFile; isExample?: boolean },
   "selectModel"
+>("selectModel");
+export const selectExampleProject = createAction<
+  { project: ExampleProject },
+  "selectExampleProject"
+>("selectExampleProject");
+export const deselectExampleProject = createAction<"deselectExampleProject">(
+  "deselectExampleProject"
 );
 export const openModelDeletion = createAction<
   { model: IModelFile },
@@ -22,20 +31,31 @@ export const closeModelCreation = createAction<void, "closeModelCreation">(
 type State = {
   isCreateDialogOpen: boolean;
   isDeleteDialogOpen: boolean;
+  isExampleProject: boolean;
   selectedModel?: IModelFile;
+  selectedExampleProject?: ExampleProject;
   processedModel?: IModelFile;
 };
 
 const initialState: State = {
   isCreateDialogOpen: false,
   isDeleteDialogOpen: false,
+  isExampleProject: false,
 };
 
 const reducer = createReducer(initialState, (builder) =>
   builder
     .addCase(selectModel, (state, { payload }) => {
-      const { model } = payload;
+      const { model, isExample } = payload;
       state.selectedModel = model;
+      state.isExampleProject = isExample;
+    })
+    .addCase(selectExampleProject, (state, { payload }) => {
+      const { project } = payload;
+      state.selectedExampleProject = project;
+    })
+    .addCase(deselectExampleProject, (state) => {
+      state.selectedExampleProject = undefined;
     })
     .addCase(openModelDeletion, (state, { payload }) => {
       const { model } = payload;

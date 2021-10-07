@@ -34,7 +34,7 @@ function useEditor(): State {
   const dispatch = useAppDispatch();
   const dirtyModels = useAppSelector(selectDirtyModels);
   const latestModels = useLatest(dirtyModels);
-  const [{ selectedModel }] = useSharedModels();
+  const [{ selectedModel, isExampleProject }] = useSharedModels();
   const [monacoEditor, setMonacoEditor] = useState<IStandaloneCodeEditor>();
 
   function createOrGetModel(path: string, content: string): ITextModel {
@@ -80,6 +80,11 @@ function useEditor(): State {
       ref.current &&
       setMonacoEditor(monaco.editor.create(ref.current, monacoOptions)),
     [ref]
+  );
+
+  useEffect(
+    () => monacoEditor?.updateOptions({ readOnly: isExampleProject }),
+    [isExampleProject]
   );
 
   useUnmount(() => monacoEditor.dispose());

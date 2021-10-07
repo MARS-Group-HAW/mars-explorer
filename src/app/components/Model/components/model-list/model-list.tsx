@@ -4,6 +4,7 @@ import { makeStyles } from "@material-ui/core/styles";
 import AddIcon from "@material-ui/icons/Add";
 import useModelList, { ModelTabs } from "./model-list.hook";
 import MyProjectList from "../my-project-list";
+import ExamplesList from "../examples-list";
 
 const buttonGroupHeight = 45;
 
@@ -55,6 +56,7 @@ function ModelList() {
         </ButtonGroup>
       </Box>
       {isMyProjectTab && <MyProjectList />}
+      {!isMyProjectTab && <ExamplesList />}
       {showAddButton && (
         <Fab color="primary" className={classes.fab} onClick={onAddButtonClick}>
           <AddIcon />

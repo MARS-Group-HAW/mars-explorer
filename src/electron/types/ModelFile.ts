@@ -1,6 +1,6 @@
-import FileRef from "./FileRef";
 import { IModelFile } from "@shared/types/Model";
 import { readFileSync } from "fs";
+import FileRef from "./FileRef";
 
 class ModelFile extends FileRef implements IModelFile {
   public content: string;

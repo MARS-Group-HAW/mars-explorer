@@ -17,6 +17,7 @@ import { ClassCreationMessage } from "@shared/types/class-creation-message";
 import SimObjects from "@shared/types/sim-objects";
 import NotImplementedError from "@shared/errors/not-implemented-error";
 import { fileURLToPath } from "url";
+import ExampleProject from "@shared/types/ExampleProject";
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
@@ -28,6 +29,11 @@ import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import menuItems from "./menu";
 
 const log = new Logger("main");
+
+enum FileExtensions {
+  CSHARP = ".cs",
+  CSV = ".csv",
+}
 
 // IMPORTANT: fixes $PATH variable for macos, see https://stackoverflow.com/questions/62067127/path-variables-empty-in-electron
 fixPath();
@@ -172,6 +178,40 @@ ipcMain.handle(Channel.GET_USER_PROJECTS, (): ModelRef[] => {
 ipcMain.handle(Channel.GET_EXAMPLE_PROJECTS, (): ModelRef[] => {
   const userProjects = getProjectsInDir(appPaths.workspaceExamplesDir);
   return userProjects.map((file) => new FileRef(file));
+});
+
+ipcMain.handle(Channel.GET_ALL_EXAMPLE_PROJECTS, (): ExampleProject[] => {
+  const examplesProjectDirs = getProjectsInDir(appPaths.workspaceExamplesDir);
+
+  return examplesProjectDirs.map((exampleProjectDir) => {
+    const files = fs
+      .readdirSync(exampleProjectDir)
+      .map((file) => path.join(exampleProjectDir, file));
+
+    const readme = files.find(
+      (file) => path.basename(file).toLowerCase() === "readme.md"
+    );
+    let readmeFile: ModelFile;
+
+    if (readme) {
+      readmeFile = new ModelFile(readme);
+    } else {
+      log.warn(`No README.md for example project "${exampleProjectDir}" found`);
+    }
+
+    const models = files
+      .filter(
+        (file) => path.extname(file).toLowerCase() === FileExtensions.CSHARP
+      )
+      .map((file) => new ModelFile(file));
+
+    return {
+      name: path.basename(exampleProjectDir),
+      path: exampleProjectDir,
+      readme: readmeFile,
+      models,
+    };
+  });
 });
 
 ipcMain.handle(Channel.CHECK_LAST_PATH, (_, path: string): ModelRef | null => {
@@ -372,11 +412,6 @@ ipcMain.handle(Channel.CLEAN_PROJECT, (_, projectPath: string) => {
   });
   log.warn("Cleaning successful.");
 });
-
-enum FileExtensions {
-  CSHARP = ".cs",
-  CSV = ".csv",
-}
 
 function getFilesInDirWithExtension(
   dir: string,
