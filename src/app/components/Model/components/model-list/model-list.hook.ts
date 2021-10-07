@@ -1,57 +1,32 @@
-import { useBoolean } from "react-use";
-import { IModelFile } from "@shared/types/Model";
 import {
   openModelCreation,
-  openModelDeletion,
-  selectModel,
   useSharedModels,
 } from "../../hooks/use-shared-models";
-import { useAppSelector } from "../../../../utils/hooks/use-store";
-import { selectDirtyModels, selectErrors } from "../../utils/model-slice";
+import useTabs from "../../../../utils/hooks/use-tabs";
+
+export enum ModelTabs {
+  MY_PROJECT,
+  EXAMPLES,
+}
 
 type State = {
-  isProjectView: boolean;
-  isExampleView: boolean;
+  tab: ModelTabs;
+  onTabChange: (tab: ModelTabs) => void;
   showAddButton: boolean;
-  isModelInvalid: (model: IModelFile) => boolean;
-  isModelSelected: (model: IModelFile) => boolean;
-  isModelDirty: (model: IModelFile) => boolean;
-  onModelClick: (model: IModelFile) => void;
-  onMyProjectButtonClick: () => void;
-  onExamplesButtonClick: () => void;
-  onDeleteObjectClick: (model: IModelFile) => void;
   onAddButtonClick: () => void;
 };
 
 function useModelList(): State {
-  const errorNames = useAppSelector(selectErrors);
-  const dirtyNames = useAppSelector(selectDirtyModels);
-  const [{ selectedModel }, dispatch] = useSharedModels();
+  const [, dispatch] = useSharedModels();
 
-  const [isProjectView, setProjectView] = useBoolean(true);
+  const [tab, setTab] = useTabs<ModelTabs>(ModelTabs.MY_PROJECT);
 
   const onAddButtonClick = () => dispatch(openModelCreation());
 
-  const onModelClick = (model: IModelFile) => dispatch(selectModel({ model }));
-
-  const onDeleteObjectClick = (model: IModelFile) =>
-    dispatch(openModelDeletion({ model }));
-
-  const isModelInvalid = (model: IModelFile) => errorNames.includes(model.name);
-  const isModelSelected = (model: IModelFile) => model === selectedModel;
-  const isModelDirty = (model: IModelFile) => dirtyNames.includes(model.path);
-
   return {
-    isProjectView,
-    isExampleView: !isProjectView,
-    isModelInvalid,
-    isModelSelected,
-    isModelDirty,
-    showAddButton: isProjectView,
-    onModelClick,
-    onMyProjectButtonClick: () => setProjectView(true),
-    onExamplesButtonClick: () => setProjectView(false),
-    onDeleteObjectClick,
+    tab,
+    onTabChange: setTab,
+    showAddButton: tab === ModelTabs.MY_PROJECT,
     onAddButtonClick,
   };
 }

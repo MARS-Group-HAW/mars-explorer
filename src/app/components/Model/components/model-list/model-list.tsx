@@ -1,18 +1,9 @@
 import * as React from "react";
-import {
-  Box,
-  Button,
-  ButtonGroup,
-  Fab,
-  LinearProgress,
-  List,
-  Typography,
-} from "@material-ui/core";
+import { Box, Button, ButtonGroup, Fab } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { IModelFile } from "@shared/types/Model";
 import AddIcon from "@material-ui/icons/Add";
-import useModelList from "./model-list.hook";
-import ModelListItem from "../model-list-item";
+import useModelList, { ModelTabs } from "./model-list.hook";
+import MyProjectList from "../my-project-list";
 
 const buttonGroupHeight = 45;
 
@@ -33,67 +24,37 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-type Props = {
-  models: IModelFile[];
-  isLoading: boolean;
-};
-
-function ModelList({ models, isLoading }: Props) {
+function ModelList() {
   const classes = useStyles();
-  const {
-    isProjectView,
-    isExampleView,
-    isModelInvalid,
-    isModelSelected,
-    isModelDirty,
-    showAddButton,
-    onModelClick,
-    onExamplesButtonClick,
-    onMyProjectButtonClick,
-    onAddButtonClick,
-    onDeleteObjectClick,
-  } = useModelList();
+  const { tab, onTabChange, showAddButton, onAddButtonClick } = useModelList();
+
+  const isMyProjectTab = tab === ModelTabs.MY_PROJECT;
 
   return (
     <>
       <Box>
         <ButtonGroup
           size="small"
-          color="secondary"
+          color="default"
+          disableElevation
           aria-label="outlined primary button group"
           className={classes.buttonGroup}
         >
           <Button
-            variant={isProjectView ? "contained" : "outlined"}
-            onClick={onMyProjectButtonClick}
+            variant={isMyProjectTab ? "contained" : "outlined"}
+            onClick={() => onTabChange(ModelTabs.MY_PROJECT)}
           >
             My Project
           </Button>
           <Button
-            variant={isExampleView ? "contained" : "outlined"}
-            onClick={onExamplesButtonClick}
+            variant={!isMyProjectTab ? "contained" : "outlined"}
+            onClick={() => onTabChange(ModelTabs.EXAMPLES)}
           >
             Examples
           </Button>
         </ButtonGroup>
       </Box>
-      <List aria-label="models" className={classes.list}>
-        {isLoading && <LinearProgress />}
-        {!isLoading && models.length === 0 && (
-          <Typography variant="caption">No Models found</Typography>
-        )}
-        {models.map((model) => (
-          <ModelListItem
-            key={model.path}
-            name={model.name}
-            selected={isModelSelected(model)}
-            invalid={isModelInvalid(model)}
-            dirty={isModelDirty(model)}
-            onClick={() => onModelClick(model)}
-            onDeleteClick={() => onDeleteObjectClick(model)}
-          />
-        ))}
-      </List>
+      {isMyProjectTab && <MyProjectList />}
       {showAddButton && (
         <Fab color="primary" className={classes.fab} onClick={onAddButtonClick}>
           <AddIcon />

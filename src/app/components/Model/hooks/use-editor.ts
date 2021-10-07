@@ -1,7 +1,7 @@
-import React, { useEffect, useState } from "react";
+import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { editor } from "monaco-editor";
 import monaco from "@app/standalone/monaco-editor/monaco";
-import { useLatest, useMount, useUnmount } from "react-use";
+import { useLatest, useUnmount } from "react-use";
 import CSHARP from "../../../standalone/monaco-editor/types";
 import { useSharedModels } from "./use-shared-models";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
@@ -25,9 +25,12 @@ const monacoOptions: IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
 };
 
-type State = {};
+type State = {
+  ref: MutableRefObject<HTMLDivElement>;
+};
 
-function useEditor(containerRef: React.RefObject<HTMLDivElement>): State {
+function useEditor(): State {
+  const ref = useRef();
   const dispatch = useAppDispatch();
   const dirtyModels = useAppSelector(selectDirtyModels);
   const latestModels = useLatest(dirtyModels);
@@ -72,15 +75,16 @@ function useEditor(containerRef: React.RefObject<HTMLDivElement>): State {
     return () => disposeable.dispose();
   }, [selectedModel]);
 
-  useMount(
+  useEffect(
     () =>
-      containerRef.current &&
-      setMonacoEditor(monaco.editor.create(containerRef.current, monacoOptions))
+      ref.current &&
+      setMonacoEditor(monaco.editor.create(ref.current, monacoOptions)),
+    [ref]
   );
 
   useUnmount(() => monacoEditor.dispose());
 
-  return {};
+  return { ref };
 }
 
 export default useEditor;
