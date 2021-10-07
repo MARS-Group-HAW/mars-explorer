@@ -1,5 +1,6 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { IModelFile, WorkingModel } from "@shared/types/Model";
+import ExampleProject from "@shared/types/ExampleProject";
 import type { RootState } from "../../../utils/store";
 import {
   initialLoadingState,
@@ -11,6 +12,7 @@ import LoadingSteps from "./LoadingSteps";
 // Define a type for the slice state
 type ModelState = LoadingState<LoadingSteps> & {
   models: WorkingModel;
+  exampleProjects: ExampleProject[];
   namesWithError: string[];
   dirtyModels: string[];
 };
@@ -18,6 +20,7 @@ type ModelState = LoadingState<LoadingSteps> & {
 // Define the initial state using that type
 const initialState: ModelState = {
   models: [],
+  exampleProjects: [],
   namesWithError: [],
   dirtyModels: [],
   ...initialLoadingState,
@@ -38,6 +41,12 @@ export const modelSlice = createSlice({
     },
     setModel: (state, { payload }: PayloadAction<WorkingModel>) => {
       state.models = payload;
+    },
+    setExampleProjects: (
+      state,
+      { payload }: PayloadAction<ExampleProject[]>
+    ) => {
+      state.exampleProjects = payload;
     },
     addToDirtyFiles: (state, { payload }: PayloadAction<string>) => {
       state.dirtyModels.push(payload);
@@ -70,6 +79,7 @@ export const modelSlice = createSlice({
 export const {
   removeErrorsInPath,
   resetErrors,
+  setExampleProjects,
   setErrorsInPath,
   finishLoadingStep,
   resetLoadingStep,
@@ -83,6 +93,8 @@ export const {
 // Other code such as selectors can use the imported `RootState` type
 export const selectModel = (state: RootState) => state.model;
 export const selectModels = (state: RootState) => state.model.models;
+export const selectExampleProjects = (state: RootState) =>
+  state.model.exampleProjects;
 export const selectErrors = (state: RootState) => state.model.namesWithError;
 export const selectDirtyModels = (state: RootState) => state.model.dirtyModels;
 export const selectModelsRead = (state: RootState) =>

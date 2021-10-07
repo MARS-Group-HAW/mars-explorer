@@ -5,6 +5,7 @@ import useMonacoServices from "./use-monaco-services";
 import useLanguageClient from "./use-language-client";
 import useProjectInitialization from "./use-project-initialization";
 import useModels from "./use-models";
+import useExampleProjects from "./use-example-projects";
 
 type State = void;
 
@@ -16,6 +17,7 @@ function useModelBootstrap(): State {
   useLanguageClient(path);
   useProjectInitialization(path);
   useModels();
+  useExampleProjects();
 }
 
 export default useModelBootstrap;
