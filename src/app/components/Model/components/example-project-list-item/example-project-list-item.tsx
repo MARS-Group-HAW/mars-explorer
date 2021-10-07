@@ -10,13 +10,15 @@ import {
 } from "@material-ui/core";
 import { ExpandLess, ExpandMore, InfoOutlined } from "@material-ui/icons";
 import ExampleProject from "@shared/types/ExampleProject";
-import ModelFile from "../../../../../electron/types/ModelFile";
+import { useBoolean } from "react-use";
+import { IModelFile } from "@shared/types/Model";
 import {
   deselectExampleProject,
   selectExampleProject,
   selectModel,
   useSharedModels,
 } from "../../hooks/use-shared-models";
+import ExampleProjectInfoDialog from "../example-project-info-dialog";
 
 type Props = {
   project: ExampleProject;
@@ -40,9 +42,11 @@ function ExampleProjectListItem({ project }: Props) {
   const [{ selectedModel, selectedExampleProject }, dispatch] =
     useSharedModels();
 
-  const isSelected = (model: ModelFile) => selectedModel?.path === model.path;
+  const [isAboutDialogOpen, setAboutDialogOpen] = useBoolean(false);
 
-  const opProjectClick = () => {
+  const isSelected = (model: IModelFile) => selectedModel?.path === model.path;
+
+  const onProjectClick = () => {
     if (
       selectedExampleProject &&
       selectedExampleProject.name === project.name
@@ -53,15 +57,18 @@ function ExampleProjectListItem({ project }: Props) {
     }
   };
 
-  const onFileClick = (model: ModelFile) => {
+  const onReadMeClick = () => setAboutDialogOpen(true);
+  const onReadMeClose = () => setAboutDialogOpen(false);
+
+  const onFileClick = (model: IModelFile) => {
     dispatch(selectModel({ model, isExample: true }));
   };
 
-  const isOpen = selectedExampleProject?.name === project.name;
+  const isExpanded = selectedExampleProject?.name === project.name;
 
   return (
     <Paper className={classes.paper}>
-      <ListItem button onClick={opProjectClick}>
+      <ListItem button onClick={onProjectClick}>
         <ListItemText
           primary={project.name}
           primaryTypographyProps={{
@@ -69,9 +76,9 @@ function ExampleProjectListItem({ project }: Props) {
             className: classes.ellipsis,
           }}
         />
-        {isOpen ? <ExpandLess /> : <ExpandMore />}
+        {isExpanded ? <ExpandLess /> : <ExpandMore />}
       </ListItem>
-      <Collapse in={isOpen} timeout="auto" unmountOnExit>
+      <Collapse in={isExpanded} timeout="auto" unmountOnExit>
         <Divider variant="middle" />
         <List component="div" disablePadding>
           {project.models.map((model) => (
@@ -92,8 +99,7 @@ function ExampleProjectListItem({ project }: Props) {
           <ListItem
             button
             className={classes.nested}
-            onClick={() => project.readme && onFileClick(project.readme)}
-            selected={project.readme && isSelected(project.readme)}
+            onClick={onReadMeClick}
             disabled={!project.readme}
           >
             <ListItemText
@@ -108,6 +114,12 @@ function ExampleProjectListItem({ project }: Props) {
           </ListItem>
         </List>
       </Collapse>
+      {isAboutDialogOpen && (
+        <ExampleProjectInfoDialog
+          readme={project.readme}
+          onClose={onReadMeClose}
+        />
+      )}
     </Paper>
   );
 }

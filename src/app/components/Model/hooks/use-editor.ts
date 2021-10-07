@@ -2,7 +2,10 @@ import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { editor } from "monaco-editor";
 import monaco from "@app/standalone/monaco-editor/monaco";
 import { useLatest, useUnmount } from "react-use";
-import CSHARP from "../../../standalone/monaco-editor/types";
+import _ from "lodash";
+// @ts-ignore
+import { renderMarkdown } from "monaco-editor/esm/vs/base/browser/markdownRenderer";
+import { CSHARP, MARKDOWN } from "../../../standalone/monaco-editor/types";
 import { useSharedModels } from "./use-shared-models";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
@@ -14,7 +17,10 @@ import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import ITextModel = editor.ITextModel;
 import IStandaloneEditorConstructionOptions = editor.IStandaloneEditorConstructionOptions;
 
+console.log(renderMarkdown);
+
 monaco.languages.register(CSHARP);
+monaco.languages.register(MARKDOWN);
 
 // eslint-disable-next-line no-restricted-globals
 (self as any).MonacoEnvironment = {
@@ -44,7 +50,17 @@ function useEditor(): State {
 
     if (textModel) return textModel;
 
-    textModel = monaco.editor.createModel(content, CSHARP.id, modelUri);
+    const lang = _.last(path.split("."));
+
+    if (!lang) {
+      throw new Error(`No language for ${path} found.`);
+    }
+
+    textModel = monaco.editor.createModel(
+      content,
+      lang === "cs" ? CSHARP.id : MARKDOWN.id,
+      modelUri
+    );
 
     return textModel;
   }
@@ -56,6 +72,7 @@ function useEditor(): State {
 
     const newModel = createOrGetModel(path, content);
     monacoEditor?.setModel(newModel);
+
     const versionId = newModel.getAlternativeVersionId();
 
     const disposeable = newModel.onDidChangeContent(() => {
