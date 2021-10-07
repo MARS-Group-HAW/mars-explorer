@@ -1,7 +1,7 @@
-import { useBoolean, useCustomCompareEffect, useUnmount } from "react-use";
+import { useBoolean, useCustomCompareEffect, useLatest } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { createMessageConnection } from "vscode-jsonrpc";
-import { useEffect } from "react";
+import { useContext, useEffect } from "react";
 import useRootUri from "./use-root-uri";
 import RendererIpcMessageReader from "../../../../../standalone/monaco-editor/client/RendererIpcMessageReader";
 import RendererIpcMessageWriter from "../../../../../standalone/monaco-editor/client/RendererIpcMessageWriter";
@@ -12,6 +12,7 @@ import LoadingSteps from "../../../../Model/utils/LoadingSteps";
 import {
   finishLoadingStep,
   resetLoadingStep,
+  selectLanguageServerInitializeStatus,
   selectModels,
   selectMonacoServicesInstalled,
 } from "../../../../Model/utils/model-slice";
@@ -19,14 +20,36 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../../utils/hooks/use-store";
+import { SnackBarContext } from "../../../../shared/snackbar/snackbar-provider";
 
 function useLanguageClient(path: string) {
+  const { addWarningAlert, addErrorAlert } = useContext(SnackBarContext);
   const dispatch = useAppDispatch();
   const { rootUri } = useRootUri(path);
   const { handleMessage } = useDiagnosticsMessages();
   const areServicesInstalled = useAppSelector(selectMonacoServicesInstalled);
+  const isServerInitialized = useAppSelector(
+    selectLanguageServerInitializeStatus
+  );
   const models = useAppSelector(selectModels);
   const [isLoading, setIsLoading] = useBoolean(true);
+  const [hasBeenCleaned, setHasBeenCleaned] = useBoolean(false);
+
+  const latestInit = useLatest(isServerInitialized);
+  const latestBeenCleaned = useLatest(hasBeenCleaned);
+
+  async function afterTimeout() {
+    if (latestInit.current) return;
+
+    if (latestBeenCleaned.current) {
+      addErrorAlert({
+        msg: "The server could not be started. Make sure that the project is created by the MARS-Explorer or is based on an example project. You can still make changes to your files but they won't be validated.",
+      });
+      dispatch(finishLoadingStep(LoadingSteps.LANGUAGE_SERVER_INITIALIZED));
+    } else {
+      cleanAndRestart();
+    }
+  }
 
   const startLanguageServer = async () => {
     window.api.send(Channel.STOP_LANGUAGE_SERVER);
@@ -47,11 +70,27 @@ function useLanguageClient(path: string) {
     const client = new CSharpLanguageClient(connection);
     client.start();
     setIsLoading(false);
-    return client;
+
+    setTimeout(afterTimeout, 30000);
   };
+
+  async function cleanAndRestart() {
+    try {
+      addWarningAlert({
+        msg: "Seems like the validation server takes too long. Cleaning your project and restarting in the background ...",
+      });
+      await window.api.invoke<string, void>(Channel.CLEAN_PROJECT, path);
+    } catch (e: unknown) {
+      addErrorAlert({ msg: `There was an error cleaning your project: ${e}` });
+    } finally {
+      setHasBeenCleaned(true);
+      startLanguageServer();
+    }
+  }
 
   useEffect(() => {
     if (!rootUri || !areServicesInstalled) return;
+    setHasBeenCleaned(false);
     startLanguageServer();
   }, [areServicesInstalled, rootUri]);
 

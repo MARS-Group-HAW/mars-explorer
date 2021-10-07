@@ -1,11 +1,17 @@
 import { Channel } from "@shared/types/Channel";
-import { useBoolean, useCustomCompareEffect, useUpdateEffect } from "react-use";
-import { useEffect } from "react";
+import {
+  useBoolean,
+  useCustomCompareEffect,
+  useTimeoutFn,
+  useUpdateEffect,
+} from "react-use";
+import { useEffect, useState } from "react";
 import useLoadingStep from "../../../../../utils/hooks/use-loading-step";
 import LoadingSteps from "../../../../Model/utils/LoadingSteps";
 import {
   finishLoadingStep,
   resetLoadingStep,
+  selectLanguageServerStartStatus,
   selectModels,
 } from "../../../../Model/utils/model-slice";
 import {
@@ -14,10 +20,11 @@ import {
 } from "../../../../../utils/hooks/use-store";
 import useChannelSubscription from "../../../../../utils/hooks/use-channel-subscription";
 
+const LANGUAGE_SERVER_STARTUP_TIMEOUT = 60000;
+
 function useProjectInitialization(path?: string) {
   const dispatch = useAppDispatch();
   const models = useAppSelector(selectModels);
-
   const [initialized, setInitialized] = useBoolean(false);
 
   useChannelSubscription(Channel.PROJECT_INITIALIZED, () =>
