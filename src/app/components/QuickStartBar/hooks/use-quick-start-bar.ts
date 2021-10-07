@@ -5,8 +5,11 @@ import { useEffect, useState } from "react";
 import { useBoolean } from "react-use";
 import { useAppSelector } from "../../../utils/hooks/use-store";
 import useSimulation from "./use-simulation";
-import { selectDirtyModels, selectErrors } from "../../Model/utils/model-slice";
-import useProjectInitializationStatus from "../../App/hooks/bootstrap/model/use-project-initialization-status";
+import {
+  selectDirtyModels,
+  selectErrors,
+  selectModelFullyInitialized,
+} from "../../Model/utils/model-slice";
 import useResultsInLocalStorage from "./use-results-in-local-storage";
 import {
   selectConfigErrors,
@@ -33,7 +36,7 @@ type State = {
 };
 
 function useQuickStartBar(): State {
-  const { isProjectFullyInitialized } = useProjectInitializationStatus();
+  const isProjectFullyInitialized = useAppSelector(selectModelFullyInitialized);
   const { path, name } = useAppSelector(selectProject);
   useResultsInLocalStorage();
   const { simState, progress, errorMsg, runSimulation, cancelSimulation } =

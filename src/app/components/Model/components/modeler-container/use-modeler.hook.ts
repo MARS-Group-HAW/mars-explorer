@@ -2,9 +2,9 @@ import { RefObject, useEffect } from "react";
 import { WorkingModel } from "@shared/types/Model";
 import useEditor from "../../hooks/use-editor";
 import { useAppSelector } from "../../../../utils/hooks/use-store";
-import useProjectInitializationStatus from "../../../App/hooks/bootstrap/model/use-project-initialization-status";
 import {
   selectLoadingSteps,
+  selectModelFullyInitialized,
   selectModelLoadingProgress,
   selectModels,
   selectStepWithStatus,
@@ -35,11 +35,11 @@ function useModeler({ containerRef }: Props): State {
 
   useEditor(containerRef);
 
-  const { isProjectFullyInitialized } = useProjectInitializationStatus();
+  const initialized = useAppSelector(selectModelFullyInitialized);
 
   // TODO: Temp workaround to validate all files
   useEffect(() => {
-    if (!isProjectFullyInitialized || !models) return;
+    if (!initialized || !models) return;
 
     const currentSelectedModel = selectedModel;
 
@@ -47,7 +47,7 @@ function useModeler({ containerRef }: Props): State {
     models.forEach((model) => dispatch(selectModel({ model })));
     // reset to last state
     dispatch(selectModel({ model: currentSelectedModel }));
-  }, [isProjectFullyInitialized, models]);
+  }, [initialized, models]);
 
   return {
     models,
