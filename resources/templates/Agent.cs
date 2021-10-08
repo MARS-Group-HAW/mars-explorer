@@ -8,7 +8,7 @@ using Mars.Interfaces.Layers;
 
 namespace $PROJECT_NAME.Model
 {
-    public class $OBJECT_NAME : IAgent<ADD_LAYER_CLASS_HERE>, IPositionable
+    public class $CLASS_NAME : IAgent<ADD_LAYER_CLASS_HERE>, IPositionable
     {
 
         public void Init(ADD_LAYER_CLASS_HERE layer)

@@ -15,12 +15,9 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 import { IFileRef } from "@shared/types/File";
 import { ClassCreationMessage } from "@shared/types/class-creation-message";
 import SimObjects from "@shared/types/sim-objects";
-import NotImplementedError from "@shared/errors/not-implemented-error";
 import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
 import { PathAbsToRelParams } from "@shared/types/ChannelParams";
-import squirrel = require("electron-squirrel-startup");
-import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
 import { launchLanguageServer } from "./server-launcher";
@@ -28,6 +25,8 @@ import { Logger } from "./logger";
 import appPaths from "./app-paths";
 import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import menuItems from "./menu";
+import squirrel = require("electron-squirrel-startup");
+import fs = require("fs-extra");
 
 const log = new Logger("main");
 
@@ -261,10 +260,11 @@ enum Templates {
   PROGRAMM_CS = "Program.cs",
   AGENT_CS = "Agent.cs",
   LAYER_CS = "Layer.cs",
+  ENTITY_CS = "Entity.cs",
 }
 
 const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
-const CLASS_NAME_PLACEHOLDER = /\$OBJECT_NAME/g;
+const CLASS_NAME_PLACEHOLDER = /\$CLASS_NAME/g;
 
 type Replaceable = {
   placeholder: RegExp;
@@ -360,8 +360,10 @@ ipcMain.handle(
         template = Templates.LAYER_CS;
         break;
       case SimObjects.ENTITY:
+        template = Templates.ENTITY_CS;
+        break;
       default:
-        throw new NotImplementedError("Entity");
+        throw new Error(`Class Type "${type}" not found.`);
     }
 
     const classFile = `${className}.cs`;
