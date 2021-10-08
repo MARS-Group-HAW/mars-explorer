@@ -1,9 +1,9 @@
-import { AgentMapping } from "../../mappings-form/utils/types";
+import { EntitiesMapping } from "../../mappings-form/utils/types";
+import defaultValues from "../../agents-entities-form/utils/defaultValues";
 
-const defaultValues: AgentMapping = {
-  name: "New agent",
-  count: 1,
-  mapping: [],
+const agentDefaultValues: EntitiesMapping = {
+  ...defaultValues,
+  name: "New agent class",
 };
 
-export default defaultValues;
+export default agentDefaultValues;
