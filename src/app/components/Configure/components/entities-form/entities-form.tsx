@@ -1,10 +1,10 @@
 import * as React from "react";
-import useAgentsForm from "./use-agents-form.hook";
+import useEntitiesForm from "./use-entities-form.hook";
 import MappingsForm from "../mappings-form";
 import AgentsEntitiesForm from "../agents-entities-form";
 
-const AgentsForm = () => {
-  const { namespace } = useAgentsForm();
+const EntitiesForm = () => {
+  const { namespace } = useEntitiesForm();
 
   return (
     <MappingsForm>
@@ -13,4 +13,4 @@ const AgentsForm = () => {
   );
 };
 
-export default AgentsForm;
+export default EntitiesForm;

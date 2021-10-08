@@ -8,6 +8,7 @@ import TypeList from "../type-list";
 import { SharedMappingsProvider } from "../../hooks/use-shared-mappings";
 import useNodeHeight from "../../../../utils/hooks/use-node-height";
 import LayersForm from "../layers-form";
+import EntitiesForm from "../entities-form";
 
 const TypeForm = () => {
   const classes = useStyles();
@@ -45,9 +46,7 @@ const TypeForm = () => {
             <Grid item xs={9}>
               {tab === TabIndizes.AGENTS && <AgentsForm />}
               {tab === TabIndizes.LAYERS && <LayersForm />}
-              {tab === TabIndizes.ENTITIES && (
-                <div>Entities: Not supported yet</div>
-              )}
+              {tab === TabIndizes.ENTITIES && <EntitiesForm />}
             </Grid>
           </Grid>
         </FormPaper>

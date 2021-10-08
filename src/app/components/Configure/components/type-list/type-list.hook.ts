@@ -1,6 +1,6 @@
 import { useField } from "formik";
 import { useLatest } from "react-use";
-import ObjectMappings from "../mappings-form/utils/types";
+import TypeMapping from "../mappings-form/utils/types";
 import {
   resetMappingNamespace,
   setMappingNamespace,
@@ -22,7 +22,7 @@ function useTypeList(): State {
   const [{ objectNsp, mappingIndex }, dispatch] = useSharedMappings();
 
   const [{ value }, , { setValue, setTouched }] =
-    useField<ObjectMappings>(objectNsp);
+    useField<TypeMapping[]>(objectNsp);
 
   const setSelectedIndex = (index: number) =>
     dispatch(setMappingNamespace(index));

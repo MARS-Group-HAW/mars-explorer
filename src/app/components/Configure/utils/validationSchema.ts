@@ -4,6 +4,7 @@ import FieldNames from "./fieldNames";
 import globalsValidationSchema from "../components/globals-form/utils/validationSchema";
 import agentsValidationSchema from "../components/agents-form/utils/validationSchema";
 import layersValidationSchema from "../components/layers-form/utils/validationSchema";
+import entitiesValidationSchema from "../components/entities-form/utils/validationSchema";
 
 import Config from "./types";
 
@@ -13,6 +14,7 @@ const Schema: SchemaOf<Config> = Yup.object({
   [FieldNames.GLOBALS]: globalsValidationSchema,
   [FieldNames.AGENTS]: agentsValidationSchema,
   [FieldNames.LAYERS]: layersValidationSchema,
+  [FieldNames.ENTITIES]: entitiesValidationSchema,
 });
 
 export default Schema;

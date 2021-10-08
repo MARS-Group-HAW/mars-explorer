@@ -115,6 +115,7 @@ describe("Transform", () => {
         },
         agents: [],
         layers: [],
+        entities: [],
       };
     });
 

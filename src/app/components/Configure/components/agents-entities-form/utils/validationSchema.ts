@@ -3,15 +3,18 @@ import Yup from "../../../utils/yup-extended";
 
 import FieldNames from "../../mappings-form/utils/fieldNames";
 import IndividualMappingsSchema from "../../mappings-form/utils/validationSchema";
-import LayersMappings from "./types";
+import AgentMappings from "../../agents-form/utils/types";
+import EntitiesMappings from "../../entities-form/utils/types";
 
-const ValidationSchema: SchemaOf<LayersMappings> = Yup.array()
+const ValidationSchema: SchemaOf<AgentMappings | EntitiesMappings> = Yup.array()
   .of(
     Yup.object().shape({
       [FieldNames.NAME]: Yup.string().required(),
-      [FieldNames.FILE]: Yup.string().nullable().optional(),
+      [FieldNames.COUNT]: Yup.number().integer().min(0),
+      [FieldNames.FILE]: Yup.string().nullable(),
       [FieldNames.MAPPING]: IndividualMappingsSchema,
     })
   )
-  .uniqueProperty(FieldNames.NAME, "Duplicate layer name");
+  .uniqueProperty(FieldNames.NAME, "Duplicate name");
+
 export default ValidationSchema;
