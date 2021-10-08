@@ -34,21 +34,23 @@ Yup.addMethod(Yup.array, "uniqueProperty", function (propertyPath, message) {
   });
 });
 
-const ValidationSchema: SchemaOf<ObjectMappings> = Yup.array().of(
-  Yup.object().shape({
-    [FieldNames.NAME]: Yup.string().required(),
-    [FieldNames.COUNT]: Yup.number().integer().min(0),
-    [FieldNames.FILE]: Yup.string().nullable(),
-    [FieldNames.MAPPING]: Yup.array()
-      .of(
-        Yup.object().shape({
-          [FieldNames.PARAMETER]: Yup.string().required(),
-          [FieldNames.VALUE]: Yup.mixed().required(),
-        })
-      )
-      // @ts-ignore
-      .uniqueProperty([FieldNames.PARAMETER], "Duplicate parameter name"),
-  })
-);
+const ValidationSchema: SchemaOf<ObjectMappings> = Yup.array()
+  .of(
+    Yup.object().shape({
+      [FieldNames.NAME]: Yup.string().required(),
+      [FieldNames.COUNT]: Yup.number().integer().min(0),
+      [FieldNames.FILE]: Yup.string().nullable(),
+      [FieldNames.MAPPING]: Yup.array()
+        .of(
+          Yup.object().shape({
+            [FieldNames.PARAMETER]: Yup.string().required(),
+            [FieldNames.VALUE]: Yup.mixed().required(),
+          })
+        )
+        // @ts-ignore
+        .uniqueProperty([FieldNames.PARAMETER], "Duplicate parameter name"),
+    })
+  ) // @ts-ignore
+  .uniqueProperty([FieldNames.NAME], "Duplicate type name");
 
 export default ValidationSchema;
