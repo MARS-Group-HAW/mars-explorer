@@ -4,6 +4,7 @@ import { OutputsValidationSchema } from "@app/components/Configure/components/ou
 import { OutputSpecification } from "@app/components/Configure/components/outputs-form/utils/types";
 import validationSchema from "./validationSchema";
 import { GlobalsValidationSchema } from "../components/globals-form/utils/validationSchema";
+import { LayersMapping } from "../components/mappings-form/utils/types";
 
 type SimFlags = {
   pythonVisualization: boolean;
@@ -56,6 +57,10 @@ class FormTransformer {
 
       delete globals.timeSpecification;
     }
+
+    schema.layers.forEach(
+      (type: LayersMapping) => type.file === null && delete type.file
+    );
 
     return schema;
   }

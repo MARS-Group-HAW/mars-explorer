@@ -9,7 +9,7 @@ const ValidationSchema: SchemaOf<ObjectMappings> = Yup.array().of(
   Yup.object().shape({
     [FieldNames.NAME]: Yup.string().required(),
     [FieldNames.COUNT]: Yup.number().integer().min(0),
-    [FieldNames.FILE]: Yup.string(),
+    [FieldNames.FILE]: Yup.string().nullable(),
     [FieldNames.MAPPING]: Yup.array().of(
       Yup.object().shape({
         [FieldNames.PARAMETER]: Yup.string().required(),

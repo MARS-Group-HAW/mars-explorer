@@ -1,4 +1,5 @@
 import * as React from "react";
+import { ReactNode } from "react";
 import { Button, Grid, makeStyles, Typography } from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import useMappingsForm from "./mappings-form.hook";
@@ -6,6 +7,7 @@ import FormInput from "../form-input";
 import withNamespace from "../../utils/withNamespace";
 import FieldNames from "./utils/fieldNames";
 import useNodeHeight from "../../../../utils/hooks/use-node-height";
+import NoDataMessage from "../../../shared/no-data-message/no-data-message";
 
 const useStyles = makeStyles(() => ({
   noObjectContainer: {
@@ -13,10 +15,6 @@ const useStyles = makeStyles(() => ({
   },
   formContainer: {
     height: "100%",
-  },
-  nameCountContainer: {
-    height: "20%",
-    padding: 5,
   },
   mappingContainer: {
     height: "80%",
@@ -29,11 +27,11 @@ const useStyles = makeStyles(() => ({
 }));
 
 type Props = {
-  namespace: string;
+  children: ReactNode;
 };
 
 // eslint-disable-next-line react/require-default-props
-const MappingsForm = ({ namespace }: Props) => {
+const MappingsForm = ({ children }: Props) => {
   const classes = useStyles();
   const { ref, height } = useNodeHeight();
   const { showForm, individualMappingNamespaces, onAddMappingClick } =
@@ -41,38 +39,10 @@ const MappingsForm = ({ namespace }: Props) => {
 
   return (
     <>
-      {!showForm && (
-        <Grid
-          container
-          justifyContent="center"
-          alignItems="center"
-          className={classes.noObjectContainer}
-        >
-          <Typography color="textSecondary">No object selected</Typography>
-        </Grid>
-      )}
+      {!showForm && <NoDataMessage msg="No class selected" />}
       {showForm && (
         <Grid container className={classes.formContainer}>
-          <Grid
-            container
-            justifyContent="space-between"
-            className={classes.nameCountContainer}
-          >
-            <Grid item>
-              <FormInput
-                outlined
-                name={withNamespace(FieldNames.NAME, namespace)}
-              />
-            </Grid>
-            <Grid item>
-              <FormInput
-                outlined
-                name={withNamespace(FieldNames.COUNT, namespace)}
-                type="number"
-                InputProps={{ inputProps: { min: 0 } }}
-              />
-            </Grid>
-          </Grid>
+          {children}
           <Grid
             ref={ref}
             container

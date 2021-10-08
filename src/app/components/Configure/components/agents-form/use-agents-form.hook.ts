@@ -1,21 +1,15 @@
-import { useField } from "formik";
-import ObjectMappings from "../mappings-form/utils/types";
-import {
-  selectObjectAtIndex,
-  useSharedMappings,
-} from "../../hooks/use-shared-mappings";
+import FieldNames from "../../utils/fieldNames";
+import useMappingsTab from "../../hooks/use-mappings-tab";
 
 type State = {
-  selectedAgentNamespace: string;
+  namespace: string;
 };
 
 function useAgentsForm(): State {
-  const [state] = useSharedMappings();
-  const namespace = selectObjectAtIndex(state);
-  const [{ value }] = useField<ObjectMappings>(namespace);
+  const { namespace } = useMappingsTab(FieldNames.AGENTS);
 
   return {
-    selectedAgentNamespace: namespace,
+    namespace,
   };
 }
 
