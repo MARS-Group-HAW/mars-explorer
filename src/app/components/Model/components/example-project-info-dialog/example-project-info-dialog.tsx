@@ -27,7 +27,7 @@ function ExampleProjectInfoDialog({ readme, onClose }: Props) {
   }
 
   return (
-    <Dialog open onClose={onClose} scroll="paper">
+    <Dialog open onClose={onClose} scroll="paper" maxWidth="md">
       <DialogContent>
         {parsedReadme ? (
           <div dangerouslySetInnerHTML={{ __html: parsedReadme.innerHTML }} />
