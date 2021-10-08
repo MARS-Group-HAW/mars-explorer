@@ -5,9 +5,10 @@ import { Grid, IconButton, Slider, Typography } from "@material-ui/core";
 import RemoveCircleOutlineIcon from "@material-ui/icons/RemoveCircleOutline";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
 import { ObjectCoordinate } from "@shared/types/ObjectData";
+import _ from "lodash";
 import useBubbleChart from "./bubble-chart.hook";
 
-const options = (
+const getOptions = (
   onLabelClick: (legendItem: LegendItem) => void
 ): ChartOptions => ({
   maintainAspectRatio: false,
@@ -54,6 +55,7 @@ const options = (
 function BubbleChart() {
   const {
     data,
+    options,
     tick,
     maxTick,
     onTickChange,
@@ -61,6 +63,8 @@ function BubbleChart() {
     decrementTick,
     onLabelClick,
   } = useBubbleChart();
+
+  const mergedOptions = _.merge({}, options, getOptions(onLabelClick));
 
   return (
     <Grid
@@ -70,7 +74,7 @@ function BubbleChart() {
       style={{ height: "100%" }}
     >
       <div style={{ position: "relative", height: "80%" }}>
-        <Bubble data={data} options={options(onLabelClick)} />
+        <Bubble data={data} options={mergedOptions} />
       </div>
       <Grid
         container

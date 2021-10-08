@@ -6,16 +6,21 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 import {
   SimulationCountMessage,
   SimulationVisMessage,
+  SimulationWorldSizeMessage,
 } from "@shared/types/SimulationMessages";
-import _ from "lodash";
+import { WorldSizes } from "@shared/types/ObjectData";
 import type { RootState } from "../../../utils/store";
 import { ResultData, ResultDataWithMeta } from "../../Analyze/utils/ResultData";
-import ResultsInStorage from "../../../utils/types/results-in-storage";
 
+export type SavedSimulationResults = {
+  projectPath: string;
+  results: SimulationState;
+};
 // Define a type for the slice state
-type SimulationState = {
+export type SimulationState = {
   simulationState: SimulationStates;
   maxProgress?: number;
+  worldSizes?: WorldSizes;
   resultData: ResultData;
 };
 
@@ -134,6 +139,12 @@ export const simulationSlice = createSlice({
         }
       }
     },
+    setWorldSizes: (
+      state,
+      action: PayloadAction<SimulationWorldSizeMessage>
+    ) => {
+      state.worldSizes = action.payload.worldSizes;
+    },
     finishResults: (state) => {
       state.simulationState = SimulationStates.SUCCESS;
       state.resultData.forEach(({ name }) => {
@@ -152,9 +163,9 @@ export const simulationSlice = createSlice({
     },
     saveDataToLocalStorage: (state, action: PayloadAction<string>) => {
       window.api.logger.info("Saving results");
-      const resultsInStorage: ResultsInStorage = {
+      const resultsInStorage: SavedSimulationResults = {
         projectPath: action.payload,
-        results: current(state).resultData,
+        results: current(state),
       };
 
       localStorageService.setItem(CacheKey.RESULTS_BY_KEY, resultsInStorage);
@@ -169,8 +180,8 @@ export const simulationSlice = createSlice({
 
       if (
         restoredData?.projectPath !== action.payload ||
-        (restoredData?.results &&
-          Object.values(restoredData.results).some(
+        (restoredData?.results.resultData &&
+          Object.values(restoredData.results.resultData).some(
             (result) => result.data.length === 0
           ))
       ) {
@@ -182,20 +193,18 @@ export const simulationSlice = createSlice({
         return initialState;
       }
 
-      const restoredDataWithFlag = restoredData.results.map((result) => ({
-        ...result,
-        hasBeenRestored: true,
-      }));
+      const restoredDataWithFlag = restoredData.results.resultData.map(
+        (result) => ({
+          ...result,
+          hasBeenRestored: true,
+        })
+      );
 
       window.api.logger.info("Successfully restored old results.");
 
-      const maxProgressArr = restoredDataWithFlag.map(
-        (value) => _.maxBy(value.data, (datum) => datum.progress).progress
-      );
-
       return {
+        ...restoredData.results,
         resultData: restoredDataWithFlag,
-        maxProgress: _.max(maxProgressArr),
         simulationState: SimulationStates.NONE,
       };
     },
@@ -237,6 +246,7 @@ export const {
   setSimulationState,
   addCountData,
   addPosData,
+  setWorldSizes,
   finishResults,
   restoreDataFromLocalStorage,
   saveDataToLocalStorage,
@@ -259,5 +269,7 @@ export const selectResultData = (state: RootState) =>
   state.simulation.resultData;
 export const selectProgress = (state: RootState) =>
   state.simulation.maxProgress;
+export const selectWorldSizes = (state: RootState) =>
+  state.simulation.worldSizes;
 
 export default simulationSlice.reducer;

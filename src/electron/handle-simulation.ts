@@ -8,6 +8,7 @@ import { ILogger } from "@shared/types/Logger";
 import {
   SimulationCountMessage,
   SimulationVisMessage,
+  SimulationWorldSizeMessage,
 } from "@shared/types/SimulationMessages";
 
 export enum WebSocketCloseCodes {
@@ -29,6 +30,7 @@ type VisWebsocketMessage = {
     x: number;
     y: number;
   }[];
+  worldSize?: { minX: number; minY: number; maxX: number; maxY: number };
 };
 
 const options: Options = {
@@ -41,6 +43,7 @@ type Props = {
   log: ILogger;
   handleCountMsg: (countMsg: SimulationCountMessage | null) => void;
   handleVisMsg: (visMsg: SimulationVisMessage | null) => void;
+  handleWorldSizeMsg: (msg: SimulationWorldSizeMessage | null) => void;
   handleMaxRetries: () => void;
 };
 
@@ -59,7 +62,13 @@ class SimulationHandler {
 
   private maxTicks: number;
 
-  constructor({ log, handleCountMsg, handleVisMsg, handleMaxRetries }: Props) {
+  constructor({
+    log,
+    handleCountMsg,
+    handleVisMsg,
+    handleMaxRetries,
+    handleWorldSizeMsg,
+  }: Props) {
     this.logger = log;
     this.countSocket = new ReconnectingWebSocket(
       `${SimulationHandler.SOCKET_ADDRESS}/progress`,
@@ -77,7 +86,8 @@ class SimulationHandler {
 
     this.countSocket.onmessage = (msg) =>
       handleCountMsg(this.handleCountMsg(msg));
-    this.visSocket.onmessage = (msg) => handleVisMsg(this.handleVisMsg(msg));
+    this.visSocket.onmessage = (msg) =>
+      handleVisMsg(this.handleVisMsg(msg, handleWorldSizeMsg));
 
     try {
       this.countSocket.onclose = this.handleCountClose;
@@ -144,14 +154,19 @@ class SimulationHandler {
   };
 
   private handleVisMsg = (
-    msg: MessageEvent<string>
+    msg: MessageEvent<string>,
+    handleWorldSizeMsg: Props["handleWorldSizeMsg"]
   ): SimulationVisMessage | null => {
-    const { currentTick, typeName, entities } =
+    const { currentTick, typeName, entities, worldSize } =
       SimulationHandler.parseMsg<VisWebsocketMessage>(msg);
 
     const progress = this.calcProgress(currentTick);
 
     const progressOfType = this.visProgress.get(typeName);
+
+    if (worldSize) {
+      handleWorldSizeMsg({ worldSizes: worldSize });
+    }
 
     if (
       this.isNewProgress(progress, progressOfType) &&

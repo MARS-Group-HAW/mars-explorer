@@ -1,4 +1,4 @@
-import { ObjectCoordinates, ObjectCounts } from "./ObjectData";
+import { ObjectCoordinates, ObjectCounts, WorldSizes } from "./ObjectData";
 
 type SimulationMessage = {
   progress: number;
@@ -10,4 +10,8 @@ export type SimulationCountMessage = SimulationMessage & {
 
 export type SimulationVisMessage = SimulationMessage & {
   objectCoords: ObjectCoordinates;
+};
+
+export type SimulationWorldSizeMessage = {
+  worldSizes: WorldSizes;
 };

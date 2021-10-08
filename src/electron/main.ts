@@ -565,6 +565,9 @@ ipcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
     handleVisMsg: (msg) =>
       msg !== null &&
       mainWindow.webContents.send(Channel.SIMULATION_COORDS_PROGRESS, msg),
+    handleWorldSizeMsg: (msg) =>
+      msg !== null &&
+      mainWindow.webContents.send(Channel.SIMULATION_WORLD_SIZES, msg),
     handleMaxRetries: () => simulationProcess.kill(),
   });
 

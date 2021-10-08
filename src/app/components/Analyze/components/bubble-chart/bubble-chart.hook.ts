@@ -1,4 +1,4 @@
-import { ChartData, LegendItem } from "chart.js";
+import { ChartData, ChartOptions, LegendItem } from "chart.js";
 import { useEffect, useState } from "react";
 import { useBoolean } from "react-use";
 import {
@@ -9,6 +9,7 @@ import { useAppSelector } from "../../../../utils/hooks/use-store";
 import {
   selectProgress,
   selectResultData,
+  selectWorldSizes,
 } from "../../../QuickStartBar/utils/simulation-slice";
 import getColorByIndex from "../../utils/colors";
 import ResultDataPerTick from "../../utils/ResultData";
@@ -16,6 +17,7 @@ import useLabelClick from "../../hooks/use-label-click";
 
 type State = {
   data: ChartData;
+  options: ChartOptions;
   tick: number;
   maxTick: number;
   onTickChange: (value: number) => void;
@@ -27,6 +29,7 @@ type State = {
 function useBubbleChart(): State {
   const resultData = useAppSelector(selectResultData);
   const progress = useAppSelector(selectProgress);
+  const worldSizes = useAppSelector(selectWorldSizes);
   const [objectListWithMetaData] = useSharedObjectsWithStatus();
   const [sliderTouched, setSliderTouched] = useBoolean(false);
   const [tick, setTick] = useState(0);
@@ -74,6 +77,22 @@ function useBubbleChart(): State {
         animation: false,
       })),
     },
+    options: worldSizes
+      ? {
+          scales: {
+            x: {
+              type: "linear",
+              min: worldSizes.minX,
+              max: worldSizes.maxY, // FIXME
+            },
+            y: {
+              type: "linear",
+              min: worldSizes.maxX, // FIXME
+              max: worldSizes.minY,
+            },
+          },
+        }
+      : {},
     onLabelClick,
   };
 }
