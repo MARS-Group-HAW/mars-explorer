@@ -6,7 +6,10 @@ import {
   setMappingNamespace,
   useSharedMappings,
 } from "../../hooks/use-shared-mappings";
-import defaultValues from "../agents-form/utils/defaultValues";
+import agentDefaultValues from "../agents-form/utils/defaultValues";
+import layerDefaultValues from "../layers-form/utils/defaultValues";
+import entityDefaultValues from "../entities-form/utils/defaultValues";
+
 import FieldNames from "../../utils/fieldNames";
 
 type State = {
@@ -28,7 +31,35 @@ function useTypeList(): State {
     dispatch(setMappingNamespace(index));
 
   const latestValue = useLatest(value);
-  const onAddClick = () => setValue([...latestValue.current, defaultValues]);
+  const onAddClick = () => {
+    let defaultValue;
+
+    switch (objectNsp) {
+      case FieldNames.AGENTS:
+        defaultValue = agentDefaultValues;
+        break;
+      case FieldNames.LAYERS:
+        defaultValue = layerDefaultValues;
+        break;
+      case FieldNames.ENTITIES:
+        defaultValue = entityDefaultValues;
+        break;
+      default: {
+        window.api.logger.warn(
+          "Unknown namespace found while adding new class: ",
+          objectNsp
+        );
+        return;
+      }
+    }
+
+    if (latestValue.current) {
+      setValue([...latestValue.current, defaultValue]);
+    } else {
+      setValue([defaultValue]);
+    }
+    setTouched(true);
+  };
   const onDeleteClick = (indexToDelete: number) => {
     if (mappingIndex === indexToDelete) {
       dispatch(resetMappingNamespace());
