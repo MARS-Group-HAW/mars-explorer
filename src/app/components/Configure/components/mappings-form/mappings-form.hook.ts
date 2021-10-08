@@ -13,6 +13,7 @@ type State = {
   showForm: boolean;
   individualMappingNamespaces: string[];
   onAddMappingClick: () => void;
+  onDeleteMappingClick: (index: number) => void;
 };
 
 function useMappingsForm(): State {
@@ -39,10 +40,16 @@ function useMappingsForm(): State {
     setTouched(true);
   };
 
+  const onDeleteMappingClick = (indexToDelete: number) => {
+    setValue(latestValue.current.filter((_, index) => indexToDelete !== index));
+    setTouched(true);
+  };
+
   return {
     showForm: Number.isInteger(mappingIndex),
     individualMappingNamespaces: mappingNamespaces,
     onAddMappingClick,
+    onDeleteMappingClick,
   };
 }
 
