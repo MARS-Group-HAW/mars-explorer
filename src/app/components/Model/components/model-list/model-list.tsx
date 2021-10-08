@@ -9,6 +9,10 @@ import ExamplesList from "../examples-list";
 const buttonGroupHeight = 45;
 
 const useStyles = makeStyles((theme) => ({
+  boxContainer: {
+    display: "flex",
+    justifyContent: "center",
+  },
   buttonGroup: {
     padding: 5,
   },
@@ -33,7 +37,7 @@ function ModelList() {
 
   return (
     <>
-      <Box>
+      <Box className={classes.boxContainer}>
         <ButtonGroup
           size="small"
           color="default"

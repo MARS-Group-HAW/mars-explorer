@@ -7,8 +7,6 @@ import ModelList from "../model-list";
 import SaveButton from "../save-button";
 import BootstrapScreen from "../bootstrap-screen";
 
-const listContainerWidth = 200;
-
 const useStyles = makeStyles(() => ({
   backdropContainer: {
     position: "relative",
@@ -17,14 +15,22 @@ const useStyles = makeStyles(() => ({
     backgroundColor: "transparent",
     overflow: "hidden",
   },
-  listContainer: {
-    position: "relative",
-    width: listContainerWidth,
+  listEditorContainer: {
+    width: "100%",
     height: "100%",
   },
-  editorContainer: {
+  listContainer: {
     position: "relative",
-    width: `calc(100% - ${listContainerWidth}px)`,
+    height: "100%",
+    resize: "horizontal",
+    overflow: "auto",
+    width: 220,
+    minWidth: 180,
+    maxWidth: "30%",
+  },
+  editorContainer: {
+    width: "100%",
+    height: "100%",
   },
   monacoContainer: {
     height: "100%",
@@ -40,17 +46,23 @@ function ModelerContainer() {
     <>
       <Grid className={classes.backdropContainer} container>
         <BootstrapScreen />
-        <div className={classes.listContainer}>
-          <ModelList />
-        </div>
-        <div className={classes.editorContainer}>
-          <div
-            className={classes.monacoContainer}
-            ref={monacoContainerRef}
-            id="monaco-container"
-          />
-          <SaveButton />
-        </div>
+        <Grid
+          direction="column"
+          className={classes.listEditorContainer}
+          container
+        >
+          <Grid item className={classes.listContainer}>
+            <ModelList />
+          </Grid>
+          <Grid item className={classes.editorContainer}>
+            <div
+              className={classes.monacoContainer}
+              ref={monacoContainerRef}
+              id="monaco-container"
+            />
+            <SaveButton />
+          </Grid>
+        </Grid>
       </Grid>
       <NewClassDialog />
       <DeleteClassDialog />
