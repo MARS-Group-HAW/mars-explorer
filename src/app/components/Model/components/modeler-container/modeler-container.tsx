@@ -6,6 +6,7 @@ import DeleteClassDialog from "../delete-class-dialog";
 import ModelList from "../model-list";
 import SaveButton from "../save-button";
 import BootstrapScreen from "../bootstrap-screen";
+import ReadOnlyIndicator from "../read-only-indicator";
 
 const useStyles = makeStyles(() => ({
   backdropContainer: {
@@ -61,6 +62,7 @@ function ModelerContainer() {
               id="monaco-container"
             />
             <SaveButton />
+            <ReadOnlyIndicator />
           </Grid>
         </Grid>
       </Grid>

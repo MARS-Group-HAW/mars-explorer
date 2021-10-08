@@ -46,6 +46,7 @@ export default makeStyles((theme) => ({
     flexGrow: 1,
     backgroundColor: theme.palette.background.default,
     height: `calc(100% - ${barHeight}px)`,
+    overflowX: "hidden",
   },
   backdrop: {
     height: `calc(100% - ${barHeight}px)`,
