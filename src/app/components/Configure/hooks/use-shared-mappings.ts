@@ -14,6 +14,10 @@ export const setObjectNamespace = createAction<
 export const setMappingNamespace = createAction<number, "setMappingNamespace">(
   "setMappingNamespace"
 );
+export const resetMappingNamespace = createAction<
+  number,
+  "resetMappingNamespace"
+>("resetMappingNamespace");
 
 type State = {
   objectNsp: TypeNamespaces;
@@ -33,6 +37,9 @@ const reducer = createReducer(initialState, (builder) =>
     })
     .addCase(setMappingNamespace, (state, { payload }) => {
       state.mappingIndex = payload;
+    })
+    .addCase(resetMappingNamespace, (state) => {
+      state.mappingIndex = undefined;
     })
 );
 

@@ -1,14 +1,9 @@
 import * as React from "react";
-import {
-  Fab,
-  List,
-  ListItem,
-  ListItemText,
-  makeStyles,
-} from "@material-ui/core";
+import { Fab, List, makeStyles } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import useTypeList from "./type-list.hook";
 import NoDataMessage from "../../../shared/no-data-message/no-data-message";
+import TypeListItem from "../type-list-item";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -31,8 +26,14 @@ let agentKey = 1;
 
 const TypeList = () => {
   const classes = useStyles();
-  const { type, typeNames, selectedIndex, setSelectedIndex, onAddClick } =
-    useTypeList();
+  const {
+    type,
+    typeNames,
+    selectedIndex,
+    setSelectedIndex,
+    onAddClick,
+    onDeleteClick,
+  } = useTypeList();
 
   const emptyTypes = typeNames.length === 0;
 
@@ -46,14 +47,13 @@ const TypeList = () => {
       {!emptyTypes && (
         <List className={classes.list}>
           {typeNames.map((name, index) => (
-            <ListItem
+            <TypeListItem
               key={agentKey++}
-              button
+              name={name}
               selected={selectedIndex === index}
               onClick={() => setSelectedIndex(index)}
-            >
-              <ListItemText primary={name} />
-            </ListItem>
+              onDelete={() => onDeleteClick(index)}
+            />
           ))}
         </List>
       )}

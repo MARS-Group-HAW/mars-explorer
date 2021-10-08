@@ -1,8 +1,8 @@
 import { useField } from "formik";
 import { useLatest } from "react-use";
-import SimObjects from "@shared/types/sim-objects";
 import ObjectMappings from "../mappings-form/utils/types";
 import {
+  resetMappingNamespace,
   setMappingNamespace,
   useSharedMappings,
 } from "../../hooks/use-shared-mappings";
@@ -15,18 +15,30 @@ type State = {
   selectedIndex: number;
   setSelectedIndex: (index: number) => void;
   onAddClick: () => void;
+  onDeleteClick: (index: number) => void;
 };
 
 function useTypeList(): State {
   const [{ objectNsp, mappingIndex }, dispatch] = useSharedMappings();
 
-  const [{ value }, , { setValue }] = useField<ObjectMappings>(objectNsp);
+  const [{ value }, , { setValue, setTouched }] =
+    useField<ObjectMappings>(objectNsp);
 
   const setSelectedIndex = (index: number) =>
     dispatch(setMappingNamespace(index));
 
   const latestValue = useLatest(value);
   const onAddClick = () => setValue([...latestValue.current, defaultValues]);
+  const onDeleteClick = (indexToDelete: number) => {
+    if (mappingIndex === indexToDelete) {
+      dispatch(resetMappingNamespace());
+    }
+
+    setValue(
+      latestValue.current.filter((val, index) => index !== indexToDelete)
+    );
+    setTouched(true);
+  };
 
   return {
     type: objectNsp,
@@ -34,6 +46,7 @@ function useTypeList(): State {
     selectedIndex: mappingIndex,
     setSelectedIndex,
     onAddClick,
+    onDeleteClick,
   };
 }
 
