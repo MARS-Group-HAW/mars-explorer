@@ -1,6 +1,6 @@
 import FieldNames from "./fieldNames";
 
-type ObjectMappings = ObjectMapping[];
+type TypeMapping = ObjectMapping;
 
 export type ObjectMapping = {
   [FieldNames.NAME]: string;
@@ -11,6 +11,8 @@ export type AgentMapping = ObjectMapping & {
   [FieldNames.COUNT]: number;
 };
 
+export type EntitiesMapping = AgentMapping;
+
 export type LayersMapping = ObjectMapping & {
   [FieldNames.FILE]?: string;
 };
@@ -20,4 +22,4 @@ export type IndividualMapping = {
   [FieldNames.VALUE]: number;
 };
 
-export default ObjectMappings;
+export default TypeMapping;

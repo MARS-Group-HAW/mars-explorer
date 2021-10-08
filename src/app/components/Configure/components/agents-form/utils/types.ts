@@ -1,3 +1,5 @@
-import ObjectMappings from "../../mappings-form/utils/types";
+import { AgentMapping } from "../../mappings-form/utils/types";
 
-export default ObjectMappings;
+type AgentMappings = AgentMapping[];
+
+export default AgentMappings;

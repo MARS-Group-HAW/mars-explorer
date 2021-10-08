@@ -32,6 +32,7 @@ function useConfigBootstrap() {
     window.api.invoke<string, boolean>(Channel.DOES_CONFIG_EXIST, projectRoot);
 
   const createDefaultConfig = (projectRoot: string) => {
+    // @ts-ignore
     const defaultConfig = FormTransformer.formToConfig(defaultValues);
     return window.api.invoke<{ path: string; content: string }, void>(
       Channel.WRITE_CONFIG_TO_FILE,

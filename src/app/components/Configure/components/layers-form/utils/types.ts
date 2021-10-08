@@ -1,3 +1,5 @@
-import ObjectMappings from "../../mappings-form/utils/types";
+import { LayersMapping } from "../../mappings-form/utils/types";
 
-export default ObjectMappings;
+type LayersMappings = LayersMapping[];
+
+export default LayersMappings;
