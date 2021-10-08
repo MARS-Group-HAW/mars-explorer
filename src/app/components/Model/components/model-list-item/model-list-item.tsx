@@ -1,16 +1,16 @@
 import * as React from "react";
+import { useRef } from "react";
 import {
   Badge,
   ListItem,
   ListItemIcon,
   ListItemText,
-  Menu,
   MenuItem,
 } from "@material-ui/core";
 import EditIcon from "@material-ui/icons/Edit";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { makeStyles } from "@material-ui/core/styles";
-import useModelListItem from "./model-list-item.hook";
+import ContextMenu from "../../../shared/context-menu";
 
 const useStyles = makeStyles((theme) => ({
   primaryText: {
@@ -43,8 +43,7 @@ function ModelListItem({
   onDeleteClick,
 }: Props) {
   const classes = useStyles();
-
-  const { listItemRef, isMenuOpen, closeMenu } = useModelListItem();
+  const ref = useRef();
 
   const colorByStatus = () => {
     if (dirty) return "primary";
@@ -55,7 +54,7 @@ function ModelListItem({
 
   return (
     <>
-      <ListItem ref={listItemRef} button selected={selected} onClick={onClick}>
+      <ListItem ref={ref} button selected={selected} onClick={onClick}>
         <Badge
           color={colorByStatus()}
           variant="dot"
@@ -71,11 +70,7 @@ function ModelListItem({
           />
         </Badge>
       </ListItem>
-      <Menu
-        anchorEl={listItemRef.current}
-        open={isMenuOpen}
-        onClose={closeMenu}
-      >
+      <ContextMenu anchorRef={ref}>
         <MenuItem dense disabled>
           {name}
         </MenuItem>
@@ -91,7 +86,7 @@ function ModelListItem({
           </ListItemIcon>
           <ListItemText primary="Delete" />
         </MenuItem>
-      </Menu>
+      </ContextMenu>
     </>
   );
 }
