@@ -1,4 +1,4 @@
-import ResultsInStorage from "./types/results-in-storage";
+import { SavedSimulationResults } from "../components/QuickStartBar/utils/simulation-slice";
 
 export enum CacheKey {
   LAST_PATH = "LAST_PATH",
@@ -7,7 +7,7 @@ export enum CacheKey {
 
 interface CacheValues {
   [CacheKey.LAST_PATH]: string;
-  [CacheKey.RESULTS_BY_KEY]: ResultsInStorage;
+  [CacheKey.RESULTS_BY_KEY]: SavedSimulationResults;
 }
 
 class LocalStorageService {

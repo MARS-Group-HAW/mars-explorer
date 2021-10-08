@@ -4,6 +4,7 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 import {
   SimulationCountMessage,
   SimulationVisMessage,
+  SimulationWorldSizeMessage,
 } from "@shared/types/SimulationMessages";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
@@ -12,6 +13,7 @@ import {
   finishResults,
   selectSimulationState,
   setSimulationState,
+  setWorldSizes,
 } from "../utils/simulation-slice";
 import useChannelSubscription from "../../../utils/hooks/use-channel-subscription";
 
@@ -56,6 +58,10 @@ function useSimulation(): State {
     dispatch(addPosData(msg));
   }
 
+  function handleWorldSizeMsg(msg: SimulationWorldSizeMessage) {
+    dispatch(setWorldSizes(msg));
+  }
+
   function handleSimulationEnd(endState: SimulationStates) {
     dispatchSimState(endState);
     window.api.logger.info(`Finishing results (Code: ${endState}).`);
@@ -74,6 +80,8 @@ function useSimulation(): State {
     Channel.SIMULATION_COUNT_PROGRESS,
     handleSimulationCountMsg
   );
+
+  useChannelSubscription(Channel.SIMULATION_WORLD_SIZES, handleWorldSizeMsg);
 
   useChannelSubscription(Channel.SIMULATION_FAILED, (e: Error) => {
     const errMsg = e.toString();

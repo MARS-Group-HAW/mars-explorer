@@ -1,3 +1,10 @@
+export type WorldSizes = {
+  minX: number;
+  minY: number;
+  maxX: number;
+  maxY: number;
+};
+
 export type ObjectCount = {
   name: string;
   count: number;
