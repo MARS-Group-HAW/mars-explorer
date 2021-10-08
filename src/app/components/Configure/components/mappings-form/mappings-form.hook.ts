@@ -19,7 +19,7 @@ function useMappingsForm(): State {
   const [state] = useSharedMappings();
   const { mappingIndex } = state;
   const namespace = selectObjectAtIndex(state);
-  const [{ value: mappingValues }, , { setValue }] = useField<
+  const [{ value: mappingValues }, , { setValue, setTouched }] = useField<
     IndividualMapping[]
   >(withNamespace(FieldNames.MAPPING, namespace));
   const latestValue = useLatest(mappingValues);
@@ -36,6 +36,7 @@ function useMappingsForm(): State {
     } else {
       setValue([...latestValue.current, defaultValues]);
     }
+    setTouched(true);
   };
 
   return {
