@@ -1,7 +1,14 @@
 import * as React from "react";
 import { ReactNode } from "react";
-import { Button, Grid, makeStyles, Typography } from "@material-ui/core";
+import {
+  Button,
+  Grid,
+  IconButton,
+  makeStyles,
+  Typography,
+} from "@material-ui/core";
 import AddCircleOutlineIcon from "@material-ui/icons/AddCircleOutline";
+import HighlightOffIcon from "@material-ui/icons/HighlightOff";
 import useMappingsForm from "./mappings-form.hook";
 import FormInput from "../form-input";
 import withNamespace from "../../utils/withNamespace";
@@ -34,8 +41,12 @@ type Props = {
 const MappingsForm = ({ children }: Props) => {
   const classes = useStyles();
   const { ref, height } = useNodeHeight();
-  const { showForm, individualMappingNamespaces, onAddMappingClick } =
-    useMappingsForm();
+  const {
+    showForm,
+    individualMappingNamespaces,
+    onAddMappingClick,
+    onDeleteMappingClick,
+  } = useMappingsForm();
 
   return (
     <>
@@ -55,7 +66,7 @@ const MappingsForm = ({ children }: Props) => {
                 size="small"
                 variant="contained"
                 disableElevation
-                color="default"
+                color="primary"
                 startIcon={<AddCircleOutlineIcon />}
                 onClick={onAddMappingClick}
               >
@@ -63,14 +74,18 @@ const MappingsForm = ({ children }: Props) => {
               </Button>
             </Grid>
             <div style={{ height: height - 40, overflowY: "scroll" }}>
+              {individualMappingNamespaces.length === 0 && (
+                <NoDataMessage msg="No individual mappings" />
+              )}
               {individualMappingNamespaces.map((mapping, index) => (
                 <Grid
                   className={classes.mappingInputsContainer}
                   key={mapping}
                   container
                   justifyContent="space-around"
+                  alignItems="center"
                 >
-                  <Grid item xs={7}>
+                  <Grid item xs={6}>
                     <FormInput
                       className={classes.mappingInput}
                       placeholder="Parameter"
@@ -88,6 +103,13 @@ const MappingsForm = ({ children }: Props) => {
                       type="number"
                     />
                   </Grid>
+                  <IconButton
+                    size="small"
+                    color="default"
+                    onClick={() => onDeleteMappingClick(index)}
+                  >
+                    <HighlightOffIcon />
+                  </IconButton>
                 </Grid>
               ))}
             </div>
