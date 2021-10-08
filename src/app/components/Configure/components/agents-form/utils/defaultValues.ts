@@ -1,6 +1,6 @@
-import { ObjectMapping } from "../../mappings-form/utils/types";
+import { AgentMapping } from "../../mappings-form/utils/types";
 
-const defaultValues: ObjectMapping = {
+const defaultValues: AgentMapping = {
   name: "New agent",
   count: 1,
   mapping: [],

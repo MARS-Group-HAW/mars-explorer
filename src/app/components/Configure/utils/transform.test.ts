@@ -114,6 +114,7 @@ describe("Transform", () => {
           options: null,
         },
         agents: [],
+        layers: [],
       };
     });
 

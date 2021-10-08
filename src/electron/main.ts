@@ -18,6 +18,7 @@ import SimObjects from "@shared/types/sim-objects";
 import NotImplementedError from "@shared/errors/not-implemented-error";
 import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
+import { PathAbsToRelParams } from "@shared/types/ChannelParams";
 import squirrel = require("electron-squirrel-startup");
 import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
@@ -152,6 +153,11 @@ ipcMain.handle(Channel.GET_EXAMPLES_PATH, () => appPaths.workspaceExamplesDir);
 
 ipcMain.handle(Channel.URI_TO_NAME, (_, uri: string) =>
   path.basename(fileURLToPath(uri))
+);
+
+ipcMain.handle(
+  Channel.PATH_ABSOLUTE_TO_RELATIVE,
+  (_, { from, to }: PathAbsToRelParams): string => path.relative(from, to)
 );
 
 function getProjectsInDir(dir: string): string[] {

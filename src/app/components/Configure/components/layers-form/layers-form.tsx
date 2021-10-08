@@ -1,10 +1,11 @@
 import * as React from "react";
 import { Grid, makeStyles } from "@material-ui/core";
-import useAgentsForm from "./use-agents-form.hook";
+import useLayersForm from "./use-layers-form.hook";
 import MappingsForm from "../mappings-form";
 import FormInput from "../form-input";
 import withNamespace from "../../utils/withNamespace";
 import FieldNames from "../mappings-form/utils/fieldNames";
+import FormFileInput from "../form-file-input";
 
 const useStyles = makeStyles(() => ({
   nameCountContainer: {
@@ -13,9 +14,9 @@ const useStyles = makeStyles(() => ({
   },
 }));
 
-const AgentsForm = () => {
+const LayersForm = () => {
   const classes = useStyles();
-  const { namespace } = useAgentsForm();
+  const { namespace } = useLayersForm();
 
   return (
     <MappingsForm>
@@ -31,11 +32,9 @@ const AgentsForm = () => {
           />
         </Grid>
         <Grid item>
-          <FormInput
-            outlined
-            name={withNamespace(FieldNames.COUNT, namespace)}
-            type="number"
-            InputProps={{ inputProps: { min: 0 } }}
+          <FormFileInput
+            namespace={withNamespace(FieldNames.FILE, namespace)}
+            label={FieldNames.FILE}
           />
         </Grid>
       </Grid>
@@ -43,4 +42,4 @@ const AgentsForm = () => {
   );
 };
 
-export default AgentsForm;
+export default LayersForm;

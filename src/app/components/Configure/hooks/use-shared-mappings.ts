@@ -2,8 +2,13 @@ import { createAction, createReducer } from "@reduxjs/toolkit";
 import { createReducerContext } from "react-use";
 import FieldNames from "../utils/fieldNames";
 
+type TypeNamespaces =
+  | FieldNames.AGENTS
+  | FieldNames.LAYERS
+  | FieldNames.ENTITIES;
+
 export const setObjectNamespace = createAction<
-  { namespace: FieldNames.AGENTS | FieldNames.LAYERS },
+  { namespace: TypeNamespaces },
   "setObjectNamespace"
 >("setObjectNamespace");
 export const setMappingNamespace = createAction<number, "setMappingNamespace">(
@@ -11,7 +16,7 @@ export const setMappingNamespace = createAction<number, "setMappingNamespace">(
 );
 
 type State = {
-  objectNsp?: FieldNames.AGENTS | FieldNames.LAYERS;
+  objectNsp: TypeNamespaces;
   mappingIndex?: number;
 };
 

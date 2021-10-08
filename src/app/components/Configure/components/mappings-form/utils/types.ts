@@ -4,8 +4,15 @@ type ObjectMappings = ObjectMapping[];
 
 export type ObjectMapping = {
   [FieldNames.NAME]: string;
-  [FieldNames.COUNT]: number;
   [FieldNames.MAPPING]: IndividualMapping[];
+};
+
+export type AgentMapping = ObjectMapping & {
+  [FieldNames.COUNT]: number;
+};
+
+export type LayersMapping = ObjectMapping & {
+  [FieldNames.FILE]?: string;
 };
 
 export type IndividualMapping = {

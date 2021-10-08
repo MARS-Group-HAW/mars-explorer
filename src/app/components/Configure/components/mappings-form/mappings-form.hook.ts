@@ -31,7 +31,11 @@ function useMappingsForm(): State {
     : [];
 
   const onAddMappingClick = () => {
-    setValue([...latestValue.current, defaultValues]);
+    if (!latestValue.current) {
+      setValue([defaultValues]);
+    } else {
+      setValue([...latestValue.current, defaultValues]);
+    }
   };
 
   return {
