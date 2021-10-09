@@ -1,7 +1,13 @@
 import { useContext, useEffect, useState } from "react";
 import { Channel } from "@shared/types/Channel";
 import SimTypes from "@shared/types/sim-objects";
+import SimObjects from "@shared/types/sim-objects";
 import { useBoolean } from "react-use";
+import {
+  AgentClassCreationMessage,
+  ClassCreationMessage,
+  DependentLayerClassCreationMessage,
+} from "@shared/types/class-creation-message";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
 import useCapitalizedValue from "../../../../utils/hooks/use-capitalized-value";
 import {
@@ -21,6 +27,10 @@ type State = {
   loadConfirmButton: boolean;
   newClassName: string;
   setNewClassName: (value: string) => void;
+  dependentLayerClassName: string;
+  setDependentLayerClassName: (value: string) => void;
+  layerClassName: string;
+  setLayerClassName: (value: string) => void;
   selectedType: SimTypes;
   onTypeClick: (type: SimTypes) => void;
   isOpen: boolean;
@@ -36,6 +46,9 @@ function useNewObjectDialog(): State {
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isLoading, setIsLoading] = useBoolean(false);
   const [newClassName, setNewClassName] = useCapitalizedValue("");
+  const [dependentLayerClassName, setDependentLayerClassName] =
+    useCapitalizedValue("");
+  const [layerClassName, setLayerClassName] = useCapitalizedValue("");
   const [selectedType, setSelectedType] = useState<SimTypes>();
   const [disable, setDisable] = useBoolean(false);
 
@@ -65,13 +78,26 @@ function useNewObjectDialog(): State {
   const onDialogConfirm = () => {
     setIsLoading(true);
 
+    const genericCreationMsg: ClassCreationMessage = {
+      projectPath: path,
+      projectName: name,
+      type: selectedType,
+      className: newClassName,
+    };
+
+    if (selectedType === SimObjects.AGENT) {
+      (genericCreationMsg as AgentClassCreationMessage).layerClassName =
+        layerClassName;
+    }
+
+    if (selectedType === SimObjects.DEPENDENT_LAYER) {
+      (
+        genericCreationMsg as DependentLayerClassCreationMessage
+      ).dependentLayerName = dependentLayerClassName;
+    }
+
     window.api
-      .invoke(Channel.CREATE_CLASS, {
-        projectPath: path,
-        projectName: name,
-        type: selectedType,
-        className: newClassName,
-      })
+      .invoke(Channel.CREATE_CLASS, genericCreationMsg)
       .then((model) => {
         addSuccessAlert({ msg: `Class "${newClassName}" has been created.` });
         dispatch(addModel(model));
@@ -93,6 +119,10 @@ function useNewObjectDialog(): State {
     loadConfirmButton: isLoading,
     newClassName,
     setNewClassName,
+    dependentLayerClassName,
+    setDependentLayerClassName,
+    layerClassName,
+    setLayerClassName,
     selectedType,
     onTypeClick: setSelectedType,
     isOpen: isCreateDialogOpen,
