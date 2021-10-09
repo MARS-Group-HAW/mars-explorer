@@ -1,17 +1,14 @@
 using System;
-using Mars.Common;
-using Mars.Common.Core.Random;
 using Mars.Interfaces.Agents;
-using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Environments;
-using Mars.Interfaces.Layers;
+using SheepWolfStarter.Model;
 
-namespace $PROJECT_NAME.Model
+namespace $PROJECT_NAME
 {
-    public class $CLASS_NAME : IAgent<ADD_LAYER_CLASS_HERE>, IPositionable
+    public class $CLASS_NAME : IAgent<$LAYER_CLASS_NAME>, IPositionable
     {
 
-        public void Init(ADD_LAYER_CLASS_HERE layer)
+        public void Init($LAYER_CLASS_NAME layer)
         {
 
         }

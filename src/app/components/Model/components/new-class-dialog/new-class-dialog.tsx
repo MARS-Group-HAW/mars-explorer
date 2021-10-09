@@ -21,14 +21,16 @@ import LayerSelectButton from "../layer-select-button";
 const description: { [key in SimObjects]: string } = {
   [SimObjects.AGENT]:
     "Agents are the main part of every model (besides layers). Once the layers have been created, we can start specifying the the agents. For this step you, as a modeler, need to know what your agents are going to be, what attributes define them and what their actions will look like. Once this has been established, we can start with the agent creation.",
-  [SimObjects.LAYER]:
+  [SimObjects.BASIC_LAYER]:
     "Layers in MARS are instruments to fulfill the tasks of agent management or data management. Depending on your model, you will be using one or several different layer types. Baseline are the layers to manage agents. They are called that because they will contain the respective agents and manage their movements.",
   [SimObjects.DEPENDENT_LAYER]:
     "If layers needs references to other layer for object and direct agent interaction or just to access data layer, the definition of dependent layers is necessary.",
-  [SimObjects.BASIC_LAYER]: "Basic Layer", // TODO
-  [SimObjects.RASTER_LAYER]: "Raster Layer", // TODO
-  [SimObjects.VECTOR_LAYER]: "Basic Layer", // TODO
-  [SimObjects.ENTITY]: "Some description about entities ...", // TODO
+  [SimObjects.RASTER_LAYER]:
+    "Raster layer and grid layer are able to process grid and raster data and can be viewed similar to a 2D matrix. Real numerical values are stored in a n x m matrix and have a certain semantic nominal value.",
+  [SimObjects.VECTOR_LAYER]:
+    "Vector layers are used to map vector objects that can be represented by points, lines or areas. Vector objects are the most commonly used types for modeling the simulated environment.r",
+  [SimObjects.ENTITY]:
+    "In contrast to agents, entities are pure objects without a Tick() method. However, entities are also identified by a UUID (Guid) ID and can be included in the model to enter other data that is not directly part of the agent parameterization. Entity are versioned and snapshots are persisted just the same as with agents.",
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -63,6 +65,10 @@ function NewClassDialog() {
     disableConfirmButton,
     newClassName,
     setNewClassName,
+    dependentLayerClassName,
+    setDependentLayerClassName,
+    layerClassName,
+    setLayerClassName,
     selectedType,
     onTypeClick,
     isOpen,
@@ -121,6 +127,32 @@ function NewClassDialog() {
           helperText="The name should be unique and contain only letters"
           onChange={(ev) => setNewClassName(ev.target.value)}
         />
+        {selectedType === SimObjects.AGENT && (
+          <TextField
+            margin="dense"
+            variant="outlined"
+            id="class-name"
+            type="text"
+            fullWidth
+            value={layerClassName}
+            label="Layer the agent will be placed on"
+            helperText="The name should be unique and contain only letters"
+            onChange={(ev) => setLayerClassName(ev.target.value)}
+          />
+        )}
+        {selectedType === SimObjects.DEPENDENT_LAYER && (
+          <TextField
+            margin="dense"
+            variant="outlined"
+            id="class-name"
+            type="text"
+            fullWidth
+            value={dependentLayerClassName}
+            label="Name of depending Layer"
+            helperText="The name should be unique and contain only letters"
+            onChange={(ev) => setDependentLayerClassName(ev.target.value)}
+          />
+        )}
       </DialogContent>
       <DialogActions>
         <Button onClick={onDialogClose} color="primary">

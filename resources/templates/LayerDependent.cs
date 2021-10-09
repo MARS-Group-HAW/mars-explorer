@@ -1,7 +1,7 @@
 using Mars.Components.Layers;
 
 
-namespace $PROJECT_NAME.Model
+namespace $PROJECT_NAME
 {
     public class $CLASS_NAME : AbstractLayer
     {

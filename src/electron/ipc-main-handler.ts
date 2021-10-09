@@ -7,6 +7,10 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 import SimObjects from "@shared/types/sim-objects";
 import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
+import {
+  AgentClassCreationMessage,
+  DependentLayerClassCreationMessage,
+} from "@shared/types/class-creation-message";
 import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
@@ -146,13 +150,15 @@ SafeIpcMain.handle(
 enum Templates {
   PROGRAMM_CS = "Program.cs",
   AGENT_CS = "Agent.cs",
-  LAYER_CS = "Layer.cs",
   LAYER_DEPENDENT_CS = "LayerDependent.cs",
+  LAYER_RASTER_CS = "LayerRaster.cs",
+  LAYER_VECTOR_CS = "LayerVector.cs",
   ENTITY_CS = "Entity.cs",
 }
 
 const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
 const CLASS_NAME_PLACEHOLDER = /\$CLASS_NAME/g;
+const LAYER_CLASS_NAME_PLACEHOLDER = /\$LAYER_CLASS_NAME/g;
 const DEPENDENT_LAYER_PLACEHOLDER = /\$DEPENDENT_LAYER_NAME/g;
 
 type Replaceable = {
@@ -233,10 +239,9 @@ SafeIpcMain.on(Channel.CREATE_PROJECT, (_, projectName: string) => {
 
 SafeIpcMain.handle(
   Channel.CREATE_CLASS,
-  async (
-    _,
-    { projectPath, projectName, type, className, args }
-  ): Promise<IModelFile> => {
+  async (_, classCreationMsg): Promise<IModelFile> => {
+    const { projectPath, projectName, type, className } = classCreationMsg;
+
     const replaceables = [
       {
         placeholder: PROJECT_NAME_PLACEHOLDER,
@@ -253,16 +258,24 @@ SafeIpcMain.handle(
     switch (type) {
       case SimObjects.AGENT:
         template = Templates.AGENT_CS;
-        break;
-      case SimObjects.LAYER:
-        template = Templates.LAYER_CS;
+        replaceables.push({
+          placeholder: LAYER_CLASS_NAME_PLACEHOLDER,
+          value: (classCreationMsg as AgentClassCreationMessage).layerClassName,
+        });
         break;
       case SimObjects.DEPENDENT_LAYER:
         template = Templates.LAYER_DEPENDENT_CS;
         replaceables.push({
           placeholder: DEPENDENT_LAYER_PLACEHOLDER,
-          value: args.dependentLayerName,
+          value: (classCreationMsg as DependentLayerClassCreationMessage)
+            .dependentLayerName,
         });
+        break;
+      case SimObjects.RASTER_LAYER:
+        template = Templates.LAYER_RASTER_CS;
+        break;
+      case SimObjects.VECTOR_LAYER:
+        template = Templates.LAYER_VECTOR_CS;
         break;
       case SimObjects.ENTITY:
         template = Templates.ENTITY_CS;
