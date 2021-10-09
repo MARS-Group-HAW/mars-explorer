@@ -4,7 +4,6 @@ import { Channel } from "@shared/types/Channel";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import * as child_process from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
-import { ClassCreationMessage } from "@shared/types/class-creation-message";
 import SimObjects from "@shared/types/sim-objects";
 import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
@@ -40,9 +39,8 @@ SafeIpcMain.handle(Channel.URI_TO_NAME, (_, uri) =>
   path.basename(fileURLToPath(uri))
 );
 
-SafeIpcMain.handle(
-  Channel.PATH_ABSOLUTE_TO_RELATIVE,
-  (_, { from, to }) => path.relative(from, to)
+SafeIpcMain.handle(Channel.PATH_ABSOLUTE_TO_RELATIVE, (_, { from, to }) =>
+  path.relative(from, to)
 );
 
 function getProjectsInDir(dir: string): string[] {
@@ -66,7 +64,7 @@ SafeIpcMain.handle(Channel.GET_USER_PROJECTS, () => {
   return userProjects.map((file) => new FileRef(file));
 });
 
-SafeIpcMain.handle(Channel.GET_EXAMPLE_PROJECTS, ()=> {
+SafeIpcMain.handle(Channel.GET_EXAMPLE_PROJECTS, () => {
   const userProjects = getProjectsInDir(appPaths.workspaceExamplesDir);
   return userProjects.map((file) => new FileRef(file));
 });
@@ -149,11 +147,13 @@ enum Templates {
   PROGRAMM_CS = "Program.cs",
   AGENT_CS = "Agent.cs",
   LAYER_CS = "Layer.cs",
+  LAYER_DEPENDENT_CS = "LayerDependent.cs",
   ENTITY_CS = "Entity.cs",
 }
 
 const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
 const CLASS_NAME_PLACEHOLDER = /\$CLASS_NAME/g;
+const DEPENDENT_LAYER_PLACEHOLDER = /\$DEPENDENT_LAYER_NAME/g;
 
 type Replaceable = {
   placeholder: RegExp;
@@ -235,8 +235,19 @@ SafeIpcMain.handle(
   Channel.CREATE_CLASS,
   async (
     _,
-    { projectPath, projectName, type, className }: ClassCreationMessage
+    { projectPath, projectName, type, className, args }
   ): Promise<IModelFile> => {
+    const replaceables = [
+      {
+        placeholder: PROJECT_NAME_PLACEHOLDER,
+        value: projectName,
+      },
+      {
+        placeholder: CLASS_NAME_PLACEHOLDER,
+        value: className,
+      },
+    ];
+
     let template: Templates;
 
     switch (type) {
@@ -245,6 +256,13 @@ SafeIpcMain.handle(
         break;
       case SimObjects.LAYER:
         template = Templates.LAYER_CS;
+        break;
+      case SimObjects.DEPENDENT_LAYER:
+        template = Templates.LAYER_DEPENDENT_CS;
+        replaceables.push({
+          placeholder: DEPENDENT_LAYER_PLACEHOLDER,
+          value: args.dependentLayerName,
+        });
         break;
       case SimObjects.ENTITY:
         template = Templates.ENTITY_CS;
@@ -256,16 +274,11 @@ SafeIpcMain.handle(
     const classFile = `${className}.cs`;
     const filePath = path.resolve(projectPath, classFile);
 
-    const content = await copyAndReplaceTemplate(template, filePath, [
-      {
-        placeholder: PROJECT_NAME_PLACEHOLDER,
-        value: projectName,
-      },
-      {
-        placeholder: CLASS_NAME_PLACEHOLDER,
-        value: className,
-      },
-    ]);
+    const content = await copyAndReplaceTemplate(
+      template,
+      filePath,
+      replaceables
+    );
 
     return {
       name: classFile,

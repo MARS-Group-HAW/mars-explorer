@@ -16,12 +16,18 @@ import SimObjects from "@shared/types/sim-objects";
 import useNewObjectDialog from "./use-new-object-dialog.hook";
 import ObjectButton from "../object-button";
 import ConditionalTooltip from "../../../shared/conditional-tooltip";
+import LayerSelectButton from "../layer-select-button";
 
 const description: { [key in SimObjects]: string } = {
   [SimObjects.AGENT]:
     "Agents are the main part of every model (besides layers). Once the layers have been created, we can start specifying the the agents. For this step you, as a modeler, need to know what your agents are going to be, what attributes define them and what their actions will look like. Once this has been established, we can start with the agent creation.",
   [SimObjects.LAYER]:
     "Layers in MARS are instruments to fulfill the tasks of agent management or data management. Depending on your model, you will be using one or several different layer types. Baseline are the layers to manage agents. They are called that because they will contain the respective agents and manage their movements.",
+  [SimObjects.DEPENDENT_LAYER]:
+    "If layers needs references to other layer for object and direct agent interaction or just to access data layer, the definition of dependent layers is necessary.",
+  [SimObjects.BASIC_LAYER]: "Basic Layer", // TODO
+  [SimObjects.RASTER_LAYER]: "Raster Layer", // TODO
+  [SimObjects.VECTOR_LAYER]: "Basic Layer", // TODO
   [SimObjects.ENTITY]: "Some description about entities ...", // TODO
 };
 
@@ -72,14 +78,25 @@ function NewClassDialog() {
           To create a new class, select a type below.
         </DialogContentText>
         <Box className={classes.buttonGroup}>
-          {Object.values(SimObjects).map((obj: SimObjects) => (
-            <ObjectButton
-              key={obj}
-              object={obj}
-              selected={obj === selectedType}
-              onClick={() => onTypeClick(obj)}
-            />
-          ))}
+          <ObjectButton
+            object={SimObjects.AGENT}
+            selected={SimObjects.AGENT === selectedType}
+            onClick={() => onTypeClick(SimObjects.AGENT)}
+          />
+          <LayerSelectButton
+            selected={[
+              SimObjects.BASIC_LAYER,
+              SimObjects.DEPENDENT_LAYER,
+              SimObjects.RASTER_LAYER,
+              SimObjects.VECTOR_LAYER,
+            ].includes(selectedType)}
+            onClick={(simObject) => onTypeClick(simObject)}
+          />
+          <ObjectButton
+            object={SimObjects.ENTITY}
+            selected={SimObjects.ENTITY === selectedType}
+            onClick={() => onTypeClick(SimObjects.ENTITY)}
+          />
         </Box>
         <Box className={classes.objectDescription}>
           {!selectedType && (
