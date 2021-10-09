@@ -29,7 +29,7 @@ function useDeleteProjectDialog(onClose: () => void): State {
 
   const handleNewProjectDialogConfirm = async (ref: IFileRef) => {
     setIsDeleting(true);
-    const deleted = await window.api.invoke<string, boolean>(
+    const deleted = await window.api.invoke(
       Channel.DELETE_FILE_OR_DIR,
       ref.path
     );

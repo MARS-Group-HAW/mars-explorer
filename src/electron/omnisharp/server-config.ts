@@ -1,9 +1,9 @@
 import * as path from "path";
 import { is } from "electron-util";
 import os = require("os");
-import { OmnisharpConfiguration } from "./types/OmnisharpConfiguration";
-import { Server } from "./types/OmnisharpServerConfiguration";
-import appPaths from "./app-paths";
+import { OmnisharpConfiguration } from "../types/OmnisharpConfiguration";
+import { Server } from "../types/OmnisharpServerConfiguration";
+import appPaths from "../app-paths";
 
 let currentOS: "linux" | "osx" | "win";
 

@@ -1,5 +1,5 @@
-import { SafeIpcRenderer } from "./SafeIpcRenderer";
 import { ILogger } from "@shared/types/Logger";
+import { SafeIpcRenderer } from "./safe-ipc-renderer";
 
 export {};
 

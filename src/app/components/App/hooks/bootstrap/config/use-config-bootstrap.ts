@@ -29,22 +29,19 @@ function useConfigBootstrap() {
   const { addErrorAlert } = useContext(SnackBarContext);
 
   const checkExistance = (projectRoot: string) =>
-    window.api.invoke<string, boolean>(Channel.DOES_CONFIG_EXIST, projectRoot);
+    window.api.invoke(Channel.DOES_CONFIG_EXIST, projectRoot);
 
   const createDefaultConfig = (projectRoot: string) => {
     // @ts-ignore
     const defaultConfig = FormTransformer.formToConfig(defaultValues);
-    return window.api.invoke<{ path: string; content: string }, void>(
-      Channel.WRITE_CONFIG_TO_FILE,
-      { path: projectRoot, content: JSON.stringify(defaultConfig, null, "\t") }
-    );
+    return window.api.invoke(Channel.WRITE_CONFIG_TO_FILE, {
+      path: projectRoot,
+      content: JSON.stringify(defaultConfig, null, "\t"),
+    });
   };
 
   const getConfigContents = (projectPath: string) =>
-    window.api.invoke<string, string | null>(
-      Channel.GET_CONFIG_IN_PROJECT,
-      projectPath
-    );
+    window.api.invoke(Channel.GET_CONFIG_IN_PROJECT, projectPath);
 
   const validateConfig = (config: FormSchema) =>
     validationSchema.validate(config);

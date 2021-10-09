@@ -18,7 +18,7 @@ export default class RendererIpcMessageWriter implements MessageWriter {
 
   public write(msg: Message): Promise<void> {
     // send all requests for the language server to the backend
-    return Promise.resolve(window.api.send(this.channel, msg));
+    return Promise.resolve(window.api.send(this.channel, msg as any));
   }
 
   // eslint-disable-next-line class-methods-use-this

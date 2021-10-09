@@ -1,7 +1,6 @@
 import { FieldInputProps, useField } from "formik";
 import { ChangeEvent } from "react";
 import { Channel } from "@shared/types/Channel";
-import { PathAbsToRelParams } from "@shared/types/ChannelParams";
 import { useAppSelector } from "../../../../utils/hooks/use-store";
 import { selectProject } from "../../../Home/utils/project-slice";
 
@@ -23,7 +22,7 @@ function useFormFileInput(namespace: string): State {
 
     if (files.length === 0) return;
 
-    const relativePath = await window.api.invoke<PathAbsToRelParams, string>(
+    const relativePath = await window.api.invoke(
       Channel.PATH_ABSOLUTE_TO_RELATIVE,
       {
         from: path,
@@ -31,7 +30,7 @@ function useFormFileInput(namespace: string): State {
       }
     );
 
-    setValue(relativePath);
+    setValue(relativePath as string);
   };
 
   const handleClearClick = () => {

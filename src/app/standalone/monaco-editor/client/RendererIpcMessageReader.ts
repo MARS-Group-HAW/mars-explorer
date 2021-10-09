@@ -11,8 +11,8 @@ export default class RendererIpcMessageReader implements MessageReader {
 
   constructor(private channel: string) {
     // listen to incoming language server notifications and messages from the backend
-    this.unsubscribeFn = window.api.on<Message>(this.channel, (msg) =>
-      this.notifySubscribers(msg)
+    this.unsubscribeFn = window.api.on(this.channel, (msg: unknown) =>
+      this.notifySubscribers(msg as Message)
     );
   }
 

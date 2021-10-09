@@ -2,7 +2,6 @@ import { useBoolean } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { useContext } from "react";
 import { IFileRef } from "@shared/types/File";
-import { ModelRef } from "@shared/types/Model";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
 
 type State = {
@@ -27,7 +26,7 @@ function useCopyProjectDialogHook(
     setIsCreating(true);
 
     try {
-      const modelRef = await window.api.invoke<string, ModelRef>(
+      const modelRef = await window.api.invoke(
         Channel.COPY_EXAMPLE_PROJECT,
         fileRef.path
       );

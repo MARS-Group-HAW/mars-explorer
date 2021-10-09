@@ -24,10 +24,10 @@ function useModels(): State {
   useAsync(async () => {
     if (path) {
       setLoading(true);
-      const workingModel = await window.api.invoke<ModelRef, WorkingModel>(
-        Channel.GET_USER_PROJECT,
-        { path, name }
-      );
+      const workingModel = await window.api.invoke(Channel.GET_USER_PROJECT, {
+        path,
+        name,
+      });
       dispatch(setModel(workingModel));
       setLoading(false);
     }

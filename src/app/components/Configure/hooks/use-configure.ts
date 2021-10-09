@@ -40,13 +40,10 @@ function useConfigure(): State {
         const transformedConfig = FormTransformer.formToConfig(parsedConfig);
 
         window.api
-          .invoke<{ path: string; content: string }, void>(
-            Channel.WRITE_CONFIG_TO_FILE,
-            {
-              path: latestPath.current,
-              content: JSON.stringify(transformedConfig, null, "\t"),
-            }
-          )
+          .invoke(Channel.WRITE_CONFIG_TO_FILE, {
+            path: latestPath.current,
+            content: JSON.stringify(transformedConfig, null, "\t"),
+          })
           .then(() => {
             addSuccessAlert({ msg: "Your config was saved." });
             dispatch(setValidState());

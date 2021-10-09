@@ -54,7 +54,7 @@ function useLanguageClient(path: string) {
   const startLanguageServer = async () => {
     window.api.send(Channel.STOP_LANGUAGE_SERVER);
     setIsLoading(true);
-    const ipcChannel = await window.api.invoke<string, string>(
+    const ipcChannel = await window.api.invoke(
       Channel.START_LANGUAGE_SERVER,
       rootUri
     );
@@ -79,7 +79,7 @@ function useLanguageClient(path: string) {
       addWarningAlert({
         msg: "Seems like the validation server takes too long. Cleaning your project and restarting in the background ...",
       });
-      await window.api.invoke<string, void>(Channel.CLEAN_PROJECT, path);
+      await window.api.invoke(Channel.CLEAN_PROJECT, path);
     } catch (e: unknown) {
       addErrorAlert({ msg: `There was an error cleaning your project: ${e}` });
     } finally {

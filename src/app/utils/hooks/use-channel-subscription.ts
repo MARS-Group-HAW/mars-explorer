@@ -11,7 +11,7 @@ function useChannelSubscription<ArgType>(
 
   useLifecycles(
     () => {
-      unsubscribeFn = window.api.on<ArgType>(channel, listener);
+      unsubscribeFn = window.api.on(channel, listener as any);
     },
     () => unsubscribeFn()
   );
