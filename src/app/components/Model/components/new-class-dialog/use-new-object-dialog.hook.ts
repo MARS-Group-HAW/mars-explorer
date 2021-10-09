@@ -1,9 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { Channel } from "@shared/types/Channel";
-import { ClassCreationMessage } from "@shared/types/class-creation-message";
 import SimTypes from "@shared/types/sim-objects";
 import { useBoolean } from "react-use";
-import { IModelFile } from "@shared/types/Model";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
 import useCapitalizedValue from "../../../../utils/hooks/use-capitalized-value";
 import {
@@ -68,7 +66,7 @@ function useNewObjectDialog(): State {
     setIsLoading(true);
 
     window.api
-      .invoke<ClassCreationMessage, IModelFile>(Channel.CREATE_CLASS, {
+      .invoke(Channel.CREATE_CLASS, {
         projectPath: path,
         projectName: name,
         type: selectedType,

@@ -25,8 +25,8 @@ function useNewProjectDialogHook(onClose: () => void): State {
 
   const handleNewProjectDialogConfirm = () => {
     setIsCreating(true);
-    window.api.send<string>(Channel.CREATE_PROJECT, newProjectName);
-    window.api.on<boolean>(Channel.PROJECT_CREATED, (success) => {
+    window.api.send(Channel.CREATE_PROJECT, newProjectName);
+    window.api.on(Channel.PROJECT_CREATED, (success) => {
       if (success) {
         addSuccessAlert({ msg: `Project "${newProjectName}" created!` });
       } else {

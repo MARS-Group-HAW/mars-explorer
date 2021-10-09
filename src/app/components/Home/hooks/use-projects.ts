@@ -17,7 +17,7 @@ function useProjects(
 
   const fetchProjects = async () =>
     window.api
-      .invoke<void, ModelRef[]>(channel)
+      .invoke(channel)
       .then((refs) => setModelRefs(refs))
       .catch((e: any) =>
         addErrorAlert({

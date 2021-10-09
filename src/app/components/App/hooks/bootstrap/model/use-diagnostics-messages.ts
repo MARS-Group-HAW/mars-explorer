@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useEffect } from "react";
 import { Message, NotificationMessage } from "vscode-jsonrpc";
 import { isNotificationMessage } from "vscode-jsonrpc/lib/common/messages";
 import { Diagnostic, PublishDiagnosticsParams } from "monaco-languageclient";
@@ -60,10 +60,7 @@ function useDiagnosticsMessages(): State {
         diagnosticParams.diagnostics.filter(diagnosticIsError);
 
       const { uri } = diagnosticParams;
-      const pathFromUri = await window.api.invoke<string, string>(
-        Channel.URI_TO_NAME,
-        uri
-      );
+      const pathFromUri = await window.api.invoke(Channel.URI_TO_NAME, uri);
 
       const isInErrors = latestErrors.current.includes(pathFromUri);
 

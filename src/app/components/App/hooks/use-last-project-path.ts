@@ -15,7 +15,7 @@ function useLastProjectPath() {
 
     if (!lastProjectPath) return;
 
-    const projectRef = await window.api.invoke<string, ModelRef | null>(
+    const projectRef = await window.api.invoke(
       Channel.CHECK_LAST_PATH,
       lastProjectPath
     );

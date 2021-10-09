@@ -46,13 +46,10 @@ function SaveButton() {
     const content = currentModel.getValue();
 
     try {
-      await window.api.invoke<{ path: string; content: string }, void>(
-        Channel.WRITE_CONTENT_TO_FILE,
-        {
-          path,
-          content,
-        }
-      );
+      await window.api.invoke(Channel.WRITE_CONTENT_TO_FILE, {
+        path,
+        content,
+      });
       addSuccessAlert({ msg: `Saved ${selectedModel.name}.` });
       dispatch(removeFromDirtyFiles(path));
     } catch (e: any) {

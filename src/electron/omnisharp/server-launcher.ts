@@ -1,5 +1,4 @@
 import { spawn } from "child_process";
-import { BrowserWindow, ipcMain } from "electron";
 import { Message } from "vscode-jsonrpc";
 import {
   StreamMessageReader,
@@ -7,8 +6,6 @@ import {
 } from "vscode-jsonrpc/lib/node/main";
 import * as rpc from "@codingame/monaco-jsonrpc";
 import {
-  DidOpenTextDocumentNotification,
-  DidOpenTextDocumentParams,
   InitializedNotification,
   InitializeParams,
   InitializeRequest,
@@ -19,16 +16,16 @@ import {
   ShowMessageParams,
 } from "vscode-languageserver";
 import { LoggerLabel } from "@shared/types/Logger";
-import { fileURLToPath } from "url";
 import { Channel } from "@shared/types/Channel";
-import fs = require("fs-extra");
+import { BrowserWindow, ipcMain } from "electron";
 import {
   OmnisharpErrorMessage,
   OmnisharpErrorNotificationParams,
   OmnisharpNotification,
 } from "./Omnisharp";
-import { Logger } from "./logger";
+import { Logger } from "../logger";
 import { getServer } from "./server-config";
+import SafeIpcMain from "../safe-ipc-main";
 
 type Test = {
   msgType: string;
@@ -119,7 +116,7 @@ export function launchLanguageServer(
         }
         case OmnisharpNotification.PROJECT_ADDED: {
           launcherLogger.info("Project initialized.");
-          mainWindow.webContents.send(Channel.PROJECT_INITIALIZED);
+          SafeIpcMain.send(Channel.PROJECT_INITIALIZED);
           break;
         }
         // TODO: show in GUI by LSP Standard
@@ -133,8 +130,7 @@ export function launchLanguageServer(
         }
         case OmnisharpNotification.ERROR:
           handleOmnisharpErrorNotification(
-            msg.params as OmnisharpErrorNotificationParams,
-            mainWindow
+            msg.params as OmnisharpErrorNotificationParams
           );
           break;
         default:
@@ -249,12 +245,11 @@ function handleShowMessageNotification(params: ShowMessageParams) {
 }
 
 function handleOmnisharpErrorNotification(
-  params: OmnisharpErrorNotificationParams,
-  mainWindow: Electron.BrowserWindow
+  params: OmnisharpErrorNotificationParams
 ) {
   lspLogger.error(params.Text);
 
   if (params.Text.startsWith(OmnisharpErrorMessage.DOTNET_NOT_FOUND)) {
-    mainWindow.webContents.send(Channel.DOTNET_NOT_FOUND);
+    SafeIpcMain.send(Channel.DOTNET_NOT_FOUND);
   }
 }

@@ -45,10 +45,7 @@ function useDeleteClassDialog(): State {
 
     setIsLoading(true);
 
-    const deleted = await window.api.invoke<string, boolean>(
-      Channel.DELETE_FILE_OR_DIR,
-      path
-    );
+    const deleted = await window.api.invoke(Channel.DELETE_FILE_OR_DIR, path);
 
     if (deleted) {
       addSuccessAlert({ msg: `"${name}" has been deleted.` });

@@ -4,12 +4,12 @@ import ReconnectingWebSocket, {
 } from "reconnecting-websocket";
 import WS from "ws";
 import { ObjectCounts } from "@shared/types/ObjectData";
-import { ILogger } from "@shared/types/Logger";
 import {
   SimulationCountMessage,
   SimulationVisMessage,
   SimulationWorldSizeMessage,
 } from "@shared/types/SimulationMessages";
+import log from "./main-logger";
 
 export enum WebSocketCloseCodes {
   RETRYING = 1000,
@@ -40,7 +40,6 @@ const options: Options = {
 };
 
 type Props = {
-  log: ILogger;
   handleCountMsg: (countMsg: SimulationCountMessage | null) => void;
   handleVisMsg: (visMsg: SimulationVisMessage | null) => void;
   handleWorldSizeMsg: (msg: SimulationWorldSizeMessage | null) => void;
@@ -49,8 +48,6 @@ type Props = {
 
 class SimulationHandler {
   private static readonly SOCKET_ADDRESS = "ws://127.0.0.1:4567";
-
-  private logger: ILogger;
 
   private countSocket: ReconnectingWebSocket;
 
@@ -63,13 +60,11 @@ class SimulationHandler {
   private maxTicks: number;
 
   constructor({
-    log,
     handleCountMsg,
     handleVisMsg,
     handleMaxRetries,
     handleWorldSizeMsg,
   }: Props) {
-    this.logger = log;
     this.countSocket = new ReconnectingWebSocket(
       `${SimulationHandler.SOCKET_ADDRESS}/progress`,
       [],
@@ -127,7 +122,7 @@ class SimulationHandler {
     const progress = this.calcProgress(currentTick);
 
     if (this.isNewProgress(progress, this.countProgress)) {
-      this.logger.debug(
+      log.debug(
         `Simulation-Progress: ${currentTick} von ${this.maxTicks} (${progress}%)`
       );
 
@@ -210,7 +205,7 @@ class SimulationHandler {
 
   private handleClose = (evt: CloseEvent, retryCount: number) => {
     if (retryCount === options.maxRetries) {
-      this.logger.warn(
+      log.warn(
         "Could not connect to the simulation process. Exiting the simulation. Is the 'console' flag set in the config.json?"
       );
       throw new Error("Max retries for reconnecting websocket reached.");
@@ -220,17 +215,17 @@ class SimulationHandler {
     switch (evt.code) {
       case WebSocketCloseCodes.RETRYING:
         if (retryCount <= 1) {
-          this.logger.info("Could not connect to WebSocket. Retrying ...");
+          log.info("Could not connect to WebSocket. Retrying ...");
         }
         break;
       case WebSocketCloseCodes.EXITING:
-        this.logger.info("WebSocket closed by simulation end.");
+        log.info("WebSocket closed by simulation end.");
         break;
       case WebSocketCloseCodes.TERMINATED:
-        this.logger.info("WebSocket closed because of termination.");
+        log.info("WebSocket closed because of termination.");
         break;
       default:
-        this.logger.info("WebSocket closed for unknown reason.");
+        log.info("WebSocket closed for unknown reason.");
     }
   };
 }

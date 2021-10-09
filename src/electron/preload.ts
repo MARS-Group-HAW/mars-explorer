@@ -34,7 +34,7 @@ function callIpcRenderer(
     PreloadLogger.warn(
       `Channel "${channel}" not a string or not part of the defined channels.`
     );
-    throw "Error: IPC channel name not allowed";
+    throw new Error("Error: IPC channel name not allowed");
   }
 
   if (!isLSPChannel(channel)) {
@@ -62,8 +62,8 @@ function callIpcRenderer(
   if (method === "invoke" || method === "send") {
     return ipcRenderer[method](channel, ...args);
   }
-  if ("on" === method) {
-    if (!args[0]) throw "Listener must be provided";
+  if (method === "on") {
+    if (!args[0]) throw new Error("Listener must be provided");
 
     const listener = args[0] as UnknownListener;
 
