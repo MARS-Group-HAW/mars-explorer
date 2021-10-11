@@ -1,0 +1,22 @@
+{
+  "globals": {
+    "steps": 100,
+    "output": "csv",
+    "options": {
+      "delimiter": ";",
+      "format": "en-EN"
+    }
+  },
+  "layers": [
+    {
+      "name": "MyGridLayer",
+      "file": "grid.csv"
+    }
+  ],
+  "agents": [
+    {
+      "name": "Murkel",
+      "count": 1
+    }
+  ]
+}
