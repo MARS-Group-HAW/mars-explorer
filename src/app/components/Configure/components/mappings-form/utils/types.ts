@@ -9,6 +9,7 @@ export type ObjectMapping = {
 
 export type AgentMapping = ObjectMapping & {
   [FieldNames.COUNT]: number;
+  [FieldNames.FILE]?: string;
 };
 
 export type EntitiesMapping = AgentMapping;

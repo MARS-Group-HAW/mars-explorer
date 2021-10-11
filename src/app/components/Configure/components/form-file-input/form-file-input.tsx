@@ -30,7 +30,12 @@ const FormFileInput = ({ namespace, label }: Props) => {
   const hasError = Boolean(error);
 
   return (
-    <Grid container justifyContent="space-between" alignItems="center">
+    <Grid
+      container
+      justifyContent="space-between"
+      alignItems="center"
+      wrap="nowrap"
+    >
       <ErrorTooltip open={hasError} title={error || ""}>
         <TextField
           id={namespace}
