@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MonacoServices } from "monaco-languageclient";
+import { MonacoServices, Services } from "monaco-languageclient";
 import monaco from "../../../../../standalone/monaco-editor/monaco";
 import useRootUri from "./use-root-uri";
 import useLoadingStep from "../../../../../utils/hooks/use-loading-step";
@@ -18,9 +18,13 @@ function useMonacoServices(path: string) {
   const [monacoServices, setMonacoService] = useState<MonacoServices>();
 
   useEffect(() => {
-    if (!rootUri) return;
+    if (!rootUri) return () => {};
     setMonacoService(undefined);
-    setMonacoService(MonacoServices.install(monaco, { rootUri }));
+
+    const service = MonacoServices.create(monaco, { rootUri });
+    const disposable = Services.install(service);
+    setMonacoService(service);
+    return () => disposable.dispose();
   }, [rootUri]);
 
   useLoadingStep<LoadingSteps>({

@@ -26,6 +26,9 @@ monaco.languages.register(MARKDOWN);
 
 const monacoOptions: IStandaloneEditorConstructionOptions = {
   automaticLayout: true,
+  lightbulb: {
+    enabled: true,
+  },
 };
 
 type State = {
