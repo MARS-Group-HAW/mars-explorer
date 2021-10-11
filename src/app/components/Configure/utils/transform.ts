@@ -14,12 +14,22 @@ type SimFlags = {
 export type FormSchema = TypeOf<typeof validationSchema>;
 
 class FormTransformer {
-  public static configToForm(config: unknown): FormSchema {
+  public static configToForm(config: any): FormSchema {
     const parsedConfig = validationSchema.cast(config);
 
     const globals = parsedConfig.globals as GlobalsValidationSchema &
       OutputsValidationSchema;
 
+    // remove old namings
+    if (
+      (config as any)?.globals?.startTime ||
+      (config as any)?.globals?.endTime
+    ) {
+      globals.startPoint = config.globals?.startTime;
+      delete (globals as any).startTime;
+      globals.endPoint = config.globals?.endTime;
+      delete (globals as any).endTime;
+    }
     if (globals.startPoint && globals.endPoint) {
       delete globals.steps;
       globals.timeSpecification = TimeSpecification.DATETIME;
