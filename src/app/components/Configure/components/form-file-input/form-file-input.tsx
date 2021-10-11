@@ -63,6 +63,7 @@ const FormFileInput = ({ namespace, label }: Props) => {
           hidden
           onChange={handleFileInput}
           onBlur={handleBlur}
+          accept="text/csv, application/geo+json, application/zip"
         />
       </IconButton>
     </Grid>
