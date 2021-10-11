@@ -3,8 +3,6 @@ import { editor } from "monaco-editor";
 import monaco from "@app/standalone/monaco-editor/monaco";
 import { useLatest, useUnmount } from "react-use";
 import _ from "lodash";
-// @ts-ignore
-import { renderMarkdown } from "monaco-editor/esm/vs/base/browser/markdownRenderer";
 import { CSHARP, MARKDOWN } from "../../../standalone/monaco-editor/types";
 import { useSharedModels } from "./use-shared-models";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
@@ -16,8 +14,7 @@ import {
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import ITextModel = editor.ITextModel;
 import IStandaloneEditorConstructionOptions = editor.IStandaloneEditorConstructionOptions;
-
-console.log(renderMarkdown);
+import useEditorDecorations from "./use-editor-decorations";
 
 monaco.languages.register(CSHARP);
 monaco.languages.register(MARKDOWN);
@@ -42,6 +39,7 @@ function useEditor(): State {
   const latestModels = useLatest(dirtyModels);
   const [{ selectedModel, isExampleProject }] = useSharedModels();
   const [monacoEditor, setMonacoEditor] = useState<IStandaloneCodeEditor>();
+  useEditorDecorations();
 
   function createOrGetModel(path: string, content: string): ITextModel {
     const modelUri = monaco.Uri.file(path);
