@@ -26,6 +26,7 @@ function useLanguageClient(path: string) {
   const { addWarningAlert, addErrorAlert } = useContext(SnackBarContext);
   const dispatch = useAppDispatch();
   const { rootUri } = useRootUri(path);
+  const latestRootUri = useLatest(rootUri);
   const { handleMessage } = useDiagnosticsMessages();
   const areServicesInstalled = useAppSelector(selectMonacoServicesInstalled);
   const isServerInitialized = useAppSelector(
@@ -56,7 +57,7 @@ function useLanguageClient(path: string) {
     setIsLoading(true);
     const ipcChannel = await window.api.invoke(
       Channel.START_LANGUAGE_SERVER,
-      rootUri
+      latestRootUri.current
     );
 
     // wire up the IPC connection
