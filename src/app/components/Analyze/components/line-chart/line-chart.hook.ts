@@ -1,7 +1,6 @@
 import { ChartData, LegendItem } from "chart.js";
 import {
   isCheckedByName,
-  toggle,
   useSharedObjectsWithStatus,
 } from "../../hooks/use-objects-selection-context";
 import { useAppSelector } from "../../../../utils/hooks/use-store";

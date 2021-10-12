@@ -22,6 +22,7 @@ const channelsAsArray = Object.keys(Channel);
 
 const isLSPChannel = (channelName: string) => channelName.startsWith("LSP");
 
+// eslint-disable-next-line consistent-return
 function callIpcRenderer(
   method: Methods,
   channel: Channel | string,

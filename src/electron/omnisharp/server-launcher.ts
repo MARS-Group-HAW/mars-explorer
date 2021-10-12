@@ -51,6 +51,52 @@ function setLabel(key: keyof Test, value: string) {
   };
 }
 
+function logMessageByType(params: { type: MessageType; message: string }) {
+  let msg = params.message;
+
+  const splitMessage = msg.split(":");
+
+  if (splitMessage[0]) {
+    setLabel("classpath", splitMessage.shift());
+    msg = splitMessage.join(":");
+  }
+
+  switch (params.type) {
+    case MessageType.Log:
+      lspLogger.log(msg);
+      break;
+    case MessageType.Info:
+      lspLogger.info(msg);
+      break;
+    case MessageType.Warning:
+      lspLogger.warn(msg);
+      break;
+    case MessageType.Error:
+      lspLogger.error(msg);
+      break;
+    default:
+      lspLogger.debug(msg);
+  }
+}
+
+function handleLogMessageNotification(params: LogMessageParams) {
+  logMessageByType(params);
+}
+
+function handleShowMessageNotification(params: ShowMessageParams) {
+  logMessageByType(params);
+}
+
+function handleOmnisharpErrorNotification(
+  params: OmnisharpErrorNotificationParams
+) {
+  lspLogger.error(params.Text);
+
+  if (params.Text.startsWith(OmnisharpErrorMessage.DOTNET_NOT_FOUND)) {
+    SafeIpcMain.send(Channel.DOTNET_NOT_FOUND);
+  }
+}
+
 function setLabels(labels: Partial<Test>) {
   const x: LoggerLabel[] = [];
 
@@ -72,6 +118,7 @@ function setLabels(labels: Partial<Test>) {
   lspLogger.labels = x;
 }
 
+// eslint-disable-next-line import/prefer-default-export
 export function launchLanguageServer(
   mainWindow: BrowserWindow,
   projectPath: string
@@ -208,48 +255,4 @@ export function launchLanguageServer(
     lspChannel: ipcChannel,
     killServer,
   };
-}
-
-function logMessageByType(params: { type: MessageType; message: string }) {
-  let msg = params.message;
-
-  const splitMessage = msg.split(":");
-
-  if (splitMessage[0]) {
-    setLabel("classpath", splitMessage.shift());
-    msg = splitMessage.join(":");
-  }
-
-  switch (params.type) {
-    case MessageType.Log:
-      lspLogger.log(msg);
-      break;
-    case MessageType.Info:
-      lspLogger.info(msg);
-      break;
-    case MessageType.Warning:
-      lspLogger.warn(msg);
-      break;
-    case MessageType.Error:
-      lspLogger.error(msg);
-      break;
-  }
-}
-
-function handleLogMessageNotification(params: LogMessageParams) {
-  logMessageByType(params);
-}
-
-function handleShowMessageNotification(params: ShowMessageParams) {
-  logMessageByType(params);
-}
-
-function handleOmnisharpErrorNotification(
-  params: OmnisharpErrorNotificationParams
-) {
-  lspLogger.error(params.Text);
-
-  if (params.Text.startsWith(OmnisharpErrorMessage.DOTNET_NOT_FOUND)) {
-    SafeIpcMain.send(Channel.DOTNET_NOT_FOUND);
-  }
 }

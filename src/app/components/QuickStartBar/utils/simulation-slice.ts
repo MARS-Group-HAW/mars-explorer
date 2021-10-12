@@ -8,21 +8,9 @@ import {
   SimulationVisMessage,
   SimulationWorldSizeMessage,
 } from "@shared/types/SimulationMessages";
-import { WorldSizes } from "@shared/types/ObjectData";
 import type { RootState } from "../../../utils/store";
-import { ResultData, ResultDataWithMeta } from "../../Analyze/utils/ResultData";
-
-export type SavedSimulationResults = {
-  projectPath: string;
-  results: SimulationState;
-};
-// Define a type for the slice state
-export type SimulationState = {
-  simulationState: SimulationStates;
-  maxProgress?: number;
-  worldSizes?: WorldSizes;
-  resultData: ResultData;
-};
+import { ResultDataWithMeta } from "../../Analyze/utils/ResultData";
+import { SavedSimulationResults, SimulationState } from "./types";
 
 const initialResultDataWithMeta: Omit<ResultDataWithMeta, "name"> = {
   data: [],

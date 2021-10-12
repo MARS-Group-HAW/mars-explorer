@@ -45,6 +45,7 @@ function useLanguageClient(path: string) {
       });
       dispatch(finishLoadingStep(LoadingSteps.LANGUAGE_SERVER_INITIALIZED));
     } else {
+      // eslint-disable-next-line @typescript-eslint/no-use-before-define
       cleanAndRestart();
     }
   }

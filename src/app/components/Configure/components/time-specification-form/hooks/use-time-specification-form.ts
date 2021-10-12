@@ -48,7 +48,6 @@ function useTimeSpecificationForm(): State {
     namespace: stepsNamespace,
     min: stepsMin,
     disabled: stepsDisabled,
-    handleReset: stepsHandleReset,
   } = useStepForm(namespace, isStepBased);
 
   const {
