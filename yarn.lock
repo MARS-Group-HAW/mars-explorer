@@ -960,6 +960,17 @@
   dependencies:
     vscode-jsonrpc "^6.0.0"
 
+"@codingame/monaco-languageclient@0.16.0":
+  version "0.16.0"
+  resolved "https://registry.npmjs.org/@codingame/monaco-languageclient/-/monaco-languageclient-0.16.0.tgz#fdede6af2ca97091a0096354d6cca004a6b4285e"
+  integrity sha512-XB3i7jZLmu2fqJdppjiZx9/wzoB6zwfk06yGP8/Rfffq44Q4ULYVWhFq3xpYWPqvmOxbeqk8fsc3MLFPRVdPlw==
+  dependencies:
+    glob-to-regexp "^0.4.1"
+    vscode-jsonrpc "6.0.0"
+    vscode-languageclient "7.0.0"
+    vscode-languageserver-textdocument "^1.0.1"
+    vscode-uri "^3.0.2"
+
 "@electron-forge/async-ora@6.0.0-beta.59":
   version "6.0.0-beta.59"
   resolved "https://registry.npmjs.org/@electron-forge/async-ora/-/async-ora-6.0.0-beta.59.tgz#66fa8eef7f80bd662abe4657ac1fef69fdd8a98f"
@@ -8827,17 +8838,6 @@ monaco-editor@^0.29.1:
   version "0.29.1"
   resolved "https://registry.npmjs.org/monaco-editor/-/monaco-editor-0.29.1.tgz#6ee93d8a5320704d48fd7058204deed72429c020"
   integrity sha512-rguaEG/zrPQSaKzQB7IfX/PpNa0qxF1FY8ZXRkN4WIl8qZdTQRSRJCtRto7IMcSgrU6H53RXI+fTcywOBC4aVw==
-
-monaco-languageclient@next:
-  version "0.13.1-next.9"
-  resolved "https://registry.npmjs.org/monaco-languageclient/-/monaco-languageclient-0.13.1-next.9.tgz#83c22bd673915efb421445aa8464cae0ef12321d"
-  integrity sha512-VXzrrlB7RbpvrsgDJw8jmgGqSoFnAWQTOgwwIop7D25O9GB4A0HriyiyTumeOd7JJAQRLyserzSbfrRlBDD+aQ==
-  dependencies:
-    glob-to-regexp "^0.4.1"
-    vscode-jsonrpc "6.0.0"
-    vscode-languageclient "7.0.0"
-    vscode-languageserver-textdocument "^1.0.1"
-    vscode-uri "^3.0.2"
 
 mount-point@^3.0.0:
   version "3.0.0"
