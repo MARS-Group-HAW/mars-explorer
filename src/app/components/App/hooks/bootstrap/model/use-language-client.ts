@@ -12,7 +12,6 @@ import LoadingSteps from "../../../../Model/utils/LoadingSteps";
 import {
   finishLoadingStep,
   resetLoadingStep,
-  selectLanguageServerInitializeStatus,
   selectModels,
   selectMonacoServicesInstalled,
 } from "../../../../Model/utils/model-slice";
@@ -29,18 +28,16 @@ function useLanguageClient(path: string) {
   const latestRootUri = useLatest(rootUri);
   const { handleMessage } = useDiagnosticsMessages();
   const areServicesInstalled = useAppSelector(selectMonacoServicesInstalled);
-  const isServerInitialized = useAppSelector(
-    selectLanguageServerInitializeStatus
-  );
   const models = useAppSelector(selectModels);
   const [isLoading, setIsLoading] = useBoolean(true);
+  const [isInitializing, setIsInitializing] = useBoolean(true);
   const [hasBeenCleaned, setHasBeenCleaned] = useBoolean(false);
 
-  const latestInit = useLatest(isServerInitialized);
+  const latestInit = useLatest(isInitializing);
   const latestBeenCleaned = useLatest(hasBeenCleaned);
 
   async function afterTimeout() {
-    if (latestInit.current) return;
+    if (!latestInit.current) return;
 
     if (latestBeenCleaned.current) {
       addErrorAlert({
@@ -55,6 +52,7 @@ function useLanguageClient(path: string) {
   const startLanguageServer = async () => {
     window.api.send(Channel.STOP_LANGUAGE_SERVER);
     setIsLoading(true);
+    setIsInitializing(true);
     const ipcChannel = await window.api.invoke(
       Channel.START_LANGUAGE_SERVER,
       latestRootUri.current
@@ -70,7 +68,10 @@ function useLanguageClient(path: string) {
     // create and start the language client
     const client = new CSharpLanguageClient(connection);
     client.start();
+
     setIsLoading(false);
+
+    client.onReady().then(() => setIsInitializing(false));
 
     setTimeout(afterTimeout, 30000);
   };
@@ -113,6 +114,15 @@ function useLanguageClient(path: string) {
       dispatch(resetLoadingStep(LoadingSteps.LANGUAGE_CLIENT_STARTED)),
     finishLoading: () =>
       dispatch(finishLoadingStep(LoadingSteps.LANGUAGE_CLIENT_STARTED)),
+  });
+
+  useLoadingStep<LoadingSteps>({
+    step: LoadingSteps.LANGUAGE_SERVER_INITIALIZED,
+    isLoading: isInitializing,
+    resetLoading: () =>
+      dispatch(resetLoadingStep(LoadingSteps.LANGUAGE_SERVER_INITIALIZED)),
+    finishLoading: () =>
+      dispatch(finishLoadingStep(LoadingSteps.LANGUAGE_SERVER_INITIALIZED)),
   });
 }
 
