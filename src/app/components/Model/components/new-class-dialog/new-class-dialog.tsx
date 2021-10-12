@@ -3,7 +3,6 @@ import {
   Box,
   Button,
   CircularProgress,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
@@ -17,6 +16,7 @@ import useNewObjectDialog from "./use-new-object-dialog.hook";
 import ObjectButton from "../object-button";
 import ConditionalTooltip from "../../../shared/conditional-tooltip";
 import LayerSelectButton from "../layer-select-button";
+import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 
 const description: { [key in SimObjects]: string } = {
   [SimObjects.AGENT]:
@@ -73,7 +73,12 @@ function NewClassDialog() {
   } = useNewObjectDialog();
 
   return (
-    <Dialog open={isOpen} onClose={onDialogClose}>
+    <DialogWithKeyListener
+      open={isOpen}
+      onClose={onDialogClose}
+      disabled={disableConfirmButton}
+      onKeyPressed={onDialogConfirm}
+    >
       <DialogTitle id="form-dialog-title">Create new Class</DialogTitle>
       <DialogContent className={classes.dialogContent}>
         <DialogContentText>
@@ -161,7 +166,7 @@ function NewClassDialog() {
           </span>
         </ConditionalTooltip>
       </DialogActions>
-    </Dialog>
+    </DialogWithKeyListener>
   );
 }
 

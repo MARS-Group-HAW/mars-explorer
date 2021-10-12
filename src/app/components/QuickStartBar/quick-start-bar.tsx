@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
@@ -23,6 +22,7 @@ import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import CircularProgressWithLabel from "./components/CircularProgressWithLabel";
+import DialogWithKeyListener from "../shared/dialog-with-key-listener";
 
 function getElBySimState(simState: SimulationStates) {
   switch (simState) {
@@ -113,7 +113,11 @@ function QuickStartBar() {
           )}
         </div>
       </Grid>
-      <Dialog open={showErrorDialog} scroll="paper">
+      <DialogWithKeyListener
+        open={showErrorDialog}
+        onKeyPressed={closeErrorDialog}
+        scroll="paper"
+      >
         <DialogTitle id="scroll-dialog-title">Last Error Message</DialogTitle>
         <DialogContent dividers>
           <DialogContentText
@@ -127,7 +131,7 @@ function QuickStartBar() {
         <DialogActions>
           <Button onClick={closeErrorDialog}>Close</Button>
         </DialogActions>
-      </Dialog>
+      </DialogWithKeyListener>
     </>
   );
 }

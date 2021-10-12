@@ -1,4 +1,4 @@
-import { useContext, useEffect, useState } from "react";
+import { useCallback, useContext, useEffect, useState } from "react";
 import { Channel } from "@shared/types/Channel";
 import SimObjects from "@shared/types/sim-objects";
 import { useBoolean } from "react-use";
