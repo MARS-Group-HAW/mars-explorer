@@ -13,7 +13,6 @@ import GridOnIcon from "@material-ui/icons/GridOn";
 
 const options = [
   SimObjects.BASIC_LAYER,
-  SimObjects.DEPENDENT_LAYER,
   SimObjects.RASTER_LAYER,
   SimObjects.VECTOR_LAYER,
 ];
@@ -28,7 +27,7 @@ const optionToLabel = (option: string) => option.replace("_", " ");
 function LayerSelectButton({ selected, onClick }: Props) {
   const [open, setOpen] = React.useState(false);
   const anchorRef = React.useRef<HTMLDivElement>(null);
-  const [selectedIndex, setSelectedIndex] = React.useState(1);
+  const [selectedIndex, setSelectedIndex] = React.useState(0);
 
   const handleClick = () => onClick(options[selectedIndex]);
 

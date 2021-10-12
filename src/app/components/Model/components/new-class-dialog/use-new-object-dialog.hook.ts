@@ -5,7 +5,6 @@ import { useBoolean } from "react-use";
 import {
   AgentClassCreationMessage,
   ClassCreationMessage,
-  DependentLayerClassCreationMessage,
 } from "@shared/types/class-creation-message";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
 import useCapitalizedValue from "../../../../utils/hooks/use-capitalized-value";
@@ -26,8 +25,6 @@ type State = {
   loadConfirmButton: boolean;
   newClassName: string;
   setNewClassName: (value: string) => void;
-  dependentLayerClassName: string;
-  setDependentLayerClassName: (value: string) => void;
   layerClassName: string;
   setLayerClassName: (value: string) => void;
   selectedType: SimObjects;
@@ -45,8 +42,6 @@ function useNewObjectDialog(): State {
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isLoading, setIsLoading] = useBoolean(false);
   const [newClassName, setNewClassName] = useCapitalizedValue("");
-  const [dependentLayerClassName, setDependentLayerClassName] =
-    useCapitalizedValue("");
   const [layerClassName, setLayerClassName] = useCapitalizedValue("");
   const [selectedType, setSelectedType] = useState<SimObjects>();
   const [disable, setDisable] = useBoolean(false);
@@ -89,12 +84,6 @@ function useNewObjectDialog(): State {
         layerClassName;
     }
 
-    if (selectedType === SimObjects.DEPENDENT_LAYER) {
-      (
-        genericCreationMsg as DependentLayerClassCreationMessage
-      ).dependentLayerName = dependentLayerClassName;
-    }
-
     window.api
       .invoke(Channel.CREATE_CLASS, genericCreationMsg)
       .then((model) => {
@@ -118,8 +107,6 @@ function useNewObjectDialog(): State {
     loadConfirmButton: isLoading,
     newClassName,
     setNewClassName,
-    dependentLayerClassName,
-    setDependentLayerClassName,
     layerClassName,
     setLayerClassName,
     selectedType,

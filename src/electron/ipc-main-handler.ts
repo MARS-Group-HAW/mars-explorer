@@ -7,10 +7,7 @@ import { SimulationStates } from "@shared/types/SimulationStates";
 import SimObjects from "@shared/types/sim-objects";
 import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
-import {
-  AgentClassCreationMessage,
-  DependentLayerClassCreationMessage,
-} from "@shared/types/class-creation-message";
+import { AgentClassCreationMessage } from "@shared/types/class-creation-message";
 import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
@@ -152,7 +149,7 @@ SafeIpcMain.handle(
 enum Templates {
   PROGRAMM_CS = "Program.cs",
   AGENT_CS = "Agent.cs",
-  LAYER_DEPENDENT_CS = "LayerDependent.cs",
+  LAYER_BASIC_CS = "LayerBasic.cs",
   LAYER_RASTER_CS = "LayerRaster.cs",
   LAYER_VECTOR_CS = "LayerVector.cs",
   ENTITY_CS = "Entity.cs",
@@ -161,7 +158,6 @@ enum Templates {
 const PROJECT_NAME_PLACEHOLDER = /\$PROJECT_NAME/g;
 const CLASS_NAME_PLACEHOLDER = /\$CLASS_NAME/g;
 const LAYER_CLASS_NAME_PLACEHOLDER = /\$LAYER_CLASS_NAME/g;
-const DEPENDENT_LAYER_PLACEHOLDER = /\$DEPENDENT_LAYER_NAME/g;
 
 type Replaceable = {
   placeholder: RegExp;
@@ -265,13 +261,8 @@ SafeIpcMain.handle(
           value: (classCreationMsg as AgentClassCreationMessage).layerClassName,
         });
         break;
-      case SimObjects.DEPENDENT_LAYER:
-        template = Templates.LAYER_DEPENDENT_CS;
-        replaceables.push({
-          placeholder: DEPENDENT_LAYER_PLACEHOLDER,
-          value: (classCreationMsg as DependentLayerClassCreationMessage)
-            .dependentLayerName,
-        });
+      case SimObjects.BASIC_LAYER:
+        template = Templates.LAYER_BASIC_CS;
         break;
       case SimObjects.RASTER_LAYER:
         template = Templates.LAYER_RASTER_CS;
