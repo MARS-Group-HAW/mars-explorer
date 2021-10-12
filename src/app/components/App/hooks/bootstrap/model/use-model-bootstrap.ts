@@ -3,7 +3,6 @@ import { selectProject } from "../../../../Home/utils/project-slice";
 import useMarsFramework from "./use-mars-framework";
 import useMonacoServices from "./use-monaco-services";
 import useLanguageClient from "./use-language-client";
-import useProjectInitialization from "./use-project-initialization";
 import useModels from "./use-models";
 import useExampleProjects from "./use-example-projects";
 
@@ -15,7 +14,6 @@ function useModelBootstrap(): State {
   useMarsFramework(path);
   useMonacoServices(path);
   useLanguageClient(path);
-  useProjectInitialization(path);
   useModels();
   useExampleProjects();
 }
