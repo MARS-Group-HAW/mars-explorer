@@ -30,6 +30,7 @@ class Main {
   }
 
   onReady = () => {
+    enforceMacOSAppLocation();
     this.window = this.createWindow();
     this.registerWebContentsListener();
   };
@@ -79,7 +80,6 @@ class Main {
 
   setupApp = () => {
     log.info("Relevant Paths: ", appPaths);
-    enforceMacOSAppLocation();
     fs.ensureDirSync(appPaths.workspaceExamplesDir);
     fs.copySync(appPaths.resourcesExamplesDir, appPaths.workspaceExamplesDir);
   };
