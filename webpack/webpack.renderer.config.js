@@ -50,7 +50,7 @@ if (!IS_DEVELOPMENT) {
 }
 
 resolves.alias = {
-  "vscode": require.resolve("monaco-languageclient/lib/vscode-compatibility")
+  "vscode": require.resolve("@codingame/monaco-languageclient/lib/vscode-compatibility")
 };
 resolves.extensions.push(".css", ".json", ".ttf");
 

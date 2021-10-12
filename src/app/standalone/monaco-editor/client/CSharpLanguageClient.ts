@@ -4,7 +4,7 @@ import {
   ErrorAction,
   MessageConnection,
   MonacoLanguageClient,
-} from "monaco-languageclient";
+} from "@codingame/monaco-languageclient";
 import { Trace } from "vscode-jsonrpc";
 
 class CSharpLanguageClient extends MonacoLanguageClient {

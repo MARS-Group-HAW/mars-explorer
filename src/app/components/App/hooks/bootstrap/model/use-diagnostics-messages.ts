@@ -1,7 +1,10 @@
 import { useEffect } from "react";
 import { Message, NotificationMessage } from "vscode-jsonrpc";
 import { isNotificationMessage } from "vscode-jsonrpc/lib/common/messages";
-import { Diagnostic, PublishDiagnosticsParams } from "monaco-languageclient";
+import {
+  Diagnostic,
+  PublishDiagnosticsParams,
+} from "@codingame/monaco-languageclient";
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { Channel } from "@shared/types/Channel";
 import { useLatest } from "react-use";

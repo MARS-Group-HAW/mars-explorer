@@ -1,4 +1,4 @@
-import { Disposable } from "monaco-languageclient";
+import { Disposable } from "@codingame/monaco-languageclient";
 
 function dummyDisposable(): Disposable {
   return {

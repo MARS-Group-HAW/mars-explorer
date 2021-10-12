@@ -1,6 +1,6 @@
 // custom implementations of the MessageReader and MessageWriter to plug into a MessageConnection
 import { DataCallback, Message, MessageReader } from "vscode-jsonrpc";
-import { Disposable } from "monaco-languageclient";
+import { Disposable } from "@codingame/monaco-languageclient";
 import dummyDisposable from "./DummyDisposable";
 
 // TODO: dispose

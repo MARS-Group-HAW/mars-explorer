@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { MonacoServices, Services } from "monaco-languageclient";
+import { MonacoServices, Services } from "@codingame/monaco-languageclient";
 import monaco from "../../../../../standalone/monaco-editor/monaco";
 import useRootUri from "./use-root-uri";
 import useLoadingStep from "../../../../../utils/hooks/use-loading-step";
