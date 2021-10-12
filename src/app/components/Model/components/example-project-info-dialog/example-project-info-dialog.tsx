@@ -1,7 +1,6 @@
 import * as React from "react";
 import {
   Button,
-  Dialog,
   DialogActions,
   DialogContent,
   Typography,
@@ -9,7 +8,14 @@ import {
 import { IModelFile } from "@shared/types/Model";
 // @ts-ignore
 import { renderMarkdown } from "monaco-editor/esm/vs/base/browser/markdownRenderer";
+import { useUnmount } from "react-use";
 import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
+
+// changes with monaco api
+type MarkdownType = {
+  dispose: () => void;
+  element: HTMLDivElement;
+};
 
 type Props = {
   readme: IModelFile;
@@ -17,7 +23,7 @@ type Props = {
 };
 
 function ExampleProjectInfoDialog({ readme, onClose }: Props) {
-  let parsedReadme;
+  let parsedReadme: MarkdownType;
 
   try {
     parsedReadme = renderMarkdown({
@@ -26,6 +32,8 @@ function ExampleProjectInfoDialog({ readme, onClose }: Props) {
   } catch (e: any) {
     window.api.logger.warn(`Error while parsing the readme contents: ${e}`);
   }
+
+  useUnmount(() => parsedReadme.dispose());
 
   return (
     <DialogWithKeyListener
@@ -37,7 +45,9 @@ function ExampleProjectInfoDialog({ readme, onClose }: Props) {
     >
       <DialogContent>
         {parsedReadme ? (
-          <div dangerouslySetInnerHTML={{ __html: parsedReadme.innerHTML }} />
+          <div
+            dangerouslySetInnerHTML={{ __html: parsedReadme.element.innerHTML }}
+          />
         ) : (
           <Typography color="textSecondary">
             An error occurred while parsing the project description.
