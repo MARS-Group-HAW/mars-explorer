@@ -12,12 +12,6 @@ export type AgentClassCreationMessage = GenericClassCreationMessage & {
   layerClassName: string;
 };
 
-export type DependentLayerClassCreationMessage = GenericClassCreationMessage & {
-  type: SimObjects.DEPENDENT_LAYER;
-  dependentLayerName: string;
-};
-
 export type ClassCreationMessage =
   | GenericClassCreationMessage
-  | AgentClassCreationMessage
-  | DependentLayerClassCreationMessage;
+  | AgentClassCreationMessage;
