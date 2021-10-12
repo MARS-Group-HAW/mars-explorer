@@ -41,7 +41,7 @@ type CategoryKeywords = {
 const categoryKeywords: CategoryKeywords[] = [
   {
     category: Category.INPUT,
-    keywordRegex: "(\\[PropertyDescription\\])|(Init\\(.*\\))",
+    keywordRegex: "\\[?(PropertyDescription|\\sInit\\w*)(\\(.+\\))?\\]?",
     hoverMessage: "This line is part of the **Input** process",
   },
   {
