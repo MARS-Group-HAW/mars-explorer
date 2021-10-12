@@ -7,7 +7,7 @@ using Mars.Interfaces.Environments;
 using Mars.Interfaces.Layers;
 using Mars.Numerics.Statistics;
 
-namespace SheepWolfStarter.Model
+namespace SheepWolfStarter
 {
     /// <summary>
     ///     Sheep walk around by chance.

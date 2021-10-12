@@ -3,7 +3,7 @@ using Mars.Interfaces.Agents;
 using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Environments;
 
-namespace SheepWolfStarter.Model
+namespace  SheepWolfStarter
 {
     public class GrassGrowthAgent : IAgent<GrasslandLayer>
     {
@@ -14,7 +14,7 @@ namespace SheepWolfStarter.Model
         {
             Grassland = layer;
         }
-        
+
         private GrasslandLayer Grassland { get; set; }
 
         public void Tick()

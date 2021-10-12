@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using Mars.Components.Starter;
 using Mars.Interfaces.Model;
-using SheepWolfStarter.Model;
+using SheepWolfStarter;
 
 namespace SheepWolfStarter
 {
