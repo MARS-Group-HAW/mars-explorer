@@ -35,10 +35,6 @@ const OMNISHARP_CONFIG: OmnisharpConfiguration = {
   cake: {
     enabled: false,
   },
-  fileOptions: {
-    excludeSearchPatterns: ["**/var/**/*", "**/obj/**/*", "**/bin/**/*"],
-    systemExcludeSearchPatterns: ["**/var/**/*", "**/obj/**/*", "**/bin/**/*"],
-  },
   msbuild: {
     enabled: true,
     EnablePackageAutoRestore: false,

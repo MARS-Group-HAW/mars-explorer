@@ -12,7 +12,7 @@ export type OmnisharpConfiguration = {
   cake: {
     enabled: boolean;
   };
-  fileOptions: {
+  fileOptions?: {
     excludeSearchPatterns: string[];
     systemExcludeSearchPatterns?: string[];
   };

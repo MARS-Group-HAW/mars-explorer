@@ -9,7 +9,7 @@ using Mars.Interfaces.Layers;
 using Mars.Numerics;
 using Mars.Numerics.Statistics;
 
-namespace SheepWolfStarter.Model
+namespace SheepWolfStarter
 {
     public class Wolf : IAgent<GrasslandLayer>, IPositionable
     {
