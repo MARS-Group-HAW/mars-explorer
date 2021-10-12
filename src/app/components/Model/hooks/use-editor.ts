@@ -11,10 +11,11 @@ import {
   removeFromDirtyFiles,
   selectDirtyModels,
 } from "../utils/model-slice";
+import useEditorDecorations from "./use-editor-decorations";
+import useEditorSave from "./use-editor-save";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import ITextModel = editor.ITextModel;
 import IStandaloneEditorConstructionOptions = editor.IStandaloneEditorConstructionOptions;
-import useEditorDecorations from "./use-editor-decorations";
 
 monaco.languages.register(CSHARP);
 monaco.languages.register(MARKDOWN);
@@ -43,6 +44,7 @@ function useEditor(): State {
   const [{ selectedModel, isExampleProject }] = useSharedModels();
   const [monacoEditor, setMonacoEditor] = useState<IStandaloneCodeEditor>();
   useEditorDecorations();
+  useEditorSave();
 
   function createOrGetModel(path: string, content: string): ITextModel {
     const modelUri = monaco.Uri.file(path);
