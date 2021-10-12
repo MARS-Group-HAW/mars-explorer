@@ -94,8 +94,9 @@ function QuickStartBar() {
         >
           Stop
         </ActionButton>
+        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus */}
         <div
-          role="progressbar"
+          role="row"
           style={{
             display: "flex",
             width: 40,

@@ -4,7 +4,6 @@ import { useBoolean } from "react-use";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
 import { useAppDispatch } from "../../../../utils/hooks/use-store";
 import {
-  removeErrorsInPath,
   removeFromDirtyFiles,
   removeModel,
   resetErrors,

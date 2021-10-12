@@ -44,7 +44,9 @@ const OMNISHARP_CONFIG: OmnisharpConfiguration = {
 function configToArg(): string[] {
   const args: string[] = [];
 
+  // eslint-disable-next-line no-restricted-syntax
   for (const [k, v] of Object.entries(OMNISHARP_CONFIG)) {
+    // eslint-disable-next-line no-restricted-syntax
     for (const [k2, v2] of Object.entries(v)) {
       // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
       args.push(`${k}:${k2}=${v2}`);
@@ -64,6 +66,7 @@ const OMNISHARP_BASE: Omit<Server, "command" | "options"> = {
   ],
 };
 
+// eslint-disable-next-line import/prefer-default-export
 export function getServer(projectPath: string): Server {
   return {
     command: is.windows ? "Omnisharp.exe" : "sh run",

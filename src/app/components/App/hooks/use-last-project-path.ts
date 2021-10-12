@@ -1,5 +1,4 @@
 import { useAsync } from "react-use";
-import { ModelRef } from "@shared/types/Model";
 import { Channel } from "@shared/types/Channel";
 import LocalStorageService, {
   CacheKey,

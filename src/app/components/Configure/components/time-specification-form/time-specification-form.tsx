@@ -7,7 +7,7 @@ import FormDatepicker from "../form-datepicker";
 import useStyles from "./time-specification-form-styles";
 import useTimeSpecificationForm from "./hooks";
 
-const TimeSpecificationForm = ({ namespace }: { namespace: string }) => {
+const TimeSpecificationForm = () => {
   const classes = useStyles();
   const {
     timeSpecNamespace,

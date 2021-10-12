@@ -1,6 +1,5 @@
 import { useContext, useEffect, useState } from "react";
 import { Channel } from "@shared/types/Channel";
-import SimTypes from "@shared/types/sim-objects";
 import SimObjects from "@shared/types/sim-objects";
 import { useBoolean } from "react-use";
 import {
@@ -31,8 +30,8 @@ type State = {
   setDependentLayerClassName: (value: string) => void;
   layerClassName: string;
   setLayerClassName: (value: string) => void;
-  selectedType: SimTypes;
-  onTypeClick: (type: SimTypes) => void;
+  selectedType: SimObjects;
+  onTypeClick: (type: SimObjects) => void;
   isOpen: boolean;
   onDialogClose: () => void;
   onDialogConfirm: () => void;
@@ -49,7 +48,7 @@ function useNewObjectDialog(): State {
   const [dependentLayerClassName, setDependentLayerClassName] =
     useCapitalizedValue("");
   const [layerClassName, setLayerClassName] = useCapitalizedValue("");
-  const [selectedType, setSelectedType] = useState<SimTypes>();
+  const [selectedType, setSelectedType] = useState<SimObjects>();
   const [disable, setDisable] = useBoolean(false);
 
   useEffect(() => {

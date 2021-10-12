@@ -1,4 +1,3 @@
-import { ModelRef, WorkingModel } from "@shared/types/Model";
 import { useAsync, useBoolean } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import {

@@ -16,7 +16,6 @@ import { OutputSpecification } from "./utils/types";
 import OutputsCsvForm from "../output-csv-form";
 import OutputsSqliteForm from "../output-sqlite-form";
 import Path from "../../../App/utils/app-paths";
-import StyledFileIcon from "./output-form-styles";
 import OutputsNoneForm from "../output-none-form";
 
 type Props = {

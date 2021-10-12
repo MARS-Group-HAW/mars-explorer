@@ -31,7 +31,7 @@ const GlobalsForm = ({ namespace }: { namespace: string }) => (
             />
           </Grid>
         </Grid>
-        <TimeSpecificationForm namespace={namespace} />
+        <TimeSpecificationForm />
       </FormPaper>
     </Grid>
     <Grid item xs={6}>

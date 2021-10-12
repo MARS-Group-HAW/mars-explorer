@@ -1,4 +1,4 @@
-import { SavedSimulationResults } from "../components/QuickStartBar/utils/simulation-slice";
+import { SavedSimulationResults } from "../components/QuickStartBar/utils/types";
 
 export enum CacheKey {
   LAST_PATH = "LAST_PATH",

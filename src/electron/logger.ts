@@ -12,6 +12,7 @@ type LoggerOptions = {
 const IS_DEV =
   process.env.ELECTRON_ENV && process.env.ELECTRON_ENV === "development";
 
+// eslint-disable-next-line import/prefer-default-export
 export class Logger implements ILogger {
   private readonly electronLog: ElectronLog;
 
@@ -74,7 +75,9 @@ export class Logger implements ILogger {
   }
 
   public set labels(labels: LoggerLabel[]) {
-    labels.forEach((label) => (this.label = label));
+    labels.forEach((label) => {
+      this.label = label;
+    });
   }
 
   private format = (...params: unknown[]): string =>
@@ -98,8 +101,10 @@ export class Logger implements ILogger {
 
   info = (...params: unknown[]): void =>
     this.electronLog.info(`%c${this.format(params)}`, "color: Cyan");
+
   log = (...params: unknown[]): void =>
     this.electronLog.log(this.format(params));
+
   warn = (...params: unknown[]): void =>
     this.electronLog.warn(`%c${this.format(params)}`, "color: Yellow");
 }
