@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   Button,
   CircularProgress,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
@@ -10,6 +9,7 @@ import {
 } from "@material-ui/core";
 import { IFileRef } from "@shared/types/File";
 import useCopyProjectDialogHook from "./use-copy-project-dialog.hook";
+import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 
 type Props = {
   projectToCopy: IFileRef;
@@ -22,7 +22,11 @@ function CopyProjectDialog({ open, onClose, projectToCopy }: Props) {
     useCopyProjectDialogHook(projectToCopy, onClose);
 
   return (
-    <Dialog open={open} onClose={handleClose}>
+    <DialogWithKeyListener
+      open={open}
+      onKeyPressed={handleConfirm}
+      onClose={handleClose}
+    >
       <DialogTitle id="form-dialog-title">
         Create a copy of {projectToCopy?.name} example Project
       </DialogTitle>
@@ -48,7 +52,7 @@ function CopyProjectDialog({ open, onClose, projectToCopy }: Props) {
           )}
         </Button>
       </DialogActions>
-    </Dialog>
+    </DialogWithKeyListener>
   );
 }
 

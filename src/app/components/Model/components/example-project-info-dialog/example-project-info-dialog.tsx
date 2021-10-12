@@ -9,6 +9,7 @@ import {
 import { IModelFile } from "@shared/types/Model";
 // @ts-ignore
 import { renderMarkdown } from "monaco-editor/esm/vs/base/browser/markdownRenderer";
+import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 
 type Props = {
   readme: IModelFile;
@@ -27,7 +28,13 @@ function ExampleProjectInfoDialog({ readme, onClose }: Props) {
   }
 
   return (
-    <Dialog open onClose={onClose} scroll="paper" maxWidth="md">
+    <DialogWithKeyListener
+      open
+      onClose={onClose}
+      onKeyPressed={onClose}
+      scroll="paper"
+      maxWidth="md"
+    >
       <DialogContent>
         {parsedReadme ? (
           <div dangerouslySetInnerHTML={{ __html: parsedReadme.innerHTML }} />
@@ -42,7 +49,7 @@ function ExampleProjectInfoDialog({ readme, onClose }: Props) {
           Close
         </Button>
       </DialogActions>
-    </Dialog>
+    </DialogWithKeyListener>
   );
 }
 

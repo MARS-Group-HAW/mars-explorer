@@ -2,20 +2,24 @@ import * as React from "react";
 import {
   Button,
   CircularProgress,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
   DialogTitle,
 } from "@material-ui/core";
 import useDeleteClassDialog from "./use-delete-object-dialog.hook";
+import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 
 function DeleteClassDialog() {
   const { name, isLoading, isOpen, onDialogConfirm, onDialogClose } =
     useDeleteClassDialog();
 
   return (
-    <Dialog open={isOpen} onClose={onDialogClose}>
+    <DialogWithKeyListener
+      open={isOpen}
+      onClose={onDialogClose}
+      onKeyPressed={onDialogConfirm}
+    >
       <DialogTitle>{`Delete Class "${name}"?`}</DialogTitle>
       <DialogContent>
         <DialogContentText id="alert-dialog-description">
@@ -39,7 +43,7 @@ function DeleteClassDialog() {
           )}
         </Button>
       </DialogActions>
-    </Dialog>
+    </DialogWithKeyListener>
   );
 }
 

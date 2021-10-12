@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   Button,
   CircularProgress,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
@@ -10,6 +9,7 @@ import {
   TextField,
 } from "@material-ui/core";
 import useNewProjectDialogHook from "./use-new-project-dialog.hook";
+import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 
 type Props = {
   open: boolean;
@@ -27,7 +27,12 @@ function NewProjectDialog({ open, onClose }: Props) {
   } = useNewProjectDialogHook(onClose);
 
   return (
-    <Dialog open={open} onClose={handleNewProjectDialogClose}>
+    <DialogWithKeyListener
+      open={open}
+      onKeyPressed={handleNewProjectDialogConfirm}
+      onClose={handleNewProjectDialogClose}
+      disabled={disableConfirmButton}
+    >
       <DialogTitle id="form-dialog-title">Create new Project</DialogTitle>
       <DialogContent>
         <DialogContentText>
@@ -64,7 +69,7 @@ function NewProjectDialog({ open, onClose }: Props) {
           )}
         </Button>
       </DialogActions>
-    </Dialog>
+    </DialogWithKeyListener>
   );
 }
 

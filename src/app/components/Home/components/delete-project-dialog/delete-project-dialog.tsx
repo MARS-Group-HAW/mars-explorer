@@ -2,7 +2,6 @@ import * as React from "react";
 import {
   Button,
   CircularProgress,
-  Dialog,
   DialogActions,
   DialogContent,
   DialogContentText,
@@ -10,6 +9,7 @@ import {
 } from "@material-ui/core";
 import { IFileRef } from "@shared/types/File";
 import useDeleteProjectDialog from "./use-delete-project.dialog";
+import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 
 type Props = {
   fileRef: IFileRef;
@@ -24,8 +24,15 @@ function DeleteProjectDialog({ fileRef, open, onClose }: Props) {
     handleNewProjectDialogClose,
   } = useDeleteProjectDialog(onClose);
 
+  const onConfirm = () => handleNewProjectDialogConfirm(fileRef);
+
   return (
-    <Dialog open={open} onClose={handleNewProjectDialogClose}>
+    <DialogWithKeyListener
+      open={open}
+      disabled={loadConfirmButton}
+      onKeyPressed={onConfirm}
+      onClose={handleNewProjectDialogClose}
+    >
       <DialogTitle id="form-dialog-title">Delete this project?</DialogTitle>
       <DialogContent>
         {/* eslint-disable-next-line react/no-unescaped-entities */}
@@ -36,7 +43,7 @@ function DeleteProjectDialog({ fileRef, open, onClose }: Props) {
           Cancel
         </Button>
         <Button
-          onClick={() => handleNewProjectDialogConfirm(fileRef)}
+          onClick={onConfirm}
           color="primary"
           disabled={loadConfirmButton}
         >
@@ -47,7 +54,7 @@ function DeleteProjectDialog({ fileRef, open, onClose }: Props) {
           )}
         </Button>
       </DialogActions>
-    </Dialog>
+    </DialogWithKeyListener>
   );
 }
 
