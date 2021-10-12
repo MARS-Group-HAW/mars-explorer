@@ -7,7 +7,7 @@ import {
   ClassCreationMessage,
 } from "@shared/types/class-creation-message";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
-import useCapitalizedValue from "../../../../utils/hooks/use-capitalized-value";
+import useClassNameInput from "../../../../utils/hooks/use-class-name-input";
 import {
   useAppDispatch,
   useAppSelector,
@@ -41,8 +41,8 @@ function useNewObjectDialog(): State {
   const dispatch = useAppDispatch();
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isLoading, setIsLoading] = useBoolean(false);
-  const [newClassName, setNewClassName] = useCapitalizedValue("");
-  const [layerClassName, setLayerClassName] = useCapitalizedValue("");
+  const [newClassName, setNewClassName] = useClassNameInput("");
+  const [layerClassName, setLayerClassName] = useClassNameInput("");
   const [selectedType, setSelectedType] = useState<SimObjects>();
   const [disable, setDisable] = useBoolean(false);
 

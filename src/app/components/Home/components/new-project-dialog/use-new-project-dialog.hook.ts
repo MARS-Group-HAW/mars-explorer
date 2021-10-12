@@ -1,7 +1,8 @@
 import { useBoolean } from "react-use";
 import { Channel } from "@shared/types/Channel";
-import { useContext, useState } from "react";
+import { useContext } from "react";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
+import useClassNameInput from "../../../../utils/hooks/use-class-name-input";
 
 type State = {
   disableConfirmButton: boolean;
@@ -15,7 +16,7 @@ type State = {
 function useNewProjectDialogHook(onClose: () => void): State {
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isCreating, setIsCreating] = useBoolean(false);
-  const [newProjectName, setNewProjectName] = useState("");
+  const [newProjectName, setNewProjectName] = useClassNameInput("");
 
   const handleNewProjectDialogClose = () => {
     setNewProjectName("");
@@ -39,20 +40,13 @@ function useNewProjectDialogHook(onClose: () => void): State {
     });
   };
 
-  const disableConfirmButton =
-    newProjectName.length === 0 || !/^[a-zA-Z]+$/.test(newProjectName);
+  const disableConfirmButton = newProjectName.length === 0;
   const loadConfirmButton = isCreating;
-
-  const setNewProjectNameCapitalized = (value: string) =>
-    setNewProjectName(
-      value.length === 1 ? value.charAt(0).toUpperCase() : value
-    );
-
   return {
     disableConfirmButton,
     loadConfirmButton,
     newProjectName,
-    setNewProjectName: setNewProjectNameCapitalized,
+    setNewProjectName,
     handleNewProjectDialogClose,
     handleNewProjectDialogConfirm,
   };
