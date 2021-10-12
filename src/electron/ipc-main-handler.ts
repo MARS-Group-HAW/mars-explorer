@@ -26,6 +26,9 @@ enum FileExtensions {
   CSV = ".csv",
 }
 
+const MARS_LIFE_VERSION = " --version 4.3.2";
+
+
 SafeIpcMain.on(Channel.RESTART_APP, () => {
   log.warn("Restart requested by user.");
   app.relaunch();
@@ -308,10 +311,8 @@ SafeIpcMain.on(Channel.INSTALL_MARS, (_, projectPath: string) => {
     );
   }
 
-  const versionFlag = " --version 4.3.2"; // FIXME
-
   const installProcess = child_process.exec(
-    `dotnet add package Mars.Life.Simulations${versionFlag}`,
+    `dotnet add package Mars.Life.Simulations${MARS_LIFE_VERSION}`,
     {
       cwd: projectPath,
     }
