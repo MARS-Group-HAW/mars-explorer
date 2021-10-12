@@ -26,8 +26,7 @@ enum FileExtensions {
   CSV = ".csv",
 }
 
-const MARS_LIFE_VERSION = " --version 4.3.2";
-
+const MARS_LIFE_VERSION = " --version 4.3.0-beta";
 
 SafeIpcMain.on(Channel.RESTART_APP, () => {
   log.warn("Restart requested by user.");

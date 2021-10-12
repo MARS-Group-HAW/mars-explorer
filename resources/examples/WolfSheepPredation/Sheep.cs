@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Mars.Common.Core.Random;
 using Mars.Interfaces.Agents;
 using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Environments;
@@ -11,7 +12,7 @@ namespace SheepWolfStarter.Model
     /// <summary>
     ///     Sheep walk around by chance.
     ///     If grass is under the sheep, it eats the grass. Otherwise do nothing, this tick.
-    ///     Every few rounds a new sheep is spawned, which receives half of the energy  
+    ///     Every few rounds a new sheep is spawned, which receives half of the energy
     /// </summary>
     public class Sheep : IAgent<GrasslandLayer>, IPositionable
     {

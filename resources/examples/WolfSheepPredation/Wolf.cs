@@ -1,6 +1,7 @@
 using System;
 using System.Linq;
 using Mars.Common;
+using Mars.Common.Core.Random;
 using Mars.Interfaces.Agents;
 using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Environments;
@@ -122,7 +123,7 @@ namespace SheepWolfStarter.Model
                     // This could happen if Energy is 1: division by 2 -> 0.5 -> cast to int -> 0
                     return;
                 }
-                
+
                 _grassland.AgentManager.Spawn<Wolf, GrasslandLayer>(null, agent =>
                 {
                     agent.Position = Position.CreatePosition(Position.X, Position.Y);

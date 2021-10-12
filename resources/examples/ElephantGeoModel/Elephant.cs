@@ -36,6 +36,10 @@ namespace Geo_Test_CS.Model
 
         [PropertyDescription]
         public UnregisterAgent UnregisterHandle { get; set; }
+        
+        private LandscapeLayer Layer { get; set; }
+        public double Energy { get; set; }
+        
         public void Init(LandscapeLayer layer)
         {
             Layer = layer;
@@ -72,8 +76,7 @@ namespace Geo_Test_CS.Model
             }
         }
 
-        private LandscapeLayer Layer { get; set; }
-        public double Energy { get; set; }
+
 
         private void Kill()
         {

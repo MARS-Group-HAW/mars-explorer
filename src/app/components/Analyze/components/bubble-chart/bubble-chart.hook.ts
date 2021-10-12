@@ -83,12 +83,12 @@ function useBubbleChart(): State {
             x: {
               type: "linear",
               min: worldSizes.minX,
-              max: worldSizes.maxY, // FIXME
+              max: worldSizes.maxX, // FIXME
             },
             y: {
               type: "linear",
-              min: worldSizes.maxX, // FIXME
-              max: worldSizes.minY,
+              min: worldSizes.minY, // FIXME
+              max: worldSizes.maxY,
             },
           },
         }
