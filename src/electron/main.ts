@@ -31,6 +31,7 @@ class Main {
 
   onReady = () => {
     enforceMacOSAppLocation();
+    this.createMenu();
     this.window = this.createWindow();
     this.registerWebContentsListener();
   };
