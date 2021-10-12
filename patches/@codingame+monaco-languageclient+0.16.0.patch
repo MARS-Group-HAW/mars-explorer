@@ -1,0 +1,30 @@
+diff --git a/node_modules/@codingame/monaco-languageclient/lib/console-window.js b/node_modules/@codingame/monaco-languageclient/lib/console-window.js
+index a52339f..d5813e9 100644
+--- a/node_modules/@codingame/monaco-languageclient/lib/console-window.js
++++ b/node_modules/@codingame/monaco-languageclient/lib/console-window.js
+@@ -17,12 +17,6 @@ class ConsoleWindow {
+         if (type === services_1.MessageType.Warning) {
+             console.warn(message);
+         }
+-        if (type === services_1.MessageType.Info) {
+-            console.info(message);
+-        }
+-        if (type === services_1.MessageType.Log) {
+-            console.log(message);
+-        }
+         return Promise.resolve(undefined);
+     }
+     createOutputChannel(name) {
+@@ -32,10 +26,10 @@ class ConsoleWindow {
+         }
+         const channel = {
+             append(value) {
+-                console.log(name + ': ' + value);
++                if(false) console.log(name + ': ' + value);
+             },
+             appendLine(line) {
+-                console.log(name + ': ' + line);
++                if(false) console.log(name + ': ' + line);
+             },
+             show() {
+                 // no-op
