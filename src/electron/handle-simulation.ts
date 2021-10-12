@@ -107,7 +107,9 @@ class SimulationHandler {
   };
 
   private isNewProgress = (progress: number, lastProgress?: number) =>
-    lastProgress === undefined || lastProgress < progress;
+    lastProgress === undefined ||
+    lastProgress === null ||
+    lastProgress < progress;
 
   private handleCountMsg = (
     msg: MessageEvent<string>
