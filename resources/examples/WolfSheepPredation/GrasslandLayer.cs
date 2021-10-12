@@ -1,4 +1,5 @@
 using System.Linq;
+using Mars.Common.Core.Random;
 using Mars.Components.Environments;
 using Mars.Components.Layers;
 using Mars.Core.Data;
@@ -15,12 +16,12 @@ namespace SheepWolfStarter.Model
         ///     Holds all sheep in a grid environment.
         /// </summary>
         public SpatialHashEnvironment<Sheep> SheepEnvironment { get; private set; }
-        
+
         /// <summary>
         ///     Holds all wolves in a grid environment.
         /// </summary>
         public SpatialHashEnvironment<Wolf> WolfEnvironment { get; private set; }
-        
+
         /// <summary>
         ///     Responsible to create new agents and initialize them with required dependencies
         /// </summary>

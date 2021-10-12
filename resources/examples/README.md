@@ -9,6 +9,7 @@ Within the mars-explorer the user can view and also copy the projects that are l
 - Your models `Mars.Life.Simulations` version must match the version used in the `MARS-Explorer` (you can find the
   version used by this app at the top of `Explorer/src/electron/ipc-main-handler.ts`
   -> `const MARS_LIFE_VERSION = "..."`)
+- The project should preferably build with `netcoreapp3.1`
 - Your directory must contain a `config.json` file
 - Your main file (usually `Program.cs`) must read the contents of the `config.json` and pass it to the `Start(...)`
   method
