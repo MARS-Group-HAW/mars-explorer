@@ -22,7 +22,7 @@ class Main {
   window!: BrowserWindow;
 
   constructor() {
-    this.setupApp();
+    this.ensureDirs();
     app.on("ready", this.onReady);
     app.on("before-quit", this.onBeforeQuit);
     app.on("window-all-closed", this.onWindowAllClosed);
@@ -79,10 +79,8 @@ class Main {
     Menu.setApplicationMenu(menu);
   };
 
-  setupApp = () => {
-    log.info("Relevant Paths: ", appPaths);
-    fs.ensureDirSync(appPaths.workspaceExamplesDir);
-    fs.copySync(appPaths.resourcesExamplesDir, appPaths.workspaceExamplesDir);
+  ensureDirs = () => {
+    fs.ensureDirSync(appPaths.workspaceDir);
   };
 
   onDidFrameFinishLoad = () => {
