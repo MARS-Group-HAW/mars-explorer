@@ -7,7 +7,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../utils/hooks/use-store";
-import { selectProject } from "../../utils/project-slice";
+import { selectProjectPath } from "../../utils/project-slice";
 import { resetStore } from "../../../../utils/store";
 
 type State = {
@@ -18,7 +18,7 @@ type State = {
 
 function useDeleteProjectDialogHook(onClose: () => void): State {
   const dispatch = useAppDispatch();
-  const { path } = useAppSelector(selectProject);
+  const path = useAppSelector(selectProjectPath);
   const latestPath = useLatest(path);
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isDeleting, setIsDeleting] = useBoolean(false);
