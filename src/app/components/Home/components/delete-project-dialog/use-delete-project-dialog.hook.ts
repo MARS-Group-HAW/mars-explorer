@@ -7,7 +7,8 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../utils/hooks/use-store";
-import { resetProject, selectProject } from "../../utils/project-slice";
+import { selectProject } from "../../utils/project-slice";
+import { resetStore } from "../../../../utils/store";
 
 type State = {
   loadConfirmButton: boolean;
@@ -15,7 +16,7 @@ type State = {
   handleNewProjectDialogConfirm: (ref: IFileRef) => void;
 };
 
-function useDeleteProjectDialog(onClose: () => void): State {
+function useDeleteProjectDialogHook(onClose: () => void): State {
   const dispatch = useAppDispatch();
   const { path } = useAppSelector(selectProject);
   const latestPath = useLatest(path);
@@ -42,7 +43,7 @@ function useDeleteProjectDialog(onClose: () => void): State {
     }
 
     if (ref.path === latestPath.current) {
-      dispatch(resetProject());
+      dispatch(resetStore());
     }
 
     handleNewProjectDialogClose();
@@ -55,4 +56,4 @@ function useDeleteProjectDialog(onClose: () => void): State {
   };
 }
 
-export default useDeleteProjectDialog;
+export default useDeleteProjectDialogHook;

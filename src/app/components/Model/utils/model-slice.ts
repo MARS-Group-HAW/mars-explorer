@@ -101,6 +101,8 @@ export const selectModelsRead = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MODELS_READ);
 export const selectLoadingSteps = (state: RootState) =>
   state.model.finishedSteps;
+export const selectMonacoServicesInstallStatus = (state: RootState) =>
+  state.model.finishedSteps.includes(LoadingSteps.MONACO_SERVICES_INSTALLED);
 export const selectLanguageServerStartStatus = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.LANGUAGE_CLIENT_STARTED);
 export const selectLanguageServerInitializeStatus = (state: RootState) =>

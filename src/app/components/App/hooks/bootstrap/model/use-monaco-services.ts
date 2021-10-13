@@ -1,40 +1,34 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { MonacoServices, Services } from "@codingame/monaco-languageclient";
+import { useBoolean } from "react-use";
 import monaco from "../../../../../standalone/monaco-editor/monaco";
-import useRootUri from "./use-root-uri";
-import useLoadingStep from "../../../../../utils/hooks/use-loading-step";
 import LoadingSteps from "../../../../Model/utils/LoadingSteps";
 import {
   finishLoadingStep,
-  resetLoadingStep,
+  selectMonacoServicesInstallStatus,
 } from "../../../../Model/utils/model-slice";
-import { useAppDispatch } from "../../../../../utils/hooks/use-store";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../utils/hooks/use-store";
 
-function useMonacoServices(path: string) {
+function useMonacoServices() {
   const dispatch = useAppDispatch();
-
-  const { rootUri } = useRootUri(path);
-
-  const [monacoServices, setMonacoService] = useState<MonacoServices>();
+  const isInstalled = useAppSelector(selectMonacoServicesInstallStatus);
+  const [isInstalling, setInstalling] = useBoolean(true);
 
   useEffect(() => {
-    if (!rootUri) return () => {};
-    setMonacoService(undefined);
-
-    const service = MonacoServices.create(monaco, { rootUri });
+    const service = MonacoServices.create(monaco);
     const disposable = Services.install(service);
-    setMonacoService(service);
+    setInstalling(false);
     return () => disposable.dispose();
-  }, [rootUri]);
+  }, []);
 
-  useLoadingStep<LoadingSteps>({
-    step: LoadingSteps.MONACO_SERVICES_INSTALLED,
-    isLoading: !monacoServices,
-    resetLoading: () =>
-      dispatch(resetLoadingStep(LoadingSteps.MONACO_SERVICES_INSTALLED)),
-    finishLoading: () =>
-      dispatch(finishLoadingStep(LoadingSteps.MONACO_SERVICES_INSTALLED)),
-  });
+  useEffect(() => {
+    if (!isInstalled && !isInstalling) {
+      dispatch(finishLoadingStep(LoadingSteps.MONACO_SERVICES_INSTALLED));
+    }
+  }, [isInstalled, isInstalling]);
 }
 
 export default useMonacoServices;
