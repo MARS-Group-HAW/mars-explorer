@@ -4,6 +4,7 @@ using Mars.Interfaces.Environments;
 
 namespace $PROJECT_NAME
 {
+    // TODO: add "description.AddAgent<$CLASS_NAME, $LAYER_CLASS_NAME>();" to your Program.cs
     public class $CLASS_NAME : IAgent<$LAYER_CLASS_NAME>, IPositionable
     {
 

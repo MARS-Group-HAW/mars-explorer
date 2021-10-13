@@ -4,6 +4,7 @@ using Mars.Interfaces.Annotations;
 
 namespace $PROJECT_NAME
 {
+    // TODO: add "description.AddEntity<$CLASS_NAME>();" to your Program.cs
     public class $CLASS_NAME : IEntity
     {
 
