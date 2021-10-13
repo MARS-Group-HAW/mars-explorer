@@ -1,7 +1,6 @@
 using System;
 using Mars.Interfaces.Agents;
 using Mars.Interfaces.Environments;
-using SheepWolfStarter.Model;
 
 namespace $PROJECT_NAME
 {
@@ -10,7 +9,7 @@ namespace $PROJECT_NAME
 
         public void Init($LAYER_CLASS_NAME layer)
         {
-
+            // do you have anything to initialize?
         }
 
         public Position Position { get; set; }
@@ -18,9 +17,10 @@ namespace $PROJECT_NAME
 
         public void Tick()
         {
-
+            // what does the agent do on each tick?
         }
 
+        // identifies the agent
         public Guid ID { get; set; }
     }
 }
