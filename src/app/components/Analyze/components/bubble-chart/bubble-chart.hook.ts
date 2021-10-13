@@ -1,5 +1,5 @@
 import { ChartData, ChartOptions, LegendItem } from "chart.js";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useBoolean } from "react-use";
 import {
   isCheckedByName,
@@ -62,6 +62,13 @@ function useBubbleChart(): State {
     return dataAtTick.coords || [];
   };
 
+  const worldSizesAreValid = useMemo(
+    () =>
+      worldSizes &&
+      Object.values(worldSizes).every((val) => !Number.isNaN(val) && val >= 0),
+    [worldSizes]
+  );
+
   return {
     tick,
     maxTick,
@@ -77,17 +84,17 @@ function useBubbleChart(): State {
         animation: false,
       })),
     },
-    options: worldSizes
+    options: worldSizesAreValid
       ? {
           scales: {
             x: {
               type: "linear",
               min: worldSizes.minX,
-              max: worldSizes.maxX, // FIXME
+              max: worldSizes.maxX,
             },
             y: {
               type: "linear",
-              min: worldSizes.minY, // FIXME
+              min: worldSizes.minY,
               max: worldSizes.maxY,
             },
           },
