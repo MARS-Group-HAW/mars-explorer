@@ -23,6 +23,7 @@ import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import CircularProgressWithLabel from "./components/CircularProgressWithLabel";
 import DialogWithKeyListener from "../shared/dialog-with-key-listener";
+import ValidationState from "../../utils/types/validation-state";
 
 function getElBySimState(simState: SimulationStates) {
   switch (simState) {
@@ -47,6 +48,7 @@ function QuickStartBar() {
     projectName,
     modelState,
     modelErrorFiles,
+    dirtyModelNames,
     configState,
     configErrors,
     disableStart,
@@ -77,9 +79,13 @@ function QuickStartBar() {
         <StatusChip
           label="Model"
           status={modelState}
-          errors={modelErrorFiles}
+          list={
+            modelState === ValidationState.DIRTY
+              ? dirtyModelNames
+              : modelErrorFiles
+          }
         />
-        <StatusChip label="Config" status={configState} errors={configErrors} />
+        <StatusChip label="Config" status={configState} list={configErrors} />
         <ActionButton
           icon={<PlayCircleOutlineIcon />}
           disabled={disableStart}

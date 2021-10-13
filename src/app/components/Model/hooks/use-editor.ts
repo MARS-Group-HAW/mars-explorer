@@ -71,7 +71,7 @@ function useEditor(): State {
   useEffect(() => {
     if (!selectedModel) return () => {};
 
-    const { path, content } = selectedModel;
+    const { path, name, content } = selectedModel;
 
     const newModel = createOrGetModel(path, content);
     monacoEditor?.setModel(newModel);
@@ -80,15 +80,15 @@ function useEditor(): State {
 
     const disposeable = newModel.onDidChangeContent(() => {
       const isSameVersion = newModel.getAlternativeVersionId() === versionId;
-      const inDirtyModels = latestModels.current.includes(path);
+      const inDirtyModels = latestModels.current.includes(name);
 
       if (isSameVersion && inDirtyModels) {
-        dispatch(removeFromDirtyFiles(path));
+        dispatch(removeFromDirtyFiles(name));
         return;
       }
 
       if (!isSameVersion && !inDirtyModels) {
-        dispatch(addToDirtyFiles(path));
+        dispatch(addToDirtyFiles(name));
       }
     });
 
