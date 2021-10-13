@@ -17,7 +17,7 @@ import ValidationState from "../../../../utils/types/validation-state";
 type Props = {
   label: string;
   status: ValidationState;
-  errors?: string[];
+  list?: string[];
 };
 
 const useStyles = makeStyles((theme) => ({
@@ -35,7 +35,7 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-function StatusChip({ label, status, errors }: Props) {
+function StatusChip({ label, status, list }: Props) {
   const theme = useTheme();
   const classes = useStyles();
 
@@ -102,34 +102,25 @@ function StatusChip({ label, status, errors }: Props) {
   if (status !== ValidationState.INVALID && status !== ValidationState.DIRTY)
     return chip;
 
-  const ErrorComponent = (
+  const isDirty = status === ValidationState.DIRTY;
+
+  const TooltipContent = (
     <>
-      <Typography>The following file(s) contain(s) error(s):</Typography>
-      <ul>
-        {errors.map((error) => (
-          <li key={error}>{error}</li>
+      <Typography variant="caption">
+        {isDirty ? "Unsaved changes in:" : "Errors in:"}
+      </Typography>
+      <ul style={{ paddingLeft: 20 }}>
+        {list.map((item) => (
+          <li key={item}>
+            <Typography variant="body1">{item}</Typography>
+          </li>
         ))}
       </ul>
     </>
   );
 
-  const DirtyComponent = (
-    <Typography variant="caption">You have unsaved changes.</Typography>
-  );
-
-  const getTextByStatus = (state: ValidationState) => {
-    switch (state) {
-      case ValidationState.INVALID:
-        return ErrorComponent;
-      case ValidationState.DIRTY:
-        return DirtyComponent;
-      default:
-        return <></>;
-    }
-  };
-
   return (
-    <Tooltip arrow title={getTextByStatus(status)} placement="top">
+    <Tooltip arrow title={TooltipContent} placement="top">
       {chip}
     </Tooltip>
   );

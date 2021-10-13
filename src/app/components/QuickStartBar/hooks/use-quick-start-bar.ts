@@ -27,6 +27,7 @@ type State = {
   errorMsg: string;
   modelState: ValidationState;
   modelErrorFiles?: string[];
+  dirtyModelNames: string[];
   configErrors: string[];
   configState: ValidationState;
   disableStart: boolean;
@@ -111,6 +112,7 @@ function useQuickStartBar(): State {
     openErrorDialog: () => setShowErrorDialog(true),
     closeErrorDialog: () => setShowErrorDialog(false),
     modelErrorFiles: modelErrors || [],
+    dirtyModelNames: modelDirtyFiles,
     configErrors,
     disableStart,
     disableStop,
