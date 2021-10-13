@@ -1,4 +1,10 @@
-import { configureStore } from "@reduxjs/toolkit";
+import {
+  AnyAction,
+  combineReducers,
+  configureStore,
+  createAction,
+  Reducer,
+} from "@reduxjs/toolkit";
 import { createLogger } from "redux-logger";
 import projectReducer from "../components/Home/utils/project-slice";
 import modelReducer from "../components/Model/utils/model-slice";
@@ -10,13 +16,24 @@ const logger = createLogger({
   predicate: (getState, action) => !action.type.startsWith("simulation"),
 });
 
+const combinedReducer = combineReducers({
+  project: projectReducer,
+  model: modelReducer,
+  config: configReducer,
+  simulation: simulationReducer,
+});
+
+export const resetStore = createAction<void, "resetStore">("resetStore");
+
+const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
+  if (action.type === resetStore.type) {
+    return {} as RootState;
+  }
+  return combinedReducer(state, action);
+};
+
 const store = configureStore({
-  reducer: {
-    project: projectReducer,
-    model: modelReducer,
-    config: configReducer,
-    simulation: simulationReducer,
-  },
+  reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware({
       serializableCheck: false,
@@ -24,7 +41,7 @@ const store = configureStore({
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself
-export type RootState = ReturnType<typeof store.getState>;
+export type RootState = ReturnType<typeof combinedReducer>;
 // Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
 export type AppDispatch = typeof store.dispatch;
 

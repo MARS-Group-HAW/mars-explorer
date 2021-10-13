@@ -33,5 +33,6 @@ export const { setProject, resetProject } = projectSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectProject = (state: RootState) => state.project;
+export const selectProjectPath = (state: RootState) => state.project.path;
 
 export default projectSlice.reducer;

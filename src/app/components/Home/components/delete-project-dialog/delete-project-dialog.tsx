@@ -8,7 +8,7 @@ import {
   DialogTitle,
 } from "@material-ui/core";
 import { IFileRef } from "@shared/types/File";
-import useDeleteProjectDialog from "./use-delete-project.dialog";
+import useDeleteProjectDialogHook from "./use-delete-project-dialog.hook";
 import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 
 type Props = {
@@ -22,7 +22,7 @@ function DeleteProjectDialog({ fileRef, open, onClose }: Props) {
     loadConfirmButton,
     handleNewProjectDialogConfirm,
     handleNewProjectDialogClose,
-  } = useDeleteProjectDialog(onClose);
+  } = useDeleteProjectDialogHook(onClose);
 
   const onConfirm = () => handleNewProjectDialogConfirm(fileRef);
 

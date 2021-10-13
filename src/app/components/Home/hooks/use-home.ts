@@ -8,6 +8,7 @@ import {
   setProject as setGlobalProject,
 } from "../utils/project-slice";
 import useProjects from "./use-projects";
+import { resetStore } from "../../../utils/store";
 
 export enum HomeTab {
   MY_PROJECTS,
@@ -52,8 +53,10 @@ function useHome(): State {
 
   const isModelSelected = (project: ModelRef) => project.path === path;
 
-  const handleProjectClick = (model: ModelRef) =>
+  const handleProjectClick = (model: ModelRef) => {
+    dispatch(resetStore());
     dispatch(setGlobalProject(model));
+  };
 
   const handleCopyClick = (model: ModelRef) => {
     setModelRef(model);
