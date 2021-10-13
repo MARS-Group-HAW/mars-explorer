@@ -316,6 +316,27 @@ SafeIpcMain.on(Channel.INSTALL_MARS, (_, projectPath: string) => {
   });
 });
 
+SafeIpcMain.on(Channel.RESTORE_PROJECT, (_, projectPath: string) => {
+  if (!fs.pathExistsSync(projectPath)) {
+    SafeIpcMain.send(Channel.PROJECT_RESTORED, false);
+    throw new Error(
+      `Error while restoring the project: Path (${projectPath}) does not exist.`
+    );
+  }
+
+  const installProcess = child_process.exec("dotnet restore", {
+    cwd: projectPath,
+  });
+
+  installProcess.on("message", (msg: MessageEvent) => log.info(msg.data));
+  installProcess.on("error", (msg: Error) => log.error(msg));
+
+  installProcess.on("exit", (code) => {
+    log.info(`[RESTORE_PROJECT] Exited with code ${code}.`);
+    SafeIpcMain.send(Channel.PROJECT_RESTORED, code === 0);
+  });
+});
+
 SafeIpcMain.handle(Channel.CLEAN_PROJECT, (_, projectPath: string) => {
   log.warn("Starting to clean ", projectPath);
 

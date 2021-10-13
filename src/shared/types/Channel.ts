@@ -33,6 +33,7 @@ export enum Channel {
   MARS_INSTALLED = "MARS_INSTALLED",
   PATH_ABSOLUTE_TO_RELATIVE = "PATH_ABSOLUTE_TO_RELATIVE",
   PROJECT_CREATED = "PROJECT_CREATED",
+  PROJECT_RESTORED = "PROJECT_RESTORED",
   PROJECT_INITIALIZED = "PROJECT_INITIALIZED",
   READ_FILE = "READ_FILE",
   RESTART_APP = "RESTART_APP",
@@ -48,6 +49,7 @@ export enum Channel {
   URI_TO_NAME = "URI_TO_NAME",
   WRITE_CONFIG_TO_FILE = "WRITE_CONFIG_TO_FILE",
   WRITE_CONTENT_TO_FILE = "WRITE_CONTENT_TO_FILE",
+  RESTORE_PROJECT = "RESTORE_PROJECT",
 }
 
 export interface ChannelInputMap {
@@ -73,8 +75,10 @@ export interface ChannelInputMap {
   [Channel.PATH_ABSOLUTE_TO_RELATIVE]: PathAbsToRelParams;
   [Channel.PROJECT_CREATED]: void;
   [Channel.PROJECT_INITIALIZED]: void;
+  [Channel.PROJECT_RESTORED]: void;
   [Channel.READ_FILE]: string;
   [Channel.RESTART_APP]: void;
+  [Channel.RESTORE_PROJECT]: string;
   [Channel.RUN_SIMULATION]: string;
   [Channel.SIMULATION_COORDS_PROGRESS]: void;
   [Channel.SIMULATION_COUNT_PROGRESS]: void;
@@ -112,8 +116,10 @@ export interface ChannelOutputMap {
   [Channel.PATH_ABSOLUTE_TO_RELATIVE]: string;
   [Channel.PROJECT_CREATED]: boolean;
   [Channel.PROJECT_INITIALIZED]: void;
+  [Channel.PROJECT_RESTORED]: boolean;
   [Channel.READ_FILE]: string;
   [Channel.RESTART_APP]: void;
+  [Channel.RESTORE_PROJECT]: void;
   [Channel.RUN_SIMULATION]: void;
   [Channel.SIMULATION_COORDS_PROGRESS]: SimulationVisMessage;
   [Channel.SIMULATION_COUNT_PROGRESS]: SimulationCountMessage;
