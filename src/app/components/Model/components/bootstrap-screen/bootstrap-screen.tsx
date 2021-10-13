@@ -23,6 +23,8 @@ function stepToLabel(step: LoadingSteps) {
       return "Reading Models";
     case LoadingSteps.MARS_FRAMEWORK_ADDED:
       return "Installing MARS-Framework";
+    case LoadingSteps.PROJECT_INITIALIZED:
+      return "Initializing project";
     default:
       return "Unknown loading step";
   }
