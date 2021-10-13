@@ -33,12 +33,9 @@ function useLanguageClient(path: string) {
   const [isInitializing, setIsInitializing] = useBoolean(true);
   const [hasBeenCleaned, setHasBeenCleaned] = useBoolean(false);
 
-  const latestInit = useLatest(isInitializing);
   const latestBeenCleaned = useLatest(hasBeenCleaned);
 
   async function afterTimeout() {
-    if (!latestInit.current) return;
-
     if (latestBeenCleaned.current) {
       addErrorAlert({
         msg: "The server could not be started. Make sure that the project is created by the MARS-Explorer or is based on an example project. You can still make changes to your files but they won't be validated.",
@@ -72,9 +69,12 @@ function useLanguageClient(path: string) {
 
     setIsLoading(false);
 
-    client.onReady().then(() => setIsInitializing(false));
+    const timeout = setTimeout(afterTimeout, 30000);
 
-    setTimeout(afterTimeout, 30000);
+    client.onReady().then(() => {
+      setIsInitializing(false);
+      clearTimeout(timeout);
+    });
   };
 
   async function cleanAndRestart() {
