@@ -73,7 +73,7 @@ export function getServer(projectPath: string): Server {
     ...OMNISHARP_BASE,
     args: [...OMNISHARP_BASE.args, `-s ${projectPath}`],
     options: {
-      cwd: path.join(appPaths.resourcesDir, "omnisharp", currentOS),
+      cwd: path.join(appPaths.omnisharpDir, currentOS),
       shell: true,
     },
   };

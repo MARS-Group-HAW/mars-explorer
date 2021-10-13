@@ -35,7 +35,7 @@ SafeIpcMain.handle(Channel.GET_WORKSPACE_PATH, () => appPaths.workspaceDir);
 
 SafeIpcMain.handle(
   Channel.GET_EXAMPLES_PATH,
-  () => appPaths.workspaceExamplesDir
+  () => appPaths.resourcesExamplesDir
 );
 
 SafeIpcMain.handle(Channel.URI_TO_NAME, (_, uri) =>
@@ -56,7 +56,6 @@ function getProjectsInDir(dir: string): string[] {
 
 SafeIpcMain.handle(Channel.GET_USER_PROJECTS, () => {
   const userProjects = getProjectsInDir(appPaths.workspaceDir)
-    .filter((file) => file !== appPaths.workspaceExamplesDir) // no example dir
     .map((file) => ({
       file,
       time: fs.statSync(file).mtime.getTime(),
@@ -68,12 +67,12 @@ SafeIpcMain.handle(Channel.GET_USER_PROJECTS, () => {
 });
 
 SafeIpcMain.handle(Channel.GET_EXAMPLE_PROJECTS, () => {
-  const userProjects = getProjectsInDir(appPaths.workspaceExamplesDir);
+  const userProjects = getProjectsInDir(appPaths.resourcesExamplesDir);
   return userProjects.map((file) => new FileRef(file));
 });
 
 SafeIpcMain.handle(Channel.GET_ALL_EXAMPLE_PROJECTS, (): ExampleProject[] => {
-  const examplesProjectDirs = getProjectsInDir(appPaths.workspaceExamplesDir);
+  const examplesProjectDirs = getProjectsInDir(appPaths.resourcesExamplesDir);
 
   return examplesProjectDirs.map((exampleProjectDir) => {
     const files = fs
