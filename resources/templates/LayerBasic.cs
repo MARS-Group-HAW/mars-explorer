@@ -1,10 +1,18 @@
 using Mars.Components.Layers;
 
-
 namespace $PROJECT_NAME
 {
-    public class $CLASS_NAME : RasterLayer
+    public class $CLASS_NAME : AbstractLayer
     {
-
+        // Do you want to execute custom logic, initialize Environments or spawn agents?
+        public override bool InitLayer(TInitData layerInitData, RegisterAgent registerAgentHandle, UnregisterAgent unregisterAgentHandle)
+        {
+            // [IMPORTANT - DO NOT DELETE] do not delete this
+            base.InitLayer(layerInitData, registerAgentHandle, unregisterAgentHandle);
+            // Put your initialization logic here.
+            return true;
+        }
     }
 }
+
+
