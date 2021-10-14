@@ -14,17 +14,23 @@ import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 type Props = {
   projectToCopy: IFileRef;
   open: boolean;
+  onCopy: () => void;
   onClose: () => void;
 };
 
-function CopyProjectDialog({ open, onClose, projectToCopy }: Props) {
+function CopyProjectDialog({ open, onClose, onCopy, projectToCopy }: Props) {
   const { loadConfirmButton, handleConfirm, handleClose } =
     useCopyProjectDialogHook(projectToCopy, onClose);
+
+  const onConfirmPress = () => {
+    handleConfirm();
+    onCopy();
+  };
 
   return (
     <DialogWithKeyListener
       open={open}
-      onKeyPressed={handleConfirm}
+      onKeyPressed={onConfirmPress}
       onClose={handleClose}
     >
       <DialogTitle id="form-dialog-title">
@@ -41,7 +47,7 @@ function CopyProjectDialog({ open, onClose, projectToCopy }: Props) {
           Cancel
         </Button>
         <Button
-          onClick={handleConfirm}
+          onClick={onConfirmPress}
           color="primary"
           disabled={loadConfirmButton}
         >

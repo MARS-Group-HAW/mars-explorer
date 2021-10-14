@@ -10,6 +10,7 @@ import {
   SimulationVisMessage,
   SimulationWorldSizeMessage,
 } from "./SimulationMessages";
+import ModelFile from "../../electron/types/ModelFile";
 
 export enum Channel {
   CHECK_LAST_PATH = "CHECK_LAST_PATH",
@@ -24,7 +25,6 @@ export enum Channel {
   GET_ALL_EXAMPLE_PROJECTS = "GET_ALL_EXAMPLE_PROJECTS",
   GET_CONFIG_IN_PROJECT = "GET_CONFIG_IN_PROJECT",
   GET_DEFAULT_CONFIG_PATH = "GET_DEFAULT_CONFIG_PATH",
-  GET_EXAMPLE_PROJECTS = "GET_EXAMPLE_PROJECTS",
   GET_EXAMPLES_PATH = "GET_EXAMPLES_PATH",
   GET_USER_PROJECT = "GET_USER_PROJECT",
   GET_USER_PROJECTS = "GET_USER_PROJECTS",
@@ -50,6 +50,7 @@ export enum Channel {
   WRITE_CONFIG_TO_FILE = "WRITE_CONFIG_TO_FILE",
   WRITE_CONTENT_TO_FILE = "WRITE_CONTENT_TO_FILE",
   RESTORE_PROJECT = "RESTORE_PROJECT",
+  GET_README_IN_DIR = "GET_README_IN_DIR",
 }
 
 export interface ChannelInputMap {
@@ -65,8 +66,8 @@ export interface ChannelInputMap {
   [Channel.GET_ALL_EXAMPLE_PROJECTS]: void;
   [Channel.GET_CONFIG_IN_PROJECT]: string;
   [Channel.GET_DEFAULT_CONFIG_PATH]: string;
-  [Channel.GET_EXAMPLE_PROJECTS]: void;
   [Channel.GET_EXAMPLES_PATH]: void;
+  [Channel.GET_README_IN_DIR]: string;
   [Channel.GET_USER_PROJECT]: ModelRef;
   [Channel.GET_USER_PROJECTS]: void;
   [Channel.GET_WORKSPACE_PATH]: void;
@@ -106,8 +107,8 @@ export interface ChannelOutputMap {
   [Channel.GET_ALL_EXAMPLE_PROJECTS]: ExampleProject[];
   [Channel.GET_CONFIG_IN_PROJECT]: string | null;
   [Channel.GET_DEFAULT_CONFIG_PATH]: string;
-  [Channel.GET_EXAMPLE_PROJECTS]: ModelRef[];
   [Channel.GET_EXAMPLES_PATH]: string;
+  [Channel.GET_README_IN_DIR]: ModelFile;
   [Channel.GET_USER_PROJECT]: WorkingModel;
   [Channel.GET_USER_PROJECTS]: ModelRef[];
   [Channel.GET_WORKSPACE_PATH]: string;

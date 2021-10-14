@@ -9,21 +9,17 @@ type State = {
   fetchProjects: () => void;
 };
 
-function useProjects(
-  channel: Channel.GET_USER_PROJECTS | Channel.GET_EXAMPLE_PROJECTS
-): State {
+function useProjects(): State {
   const { addErrorAlert } = useContext(SnackBarContext);
   const [modelRefs, setModelRefs] = useState<ModelRef[]>([]);
 
   const fetchProjects = async () =>
     window.api
-      .invoke(channel)
+      .invoke(Channel.GET_USER_PROJECTS)
       .then((refs) => setModelRefs(refs))
       .catch((e: any) =>
         addErrorAlert({
-          msg: `An error occured while trying to access your ${
-            channel === Channel.GET_EXAMPLE_PROJECTS ? "example" : ""
-          } projects: ${e}`,
+          msg: `An error occured while trying to access your projects: ${e}`,
         })
       );
 
