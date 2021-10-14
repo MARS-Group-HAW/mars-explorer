@@ -110,7 +110,10 @@ function ExampleProjectListItem({ project }: Props) {
                 className: classes.ellipsis,
               }}
             />
-            <InfoOutlined color="primary" fontSize="small" />
+            <InfoOutlined
+              color={project.readme ? "primary" : "disabled"}
+              fontSize="small"
+            />
           </ListItem>
         </List>
       </Collapse>

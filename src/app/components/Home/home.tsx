@@ -2,29 +2,22 @@ import * as React from "react";
 import {
   AppBar,
   Box,
-  Button,
   Fab,
-  Grid,
-  IconButton,
   Paper,
   Tab,
   Table,
   TableBody,
-  TableCell,
   TableContainer,
-  TableRow,
   Tabs,
-  Typography,
 } from "@material-ui/core";
 import { makeStyles } from "@material-ui/core/styles";
-import { Link } from "react-router-dom";
 import AddIcon from "@material-ui/icons/Add";
-import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import useHome, { HomeTab } from "./hooks/use-home";
-import Path from "../App/utils/app-paths";
 import NewProjectDialog from "./components/new-project-dialog";
 import DeleteProjectDialog from "./components/delete-project-dialog";
 import CopyProjectDialog from "./components/copy-project-dialog";
+import UserProjectRow from "./components/user-project-row";
+import ExampleProjectRow from "./components/example-project-row";
 
 const useStyles = makeStyles((theme) => ({
   table: {
@@ -43,6 +36,7 @@ const Home = () => {
     tab,
     onTabChange,
     projects,
+    exampleProjects,
     processingModel,
     openCreateDialog,
     openDeleteDialog,
@@ -75,56 +69,26 @@ const Home = () => {
         <TableContainer component={Paper}>
           <Table aria-label="user projects">
             <TableBody>
-              {projects.map((row) => (
-                <TableRow key={row.name}>
-                  <TableCell component="th" scope="row">
-                    <Typography>{row.name}</Typography>
-                  </TableCell>
-                  <TableCell>
-                    <Typography color="textSecondary" variant="caption">
-                      {row.path}
-                    </Typography>
-                  </TableCell>
-                  <TableCell align="right">
-                    <Grid
-                      container
-                      wrap="nowrap"
-                      justifyContent="space-between"
-                    >
-                      <IconButton
-                        onClick={() => handleDeleteProjectClick(row)}
-                        color="default"
-                        size="small"
-                        disabled={!isUserProject}
-                      >
-                        <DeleteForeverIcon />
-                      </IconButton>
-                      {isUserProject ? (
-                        <Button
-                          style={{ marginLeft: 10 }}
-                          component={Link}
-                          to={Path.MODEL}
-                          variant="contained"
-                          color="primary"
-                          disabled={isModelSelected(row)}
-                          onClick={() => handleProjectClick(row)}
-                        >
-                          Open
-                        </Button>
-                      ) : (
-                        <Button
-                          style={{ marginLeft: 10 }}
-                          variant="contained"
-                          color="primary"
-                          onClick={() => handleExampleProjectClick(row)}
-                        >
-                          Copy
-                        </Button>
-                      )}
-                    </Grid>
-                  </TableCell>
-                </TableRow>
-              ))}
+              {isUserProject &&
+                projects.map((row) => (
+                  <UserProjectRow
+                    key={row.path}
+                    name={row.name}
+                    path={row.path}
+                    isSelected={isModelSelected(row)}
+                    onClick={() => handleProjectClick(row)}
+                    onDeleteClick={() => handleDeleteProjectClick(row)}
+                  />
+                ))}
+              {!isUserProject &&
+                exampleProjects.map((row) => (
+                  <ExampleProjectRow
+                    key={row.path}
+                    name={row.name}
+                    readme={row.readme}
+                    onClick={() => handleExampleProjectClick(row)}
+                  />
+                ))}
             </TableBody>
           </Table>
         </TableContainer>
@@ -141,6 +105,7 @@ const Home = () => {
       <CopyProjectDialog
         projectToCopy={processingModel}
         open={openCopyDialog}
+        onCopy={() => onTabChange(HomeTab.MY_PROJECTS)}
         onClose={handleCopyProjectClose}
       />
       <Fab

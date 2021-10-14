@@ -66,11 +66,6 @@ SafeIpcMain.handle(Channel.GET_USER_PROJECTS, () => {
   return userProjects.map((file) => new FileRef(file));
 });
 
-SafeIpcMain.handle(Channel.GET_EXAMPLE_PROJECTS, () => {
-  const userProjects = getProjectsInDir(appPaths.resourcesExamplesDir);
-  return userProjects.map((file) => new FileRef(file));
-});
-
 SafeIpcMain.handle(Channel.GET_ALL_EXAMPLE_PROJECTS, (): ExampleProject[] => {
   const examplesProjectDirs = getProjectsInDir(appPaths.resourcesExamplesDir);
 
