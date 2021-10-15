@@ -7,7 +7,9 @@ import {
 } from "@reduxjs/toolkit";
 import { createLogger } from "redux-logger";
 import projectReducer from "../components/Home/utils/project-slice";
-import modelReducer from "../components/Model/utils/model-slice";
+import modelReducer, {
+  initialState,
+} from "../components/Model/utils/model-slice";
 import configReducer from "../components/Configure/utils/config-slice";
 import simulationReducer from "../components/QuickStartBar/utils/simulation-slice";
 
@@ -29,6 +31,7 @@ const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
   if (action.type === resetStore.type) {
     return {
       model: {
+        ...initialState,
         exampleProjects: state.model.exampleProjects,
       },
     } as RootState;
