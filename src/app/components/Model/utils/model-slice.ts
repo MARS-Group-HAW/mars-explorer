@@ -9,38 +9,64 @@ import {
 } from "../../../utils/slices/loading-slice";
 import LoadingSteps from "./LoadingSteps";
 
+type ModelWithMeta = {
+  model: IModelFile;
+  isDirty: boolean;
+  isErroneous: boolean;
+  lastSavedVersion: number;
+};
+
+type ModelId = {
+  path: string;
+};
+
+type ErrorPayload = ModelId & Pick<ModelWithMeta, "isErroneous">;
+type DirtyPayload = ModelId & Pick<ModelWithMeta, "isDirty">;
+type VersionPayload = ModelId & Pick<ModelWithMeta, "lastSavedVersion">;
+
 // Define a type for the slice state
 type ModelState = LoadingState<LoadingSteps> & {
-  models: WorkingModel;
+  models: ModelWithMeta[];
   exampleProjects: ExampleProject[];
-  namesWithError: string[];
-  dirtyModels: string[];
 };
 
 // Define the initial state using that type
 const initialState: ModelState = {
   models: [],
   exampleProjects: [],
-  namesWithError: [],
-  dirtyModels: [],
   ...initialLoadingState,
   maxSteps: Object.keys(LoadingSteps).length,
 };
+
+const findIndexOfModelByPath = (
+  modelsWithMeta: ModelWithMeta[],
+  searchPath: string
+) => modelsWithMeta.findIndex(({ model }) => model.path === searchPath);
 
 export const modelSlice = createSlice({
   name: "model",
   initialState,
   reducers: {
     addModel: (state, { payload }: PayloadAction<IModelFile>) => {
-      state.models.push(payload);
+      state.models.push({
+        model: payload,
+        isDirty: false,
+        isErroneous: false,
+        lastSavedVersion: 1,
+      });
     },
     removeModel: (state, { payload }: PayloadAction<IModelFile>) => {
       state.models = state.models.filter(
-        (model) => model.path !== payload.path
+        ({ model }) => model.path !== payload.path
       );
     },
     setModel: (state, { payload }: PayloadAction<WorkingModel>) => {
-      state.models = payload;
+      state.models = payload.map((model) => ({
+        model,
+        isDirty: false,
+        isErroneous: false,
+        lastSavedVersion: 1,
+      }));
     },
     setExampleProjects: (
       state,
@@ -48,55 +74,99 @@ export const modelSlice = createSlice({
     ) => {
       state.exampleProjects = payload;
     },
-    addToDirtyFiles: (state, { payload }: PayloadAction<string>) => {
-      state.dirtyModels.push(payload);
+    setErrorStateInModel: (state, { payload }: PayloadAction<ErrorPayload>) => {
+      const { path, isErroneous } = payload;
+      const indexOfModel = findIndexOfModelByPath(state.models, path);
+
+      if (indexOfModel === -1) {
+        window.api.logger.warn(`Model ${path} was not found.`);
+        return;
+      }
+
+      state.models[indexOfModel].isErroneous = isErroneous;
     },
-    removeFromDirtyFiles: (state, { payload }: PayloadAction<string>) => {
-      state.dirtyModels = state.dirtyModels.filter(
-        (modelPath) => modelPath !== payload
-      );
+    setDirtyStateInModel: (state, { payload }: PayloadAction<DirtyPayload>) => {
+      const { path, isDirty } = payload;
+      const indexOfModel = findIndexOfModelByPath(state.models, path);
+
+      if (indexOfModel === -1) {
+        window.api.logger.warn(`Model ${path} was not found.`);
+        return;
+      }
+
+      state.models[indexOfModel].isDirty = isDirty;
     },
     resetDirtyModels: (state) => {
-      state.dirtyModels = initialState.dirtyModels;
+      state.models = state.models.map((model) => ({
+        ...model,
+        isDirty: false,
+      }));
     },
     resetErrors: (state) => {
-      state.namesWithError = initialState.namesWithError;
+      state.models = state.models.map((model) => ({
+        ...model,
+        isErroneous: false,
+      }));
     },
-    removeErrorsInPath: (state, { payload }: PayloadAction<string>) => {
-      state.namesWithError = state.namesWithError.filter(
-        (path) => path !== payload
-      );
-    },
-    setErrorsInPath: (state, { payload }: PayloadAction<string>) => {
-      if (state.namesWithError.includes(payload)) return;
+    setVersionId: (state, { payload }: PayloadAction<VersionPayload>) => {
+      const { path, lastSavedVersion } = payload;
+      const indexOfModel = findIndexOfModelByPath(state.models, path);
 
-      state.namesWithError = [payload, ...state.namesWithError];
+      if (indexOfModel === -1) {
+        window.api.logger.warn(`Model ${path} was not found.`);
+        return;
+      }
+
+      state.models[indexOfModel].lastSavedVersion = lastSavedVersion;
     },
     ...loadingReducers<LoadingSteps>(),
   },
 });
 
 export const {
-  removeErrorsInPath,
   resetErrors,
   setExampleProjects,
-  setErrorsInPath,
   finishLoadingStep,
   resetLoadingStep,
   addModel,
   removeModel,
   setModel,
-  addToDirtyFiles,
-  removeFromDirtyFiles,
+  setErrorStateInModel,
+  setDirtyStateInModel,
+  setVersionId,
+  resetDirtyModels,
+  resetLoadingSteps,
 } = modelSlice.actions;
 
 // Other code such as selectors can use the imported `RootState` type
 export const selectModel = (state: RootState) => state.model;
 export const selectModels = (state: RootState) => state.model.models;
+export const selectModelsWithoutMeta = (state: RootState) =>
+  state.model.models.map((model) => model.model);
 export const selectExampleProjects = (state: RootState) =>
   state.model.exampleProjects;
-export const selectErrors = (state: RootState) => state.model.namesWithError;
-export const selectDirtyModels = (state: RootState) => state.model.dirtyModels;
+export const selectModelVersionByPath = (state: RootState) => {
+  const modelsPathWithVersion: Record<string, number> = {};
+
+  state.model.models.forEach(({ model, lastSavedVersion }) => {
+    modelsPathWithVersion[model.path] = lastSavedVersion;
+  });
+
+  return modelsPathWithVersion;
+};
+
+export const selectErrors = (state: RootState) =>
+  state.model.models
+    .filter((model) => model.isErroneous)
+    .map((model) => model.model.name);
+export const selectModelsPathWithError = (state: RootState) =>
+  state.model.models
+    .filter((model) => model.isErroneous)
+    .map((model) => model.model.path);
+export const selectDirtyModels = (state: RootState) =>
+  state.model.models
+    .filter((model) => model.isDirty)
+    .map((model) => model.model.name);
 export const selectModelsRead = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MODELS_READ);
 export const selectLoadingSteps = (state: RootState) =>

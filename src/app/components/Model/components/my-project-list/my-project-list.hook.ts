@@ -40,7 +40,7 @@ function useModelList(): State {
 
   return {
     isLoading: !areModelsReady,
-    models,
+    models: models.map((model) => model.model),
     isModelInvalid,
     isModelSelected,
     isModelDirty,

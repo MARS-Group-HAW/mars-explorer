@@ -3,11 +3,7 @@ import { Channel } from "@shared/types/Channel";
 import { useBoolean } from "react-use";
 import { SnackBarContext } from "../../../shared/snackbar/snackbar-provider";
 import { useAppDispatch } from "../../../../utils/hooks/use-store";
-import {
-  removeFromDirtyFiles,
-  removeModel,
-  resetErrors,
-} from "../../utils/model-slice";
+import { removeModel } from "../../utils/model-slice";
 import {
   closeModelDeletion,
   useSharedModels,
@@ -49,8 +45,6 @@ function useDeleteClassDialog(): State {
     if (deleted) {
       addSuccessAlert({ msg: `"${name}" has been deleted.` });
       dispatch(removeModel(processedModel));
-      dispatch(removeFromDirtyFiles(processedModel.path));
-      dispatch(resetErrors());
     } else {
       addErrorAlert({
         msg: `An error occurred while deleting "${name}".`,
