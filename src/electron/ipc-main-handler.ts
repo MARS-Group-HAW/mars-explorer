@@ -3,6 +3,7 @@ import { app } from "electron";
 import { Channel } from "@shared/types/Channel";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import * as child_process from "child_process";
+import { ChildProcess } from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import SimObjects from "@shared/types/sim-objects";
 import { fileURLToPath } from "url";
@@ -445,16 +446,10 @@ enum ProcessExitCode {
   TERMINATED = 143,
 }
 
-SafeIpcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
-  if (!fs.pathExistsSync(projectPath)) {
-    throw new Error(
-      `Error while starting the simulation: Path (${projectPath}) does not exist.`
-    );
-  }
-
+function runSimulation(projectPath: string) {
   log.info(`Starting simulation in ${projectPath} ...`);
-  const simulationProcess = child_process.exec(
-    "dotnet run",
+  return child_process.exec(
+    "dotnet run --no-build",
     {
       cwd: projectPath,
     },
@@ -465,51 +460,86 @@ SafeIpcMain.handle(Channel.RUN_SIMULATION, (_, projectPath: string): void => {
       SafeIpcMain.send(Channel.SIMULATION_FAILED, error);
     }
   );
+}
 
-  SafeIpcMain.once(Channel.TERMINATE_SIMULATION, () => {
-    log.info(`Canceling simulation of ${projectPath}`);
-    simulationProcess.kill();
-  });
-
-  const wsHandler = new SimulationHandler({
-    handleCountMsg: (msg) =>
-      msg !== null && SafeIpcMain.send(Channel.SIMULATION_COUNT_PROGRESS, msg),
-    handleVisMsg: (msg) =>
-      msg !== null && SafeIpcMain.send(Channel.SIMULATION_COORDS_PROGRESS, msg),
-    handleWorldSizeMsg: (msg) =>
-      msg !== null && SafeIpcMain.send(Channel.SIMULATION_WORLD_SIZES, msg),
-    handleMaxRetries: () => simulationProcess.kill(),
-  });
-
-  const cleanupHandler = (wsCode?: WebSocketCloseCodes) => {
-    SafeIpcMain.removeHandler(Channel.TERMINATE_SIMULATION);
-    wsHandler.closeSockets(wsCode);
-  };
-
-  simulationProcess.on("exit", (code) => {
-    let exitState: SimulationStates;
-
-    switch (code) {
-      case ProcessExitCode.SUCCESS:
-        log.info(`Simulation exited successfully (${code}).`);
-        exitState = SimulationStates.SUCCESS;
-        cleanupHandler(WebSocketCloseCodes.EXITING);
-        break;
-      case ProcessExitCode.TERMINATED:
-        log.info(`Simulation was terminated (${code}).`);
-        exitState = SimulationStates.TERMINATED;
-        cleanupHandler(WebSocketCloseCodes.TERMINATED);
-        break;
-      case ProcessExitCode.ERROR:
-        log.error(`Simulation errored (${code}).`);
-        exitState = SimulationStates.FAILED;
-        cleanupHandler();
-        break;
-      default:
-        exitState = SimulationStates.UNKNOWN;
-        cleanupHandler();
+SafeIpcMain.on(
+  Channel.RUN_SIMULATION,
+  async (_, projectPath: string): Promise<void> => {
+    if (!fs.pathExistsSync(projectPath)) {
+      throw new Error(
+        `Error while starting the simulation: Path (${projectPath}) does not exist.`
+      );
     }
 
-    SafeIpcMain.send(Channel.SIMULATION_EXITED, exitState);
-  });
-});
+    let runProcess: ChildProcess;
+
+    log.info(`Building project ${projectPath} ...`);
+    const buildProcess = child_process.exec(
+      "dotnet build",
+      {
+        cwd: projectPath,
+      },
+      (error, stdout) => {
+        if (error) {
+          log.error("Error while building: ", stdout);
+          SafeIpcMain.send(Channel.SIMULATION_FAILED, stdout);
+          SafeIpcMain.send(Channel.SIMULATION_EXITED, SimulationStates.FAILED);
+          return;
+        }
+
+        runProcess = runSimulation(projectPath);
+
+        const wsHandler = new SimulationHandler({
+          handleCountMsg: (msg) =>
+            msg !== null &&
+            SafeIpcMain.send(Channel.SIMULATION_COUNT_PROGRESS, msg),
+          handleVisMsg: (msg) =>
+            msg !== null &&
+            SafeIpcMain.send(Channel.SIMULATION_COORDS_PROGRESS, msg),
+          handleWorldSizeMsg: (msg) =>
+            msg !== null &&
+            SafeIpcMain.send(Channel.SIMULATION_WORLD_SIZES, msg),
+          handleMaxRetries: () => runProcess.kill(),
+        });
+
+        const cleanupHandler = (wsCode?: WebSocketCloseCodes) => {
+          SafeIpcMain.removeHandler(Channel.TERMINATE_SIMULATION);
+          wsHandler.closeSockets(wsCode);
+        };
+
+        runProcess.on("exit", (code) => {
+          let exitState: SimulationStates;
+
+          switch (code) {
+            case ProcessExitCode.SUCCESS:
+              log.info(`Simulation exited successfully (${code}).`);
+              exitState = SimulationStates.SUCCESS;
+              cleanupHandler(WebSocketCloseCodes.EXITING);
+              break;
+            case ProcessExitCode.TERMINATED:
+              log.info(`Simulation was terminated (${code}).`);
+              exitState = SimulationStates.TERMINATED;
+              cleanupHandler(WebSocketCloseCodes.TERMINATED);
+              break;
+            case ProcessExitCode.ERROR:
+              log.error(`Simulation errored (${code}).`);
+              exitState = SimulationStates.FAILED;
+              cleanupHandler();
+              break;
+            default:
+              exitState = SimulationStates.UNKNOWN;
+              cleanupHandler();
+          }
+
+          SafeIpcMain.send(Channel.SIMULATION_EXITED, exitState);
+        });
+      }
+    );
+
+    SafeIpcMain.once(Channel.TERMINATE_SIMULATION, () => {
+      log.info(`Canceling simulation of ${projectPath}`);
+      buildProcess?.kill();
+      runProcess?.kill();
+    });
+  }
+);

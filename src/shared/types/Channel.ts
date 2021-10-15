@@ -125,7 +125,7 @@ export interface ChannelOutputMap {
   [Channel.SIMULATION_COORDS_PROGRESS]: SimulationVisMessage;
   [Channel.SIMULATION_COUNT_PROGRESS]: SimulationCountMessage;
   [Channel.SIMULATION_EXITED]: SimulationStates;
-  [Channel.SIMULATION_FAILED]: ExecException;
+  [Channel.SIMULATION_FAILED]: ExecException | string;
   [Channel.SIMULATION_WORLD_SIZES]: SimulationWorldSizeMessage;
   [Channel.START_LANGUAGE_SERVER]: string;
   [Channel.STOP_LANGUAGE_SERVER]: void;

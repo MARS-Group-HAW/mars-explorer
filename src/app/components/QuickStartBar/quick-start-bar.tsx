@@ -126,13 +126,14 @@ function QuickStartBar() {
       >
         <DialogTitle id="scroll-dialog-title">Last Error Message</DialogTitle>
         <DialogContent dividers>
-          <DialogContentText
-            id="scroll-dialog-description"
-            tabIndex={-1}
-            style={{ fontFamily: "monospace", color: "red" }}
-          >
-            {errorMsg}
-          </DialogContentText>
+          {errorMsg?.split("\n").map((msg) => (
+            <DialogContentText
+              tabIndex={-1}
+              style={{ fontFamily: "monospace", color: "red" }}
+            >
+              {msg}
+            </DialogContentText>
+          ))}
         </DialogContent>
         <DialogActions>
           <Button onClick={closeErrorDialog}>Close</Button>

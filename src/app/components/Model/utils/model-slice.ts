@@ -3,7 +3,6 @@ import { IModelFile, WorkingModel } from "@shared/types/Model";
 import ExampleProject from "@shared/types/ExampleProject";
 import type { RootState } from "../../../utils/store";
 import {
-  initialLoadingState,
   loadingReducers,
   LoadingState,
 } from "../../../utils/slices/loading-slice";
@@ -31,10 +30,10 @@ type ModelState = LoadingState<LoadingSteps> & {
 };
 
 // Define the initial state using that type
-const initialState: ModelState = {
+export const initialState: ModelState = {
   models: [],
   exampleProjects: [],
-  ...initialLoadingState,
+  finishedSteps: [],
   maxSteps: Object.keys(LoadingSteps).length,
 };
 
