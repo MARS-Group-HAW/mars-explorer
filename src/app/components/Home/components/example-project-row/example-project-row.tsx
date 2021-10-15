@@ -10,14 +10,16 @@ import {
 import { IModelFile } from "@shared/types/Model";
 import InfoOutlinedIcon from "@material-ui/icons/InfoOutlined";
 import MarkdownParser from "../../../shared/markdown-parser";
+import ConditionalTooltip from "../../../shared/conditional-tooltip";
 
 type Props = {
   name: string;
   readme: IModelFile;
   onClick: () => void;
+  disabled: boolean;
 };
 
-function ExampleProjectRow({ name, readme, onClick }: Props) {
+function ExampleProjectRow({ name, readme, disabled, onClick }: Props) {
   return (
     <TableRow>
       <TableCell component="th" scope="row">
@@ -39,14 +41,19 @@ function ExampleProjectRow({ name, readme, onClick }: Props) {
         </Grid>
       </TableCell>
       <TableCell align="right">
-        <Button
-          style={{ marginLeft: 10 }}
-          variant="contained"
-          color="primary"
-          onClick={onClick}
-        >
-          Copy
-        </Button>
+        <ConditionalTooltip show={disabled} title="Already copied.">
+          <span>
+            <Button
+              style={{ marginLeft: 10 }}
+              variant="contained"
+              color="primary"
+              onClick={onClick}
+              disabled={disabled}
+            >
+              Copy
+            </Button>
+          </span>
+        </ConditionalTooltip>
       </TableCell>
     </TableRow>
   );

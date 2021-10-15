@@ -23,6 +23,7 @@ type State = {
   exampleProjects: ExampleProject[];
   processingModel?: ModelRef;
   isModelSelected: (project: ModelRef) => boolean;
+  hasModelBeenCopied: (exampleProject: ExampleProject) => boolean;
   openCreateDialog: boolean;
   openDeleteDialog: boolean;
   openCopyDialog: boolean;
@@ -50,6 +51,9 @@ function useHome(): State {
   const [tab, setTab] = useState(HomeTab.MY_PROJECTS);
 
   const isModelSelected = (project: ModelRef) => project.path === path;
+
+  const hasModelBeenCopied = (exampleProject: ExampleProject) =>
+    userProjects.map((project) => project.name).includes(exampleProject.name);
 
   const handleProjectClick = (model: ModelRef) => {
     dispatch(resetStore());
@@ -87,6 +91,7 @@ function useHome(): State {
     exampleProjects,
     processingModel: modelRef,
     isModelSelected,
+    hasModelBeenCopied,
     openCreateDialog: newProjectDialogOpen,
     openDeleteDialog: deleteProjectDialogOpen,
     openCopyDialog: copyProjectDialogOpen,

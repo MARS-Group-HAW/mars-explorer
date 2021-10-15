@@ -42,6 +42,7 @@ const Home = () => {
     openDeleteDialog,
     openCopyDialog,
     isModelSelected,
+    hasModelBeenCopied,
     handleProjectClick,
     handleExampleProjectClick,
     handleNewProjectClick,
@@ -86,6 +87,7 @@ const Home = () => {
                     key={row.path}
                     name={row.name}
                     readme={row.readme}
+                    disabled={hasModelBeenCopied(row)}
                     onClick={() => handleExampleProjectClick(row)}
                   />
                 ))}
