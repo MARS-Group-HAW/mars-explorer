@@ -2,8 +2,9 @@
 using Grid_Test_CS.Model;
 using Mars.Components.Starter;
 using Mars.Interfaces.Model;
+using RandomGridMoveModel.Model;
 
-namespace Grid_Test_CS
+namespace RandomGridMoveModel
 {
     internal static class Program
     {
@@ -15,11 +16,12 @@ namespace Grid_Test_CS
             description.AddLayer<MyGridLayer>();
             // Register agent Murkel
             description.AddAgent<Murkel, MyGridLayer>();
-            // Create simulation task
-            var task = SimulationStarter.Start(description, args);
-            // Run simulation
-            var loopResults = task.Run();
-            // Feedback to user that simulation run was successful
+            
+            var file = File.ReadAllText("config.json");
+            var simConfig = SimulationConfig.Deserialize(file);
+            using var application = SimulationStarter.BuildApplication(description, simConfig);
+            var simulation = application.Resolve<ISimulation>();
+            var state = simulation.StartSimulation();
             Console.WriteLine($"Simulation execution finished after {loopResults.Iterations} steps");
         }
     }

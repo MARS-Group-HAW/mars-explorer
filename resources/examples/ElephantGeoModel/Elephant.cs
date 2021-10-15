@@ -6,7 +6,7 @@ using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Environments;
 using Mars.Interfaces.Layers;
 
-namespace Geo_Test_CS.Model
+namespace ElephantGeoModel
 {
     public class Elephant : IAgent<LandscapeLayer>, IPositionable
     {
@@ -36,10 +36,6 @@ namespace Geo_Test_CS.Model
 
         [PropertyDescription]
         public UnregisterAgent UnregisterHandle { get; set; }
-        
-        private LandscapeLayer Layer { get; set; }
-        public double Energy { get; set; }
-        
         public void Init(LandscapeLayer layer)
         {
             Layer = layer;
@@ -50,7 +46,7 @@ namespace Geo_Test_CS.Model
 
         public void Tick()
         {
-            var nearestWaterPos = Water.Explore(Position.PositionArray,-1D,1).FirstOrDefault().Node.NodePosition;
+            var nearestWaterPos = Water.Explore(Position.PositionArray,-1D,1).FirstOrDefault().NodePosition;
 
             Energy -= -10.0;
             if (Energy <= 0.0)
@@ -76,7 +72,8 @@ namespace Geo_Test_CS.Model
             }
         }
 
-
+        private LandscapeLayer Layer { get; set; }
+        public double Energy { get; set; }
 
         private void Kill()
         {

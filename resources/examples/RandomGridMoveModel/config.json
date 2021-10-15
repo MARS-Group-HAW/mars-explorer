@@ -10,7 +10,7 @@
   "layers": [
     {
       "name": "MyGridLayer",
-      "file": "grid.csv"
+      "file": "resources/grid.csv"
     }
   ],
   "agents": [

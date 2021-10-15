@@ -13,25 +13,25 @@
 	"layers": [
 		{
 			"name":"WaterLayer",
-			"file":"merged_water.geojson"
+			"file":"resources/merged_water.geojson"
 		},
 		{
 			"name":"KNPPerimeter",
-			"file":"gis_raster_border.zip"
+			"file":"resources/gis_raster_border.zip"
 		},
 		{
 			"name":"RCP85Prec",
-			"file":"RCP8.5_2010_2050_pre.zip"
+			"file":"resources/RCP8.5_2010_2050_pre.zip"
 		},
 		{
 			"name":"RCP85AGBio",
-			"file":"veg_knp_wifi_RCP85.zip"
+			"file":"resources/veg_knp_wifi_RCP85.zip"
 		}
 	],
 	"agents": [ {
       		"name":"Elephant",
       		"count":1,
-      		"file":"elephant1989_constant_population_15k.csv"
+      		"file":"resources/elephant1989_constant_population_15k.csv"
 		}
 	]
 }

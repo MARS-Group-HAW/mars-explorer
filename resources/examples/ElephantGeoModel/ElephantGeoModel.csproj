@@ -2,18 +2,18 @@
 
     <PropertyGroup>
         <OutputType>Exe</OutputType>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
         <RootNamespace>ElephantGeoModel</RootNamespace>
     </PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Mars.Life.Simulations" Version="4.3.0-beta" />
+        <PackageReference Include="Mars.Life.Simulations" Version="4.2.*" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="config.json">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
-        <Content Include="*.*">
+        <Content Include="resources/*.*">
             <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
         </Content>
     </ItemGroup>
