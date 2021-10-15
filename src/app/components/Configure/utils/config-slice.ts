@@ -69,5 +69,7 @@ export const selectConfigHasBeenChecked = (state: RootState) =>
   state.config.status === ValidationState.VALID ||
   state.config.status === ValidationState.INVALID ||
   state.config.status === ValidationState.DIRTY;
+export const selectConfigIsDirty = (state: RootState) =>
+  state.config.status === ValidationState.DIRTY;
 
 export default configSlice.reducer;

@@ -104,20 +104,32 @@ function StatusChip({ label, status, list }: Props) {
 
   const isDirty = status === ValidationState.DIRTY;
 
-  const TooltipContent = (
-    <>
+  let TooltipContent;
+
+  if (list.length > 0) {
+    TooltipContent = (
+      <>
+        <Typography variant="caption">
+          {isDirty ? "Unsaved changes in:" : "Errors in:"}
+        </Typography>
+        <ul style={{ paddingLeft: 20 }}>
+          {list.map((item) => (
+            <li key={item}>
+              <Typography variant="body1">{item}</Typography>
+            </li>
+          ))}
+        </ul>
+      </>
+    );
+  } else {
+    TooltipContent = (
       <Typography variant="caption">
-        {isDirty ? "Unsaved changes in:" : "Errors in:"}
+        {isDirty
+          ? "You have unsaved changes."
+          : "You have errors in your config."}
       </Typography>
-      <ul style={{ paddingLeft: 20 }}>
-        {list.map((item) => (
-          <li key={item}>
-            <Typography variant="body1">{item}</Typography>
-          </li>
-        ))}
-      </ul>
-    </>
-  );
+    );
+  }
 
   return (
     <Tooltip arrow title={TooltipContent} placement="top">
