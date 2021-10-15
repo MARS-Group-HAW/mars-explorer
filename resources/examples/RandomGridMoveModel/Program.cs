@@ -1,8 +1,7 @@
 ﻿using System;
-using Grid_Test_CS.Model;
+using System.IO;
 using Mars.Components.Starter;
 using Mars.Interfaces.Model;
-using RandomGridMoveModel.Model;
 
 namespace RandomGridMoveModel
 {
@@ -10,6 +9,7 @@ namespace RandomGridMoveModel
     {
         public static void Main(string[] args)
         {
+            // [IMPORTANT - DO NOT DELETE] This describes your executing model
             // Create a new model container
             var description = new ModelDescription();
             // Register layer MyGrid
@@ -17,12 +17,15 @@ namespace RandomGridMoveModel
             // Register agent Murkel
             description.AddAgent<Murkel, MyGridLayer>();
             
+            // [IMPORTANT - DO NOT DELETE] this reads your config
             var file = File.ReadAllText("config.json");
-            var simConfig = SimulationConfig.Deserialize(file);
-            using var application = SimulationStarter.BuildApplication(description, simConfig);
-            var simulation = application.Resolve<ISimulation>();
-            var state = simulation.StartSimulation();
-            Console.WriteLine($"Simulation execution finished after {loopResults.Iterations} steps");
+            var config = SimulationConfig.Deserialize(file);
+            
+            // [IMPORTANT - DO NOT DELETE] start a simulation
+            using var starter = SimulationStarter.Start(description, config);
+            var handle = starter.Run();
+            Console.WriteLine("Successfully executed iterations: " + handle.Iterations);
+            starter.Dispose();
         }
     }
 }
