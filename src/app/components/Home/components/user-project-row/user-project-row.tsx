@@ -10,6 +10,7 @@ import {
 import DeleteForeverIcon from "@material-ui/icons/DeleteForever";
 import { Link } from "react-router-dom";
 import Path from "../../../App/utils/app-paths";
+import ConditionalTooltip from "../../../shared/conditional-tooltip";
 
 type Props = {
   name: string;
@@ -41,17 +42,21 @@ function UserProjectRow({
           <IconButton onClick={onDeleteClick} color="default" size="small">
             <DeleteForeverIcon />
           </IconButton>
-          <Button
-            style={{ marginLeft: 10 }}
-            component={Link}
-            to={Path.MODEL}
-            variant="contained"
-            color="primary"
-            disabled={isSelected}
-            onClick={onClick}
-          >
-            Open
-          </Button>
+          <ConditionalTooltip show={isSelected} title="Already open">
+            <span>
+              <Button
+                style={{ marginLeft: 10 }}
+                component={Link}
+                to={Path.MODEL}
+                variant="contained"
+                color="primary"
+                disabled={isSelected}
+                onClick={onClick}
+              >
+                Open
+              </Button>
+            </span>
+          </ConditionalTooltip>
         </Grid>
       </TableCell>
     </TableRow>
