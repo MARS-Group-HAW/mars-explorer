@@ -19,7 +19,7 @@ function useProjects(): State {
       .then((refs) => setModelRefs(refs))
       .catch((e: any) =>
         addErrorAlert({
-          msg: `An error occured while trying to access your projects: ${e}`,
+          msg: `An error occurred while trying to access your projects: ${e}`,
         })
       );
 
