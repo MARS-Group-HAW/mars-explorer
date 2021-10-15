@@ -1,5 +1,5 @@
-﻿using Mars.Common.Core.Logging;
-using Mars.Common.Core.Logging.Enums;
+﻿using System;
+using System.IO;
 using Mars.Components.Starter;
 using Mars.Interfaces.Model;
 
@@ -9,30 +9,27 @@ namespace ElephantGeoModel
     {
         public static void Main(string[] args)
         {
-            if (args != null && System.Linq.Enumerable.Any(args, s => s.Equals("-l")))
-            {
-                LoggerFactory.SetLogLevel(LogLevel.Info);
-                LoggerFactory.ActivateConsoleLogging();
-            }
-            // Create a new model container
+            // [IMPORTANT - DO NOT DELETE] This describes your executing model
             var description = new ModelDescription();
-            // Register layer MyGrid
+            // Register layer
             description.AddLayer<LandscapeLayer>();
             // Register additional data layer
             description.AddLayer<KNPPerimeter>();
             description.AddLayer<WaterLayer>();
             description.AddLayer<RCP85Prec>();
             description.AddLayer<RCP85AGBio>();
-            // Register agent Murkel
+            // Register agent Elephant
             description.AddAgent<Elephant, LandscapeLayer>();
             
+            // [IMPORTANT - DO NOT DELETE] this reads your config
             var file = File.ReadAllText("config.json");
-            var simConfig = SimulationConfig.Deserialize(file);
-            using var application = SimulationStarter.BuildApplication(description, simConfig);
-            var simulation = application.Resolve<ISimulation>();
-            var state = simulation.StartSimulation();
-
-            Console.WriteLine($"Simulation execution finished after {loopResults.Iterations} steps");
+            var config = SimulationConfig.Deserialize(file);
+            
+            // [IMPORTANT - DO NOT DELETE] start a simulation
+            var starter = SimulationStarter.Start(description, config);
+            var handle = starter.Run();
+            Console.WriteLine("Successfully executed iterations: " + handle.Iterations);
+            starter.Dispose();
         }
     }
 }
