@@ -1,13 +1,13 @@
 using System;
 using Mars.Common.Core;
+using Mars.Common.Core.Random;
 using Mars.Components.Environments;
 using Mars.Interfaces.Agents;
 using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Environments;
 using Mars.Interfaces.Layers;
-using Mars.Numerics.Statistics;
 
-namespace Grid_Test_CS.Model
+namespace RandomGridMoveModel
 {
     public class Murkel : IAgent<MyGridLayer>, IPositionable
     {

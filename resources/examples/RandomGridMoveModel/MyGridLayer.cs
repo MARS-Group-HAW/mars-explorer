@@ -2,9 +2,10 @@ using System.Linq;
 using Mars.Components.Environments;
 using Mars.Components.Layers;
 using Mars.Core.Data;
+using Mars.Interfaces.Data;
 using Mars.Interfaces.Layers;
 
-namespace Grid_Test_CS.Model
+namespace RandomGridMoveModel
 {
     public class MyGridLayer : RasterLayer
     {

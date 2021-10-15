@@ -1,6 +1,6 @@
 using Mars.Components.Layers;
 
-namespace Geo_Test_CS.Model
+namespace ElephantGeoModel
 {
     public class KNPPerimeter : RasterLayer
     {

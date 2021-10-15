@@ -27,7 +27,11 @@ export const resetStore = createAction<void, "resetStore">("resetStore");
 
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
   if (action.type === resetStore.type) {
-    return {} as RootState;
+    return {
+      model: {
+        exampleProjects: state.model.exampleProjects,
+      },
+    } as RootState;
   }
   return combinedReducer(state, action);
 };
