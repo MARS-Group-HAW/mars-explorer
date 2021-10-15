@@ -36,7 +36,7 @@ function useSimulation(): State {
 
   function runSimulation(path: string) {
     dispatchSimState(SimulationStates.STARTED);
-    window.api.invoke(Channel.RUN_SIMULATION, path);
+    window.api.send(Channel.RUN_SIMULATION, path);
   }
 
   function cancelSimulation() {
@@ -83,8 +83,8 @@ function useSimulation(): State {
 
   useChannelSubscription(Channel.SIMULATION_WORLD_SIZES, handleWorldSizeMsg);
 
-  useChannelSubscription(Channel.SIMULATION_FAILED, (e: Error) => {
-    const errMsg = e.toString();
+  useChannelSubscription(Channel.SIMULATION_FAILED, (e: Error | string) => {
+    const errMsg = e instanceof String ? (e as string) : e.toString();
     window.api.logger.error("Simulation Error: ", errMsg);
     setError(errMsg);
   });
