@@ -1,6 +1,7 @@
 import * as React from "react";
 import { Formik } from "formik";
 import { Box, CircularProgress, Typography } from "@material-ui/core";
+import { Prompt } from "react-router-dom";
 import validationSchema from "./utils/validationSchema";
 import useConfigure from "./hooks";
 import useStyles from "./configure-styles";
@@ -11,8 +12,14 @@ import FormikWatcher from "./components/formik-watcher";
 
 export default function Configure() {
   const classes = useStyles();
-  const { config, showNoPathMsg, showForm, showLoading, handleSubmit } =
-    useConfigure();
+  const {
+    config,
+    showNoPathMsg,
+    showForm,
+    showLoading,
+    hasUnsavedChanges,
+    handleSubmit,
+  } = useConfigure();
 
   return (
     <div className={classes.root}>
@@ -25,6 +32,12 @@ export default function Configure() {
           </Typography>
         </Box>
       )}
+      <Prompt
+        when={hasUnsavedChanges}
+        message={() =>
+          `You have unsaved changes in your config. Do you really want to leave?`
+        }
+      />
       {showForm && (
         <Formik
           onSubmit={handleSubmit}
