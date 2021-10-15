@@ -1,4 +1,4 @@
-import { useCallback, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Channel } from "@shared/types/Channel";
 import SimObjects from "@shared/types/sim-objects";
 import { useBoolean } from "react-use";
@@ -13,7 +13,7 @@ import {
   useAppSelector,
 } from "../../../../utils/hooks/use-store";
 import { selectProject } from "../../../Home/utils/project-slice";
-import { addModel, selectModels } from "../../utils/model-slice";
+import { addModel, selectModelsWithoutMeta } from "../../utils/model-slice";
 import {
   closeModelCreation,
   selectModel,
@@ -35,7 +35,7 @@ type State = {
 };
 
 function useNewObjectDialog(): State {
-  const models = useAppSelector(selectModels);
+  const models = useAppSelector(selectModelsWithoutMeta);
   const { path, name } = useAppSelector(selectProject);
   const [{ isCreateDialogOpen }, sharedModelDispatch] = useSharedModels();
   const dispatch = useAppDispatch();

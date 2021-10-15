@@ -1,18 +1,13 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { editor } from "monaco-editor";
 import monaco from "@app/standalone/monaco-editor/monaco";
-import { useLatest, useUnmount } from "react-use";
+import { useUnmount } from "react-use";
 import _ from "lodash";
 import { CSHARP, MARKDOWN } from "../../../standalone/monaco-editor/types";
 import { useSharedModels } from "./use-shared-models";
-import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
-import {
-  addToDirtyFiles,
-  removeFromDirtyFiles,
-  selectDirtyModels,
-} from "../utils/model-slice";
 import useEditorDecorations from "./use-editor-decorations";
 import useEditorSaveKey from "./use-editor-save-key";
+import useDirtyFileHandler from "./use-dirty-file-handler";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import ITextModel = editor.ITextModel;
 import IStandaloneEditorConstructionOptions = editor.IStandaloneEditorConstructionOptions;
@@ -38,13 +33,11 @@ type State = {
 
 function useEditor(): State {
   const ref = useRef();
-  const dispatch = useAppDispatch();
-  const dirtyModels = useAppSelector(selectDirtyModels);
-  const latestModels = useLatest(dirtyModels);
   const [{ selectedModel, isExampleProject }] = useSharedModels();
   const [monacoEditor, setMonacoEditor] = useState<IStandaloneCodeEditor>();
   useEditorDecorations();
   useEditorSaveKey();
+  useDirtyFileHandler();
 
   function createOrGetModel(path: string, content: string): ITextModel {
     const modelUri = monaco.Uri.file(path);
@@ -69,30 +62,12 @@ function useEditor(): State {
   }
 
   useEffect(() => {
-    if (!selectedModel) return () => {};
+    if (!selectedModel) return;
 
-    const { path, name, content } = selectedModel;
+    const { path, content } = selectedModel;
 
     const newModel = createOrGetModel(path, content);
     monacoEditor?.setModel(newModel);
-
-    const versionId = newModel.getAlternativeVersionId();
-
-    const disposeable = newModel.onDidChangeContent(() => {
-      const isSameVersion = newModel.getAlternativeVersionId() === versionId;
-      const inDirtyModels = latestModels.current.includes(name);
-
-      if (isSameVersion && inDirtyModels) {
-        dispatch(removeFromDirtyFiles(name));
-        return;
-      }
-
-      if (!isSameVersion && !inDirtyModels) {
-        dispatch(addToDirtyFiles(name));
-      }
-    });
-
-    return () => disposeable.dispose();
   }, [selectedModel]);
 
   useEffect(

@@ -4,7 +4,7 @@ import { Channel } from "@shared/types/Channel";
 import { useAppDispatch } from "../../../utils/hooks/use-store";
 import { useSharedModels } from "./use-shared-models";
 import { SnackBarContext } from "../../shared/snackbar/snackbar-provider";
-import { removeFromDirtyFiles } from "../utils/model-slice";
+import { setDirtyStateInModel, setVersionId } from "../utils/model-slice";
 
 type State = {
   saveCurrentFile: () => void;
@@ -27,7 +27,7 @@ function useSaveFile(): State {
       return;
     }
 
-    const { path } = selectedModel;
+    const { path, name } = selectedModel;
 
     const content = currentModel.getValue();
 
@@ -36,8 +36,14 @@ function useSaveFile(): State {
         path,
         content,
       });
-      addSuccessAlert({ msg: `Saved ${selectedModel.name}.` });
-      dispatch(removeFromDirtyFiles(path));
+      addSuccessAlert({ msg: `Saved ${name}.` });
+      dispatch(setDirtyStateInModel({ path, isDirty: false }));
+      dispatch(
+        setVersionId({
+          path,
+          lastSavedVersion: currentModel.getAlternativeVersionId(),
+        })
+      );
     } catch (e: any) {
       addErrorAlert({ msg: `An error occurred while saving your file: ${e}` });
     }

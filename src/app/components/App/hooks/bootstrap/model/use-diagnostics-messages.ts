@@ -6,19 +6,18 @@ import {
   PublishDiagnosticsParams,
 } from "@codingame/monaco-languageclient";
 import { DiagnosticSeverity } from "vscode-languageserver";
-import { Channel } from "@shared/types/Channel";
 import { useLatest } from "react-use";
+import { Uri } from "monaco-editor";
 import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../../utils/hooks/use-store";
-import { selectProject } from "../../../../Home/utils/project-slice";
+import { selectProjectPath } from "../../../../Home/utils/project-slice";
 import {
-  removeErrorsInPath,
   resetErrors,
-  selectErrors,
   selectModelFullyInitialized,
-  setErrorsInPath,
+  selectModelsPathWithError,
+  setErrorStateInModel,
 } from "../../../../Model/utils/model-slice";
 
 type State = {
@@ -36,8 +35,8 @@ const diagnosticIsError = (diagnostic: Diagnostic): boolean =>
   diagnostic.severity === DiagnosticSeverity.Error;
 
 function useDiagnosticsMessages(): State {
-  const { path } = useAppSelector(selectProject);
-  const errors = useAppSelector(selectErrors);
+  const projectPath = useAppSelector(selectProjectPath);
+  const errors = useAppSelector(selectModelsPathWithError);
   const latestErrors = useLatest(errors);
 
   const initialized = useAppSelector(selectModelFullyInitialized);
@@ -49,7 +48,7 @@ function useDiagnosticsMessages(): State {
     dispatch(resetErrors());
   };
 
-  useEffect(resetDiagnostics, [path]);
+  useEffect(resetDiagnostics, [projectPath]);
 
   async function handleMessage(msg: Message) {
     if (!latestInitialized.current) return;
@@ -63,17 +62,27 @@ function useDiagnosticsMessages(): State {
         diagnosticParams.diagnostics.filter(diagnosticIsError);
 
       const { uri } = diagnosticParams;
-      const pathFromUri = await window.api.invoke(Channel.URI_TO_NAME, uri);
+      const { path } = Uri.parse(uri);
 
-      const isInErrors = latestErrors.current.includes(pathFromUri);
+      const isInErrors = latestErrors.current.includes(path);
 
       if (diagnosticErrors.length > 0 && !isInErrors) {
-        dispatch(setErrorsInPath(pathFromUri));
+        dispatch(
+          setErrorStateInModel({
+            path,
+            isErroneous: true,
+          })
+        );
         return;
       }
 
       if (diagnosticErrors.length === 0 && isInErrors) {
-        dispatch(removeErrorsInPath(pathFromUri));
+        dispatch(
+          setErrorStateInModel({
+            path,
+            isErroneous: false,
+          })
+        );
       }
     }
   }
