@@ -34,6 +34,7 @@ class FormTransformer {
       delete globals.steps;
       globals.timeSpecification = TimeSpecification.DATETIME;
     } else {
+      delete globals.deltaTUnit;
       globals.timeSpecification = TimeSpecification.STEP;
     }
 
@@ -59,6 +60,7 @@ class FormTransformer {
       if (globals.timeSpecification === TimeSpecification.STEP) {
         delete globals.startPoint;
         delete globals.endPoint;
+        delete globals.deltaTUnit;
       }
 
       if (globals.timeSpecification === TimeSpecification.DATETIME) {
