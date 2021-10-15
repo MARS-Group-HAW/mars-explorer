@@ -21,8 +21,8 @@ const ValidationSchema: SchemaOf<GlobalsOptions> = Yup.object()
         then: Yup.string()
           .oneOf(ALL_TIME_UNITS)
           .required("Units are required if time-based"),
-      })
-      .default(defaultValues[FieldNames.DELTA_T_UNIT]),
+      }),
+    // .default(defaultValues[FieldNames.DELTA_T_UNIT]),
     [FieldNames.TIME_SPECIFICATION]: Yup.mixed()
       .oneOf(Object.values(TimeSpecification))
       .default(defaultValues[FieldNames.TIME_SPECIFICATION]),
