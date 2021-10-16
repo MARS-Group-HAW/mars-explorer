@@ -1,5 +1,6 @@
 import { spawn } from "child_process";
 import { BrowserWindow } from "electron";
+import kill from "tree-kill";
 import { getServer } from "./server-config";
 import mainLogger from "../main-logger";
 import LspWriter from "./lsp-writer";
@@ -27,7 +28,7 @@ function launchLanguageServer(
   const killServer = () => {
     reader.dispose();
     writer.dispose();
-    lsProcess.kill("SIGINT");
+    kill(lsProcess.pid);
   };
 
   mainLogger.info("Server spawned successfully!");

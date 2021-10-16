@@ -45,6 +45,7 @@
     "reconnecting-websocket": "^4.4.0",
     "redux-logger": "^3.0.6",
     "reflect-metadata": "^0.1.13",
+    "tree-kill": "^1.2.2",
     "vscode-jsonrpc": "^6.0.0",
     "vscode-languageserver": "7.0.0",
     "ws": "^5.0.0",
