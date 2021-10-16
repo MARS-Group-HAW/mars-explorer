@@ -73,7 +73,7 @@ const MappingsForm = ({ children }: Props) => {
                 Add Mapping
               </Button>
             </Grid>
-            <div style={{ height: height - 40, overflowY: "scroll" }}>
+            <div style={{ height: height - 40, overflowY: "auto" }}>
               {individualMappingNamespaces.length === 0 && (
                 <NoDataMessage msg="No individual mappings" />
               )}
