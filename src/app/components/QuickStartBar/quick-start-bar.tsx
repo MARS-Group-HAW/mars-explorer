@@ -14,34 +14,9 @@ import StatusChip from "@app/components/QuickStartBar/components/status-chip";
 import ActionButton from "@app/components/QuickStartBar/components/action-button";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import StopIcon from "@material-ui/icons/Stop";
-import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
-import ErrorIcon from "@material-ui/icons/Error";
-import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
-import PanToolIcon from "@material-ui/icons/PanTool";
-import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
-import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
-import { SimulationStates } from "@shared/types/SimulationStates";
-import CircularProgressWithLabel from "./components/CircularProgressWithLabel";
 import DialogWithKeyListener from "../shared/dialog-with-key-listener";
 import ValidationState from "../../utils/types/validation-state";
-
-function getElBySimState(simState: SimulationStates) {
-  switch (simState) {
-    case SimulationStates.SUCCESS:
-      return <CheckCircleOutlineIcon color="secondary" />;
-    case SimulationStates.FAILED:
-      return <ErrorIcon color="secondary" />;
-    case SimulationStates.PAUSED:
-      return <PauseCircleOutlineIcon color="secondary" />;
-    case SimulationStates.TERMINATED:
-      return <PanToolIcon color="secondary" />;
-    case SimulationStates.NONE:
-      return <HourglassEmptyIcon color="secondary" />;
-    case SimulationStates.UNKNOWN:
-    default:
-      return <HelpOutlineIcon />;
-  }
-}
+import StatusIndicator from "./components/status-indicator";
 
 function QuickStartBar() {
   const {
@@ -100,24 +75,20 @@ function QuickStartBar() {
         >
           Stop
         </ActionButton>
-        {/* eslint-disable-next-line jsx-a11y/click-events-have-key-events,jsx-a11y/interactive-supports-focus */}
-        <div
-          role="row"
+        <Grid
           style={{
-            display: "flex",
-            width: 40,
             cursor: errorMsg ? "pointer" : "initial",
           }}
+          justifyContent="center"
+          alignItems="center"
           onClick={() => errorMsg && openErrorDialog()}
         >
-          {!showProgress && getElBySimState(simState)}
-          {showProgress && (
-            <CircularProgressWithLabel
-              hasStarted={simState === SimulationStates.RUNNING}
-              value={progress}
-            />
-          )}
-        </div>
+          <StatusIndicator
+            showProgress={showProgress}
+            progress={progress}
+            simState={simState}
+          />
+        </Grid>
       </Grid>
       <DialogWithKeyListener
         open={showErrorDialog}
