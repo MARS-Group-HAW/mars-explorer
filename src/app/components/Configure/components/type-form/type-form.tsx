@@ -39,10 +39,9 @@ const TypeForm = () => {
             spacing={2}
             style={{ height: "100%" }}
           >
-            <Grid style={{ height }} item xs={2}>
+            <Grid style={{ height }} item xs={3}>
               <TypeList />
             </Grid>
-            <Divider orientation="vertical" flexItem />
             <Grid item xs={9}>
               {tab === TabIndizes.AGENTS && <AgentsForm />}
               {tab === TabIndizes.LAYERS && <LayersForm />}

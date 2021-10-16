@@ -15,7 +15,7 @@ import FieldNames from "../../utils/fieldNames";
 type State = {
   type: Omit<FieldNames, "GLOBALS">;
   typeNames: string[];
-  selectedIndex: number;
+  selectedIndex: number | false;
   setSelectedIndex: (index: number) => void;
   onAddClick: () => void;
   onDeleteClick: (index: number) => void;
@@ -74,7 +74,7 @@ function useTypeList(): State {
   return {
     type: objectNsp,
     typeNames: value ? value.map((mapping) => mapping.name) : [],
-    selectedIndex: mappingIndex,
+    selectedIndex: mappingIndex ?? false,
     setSelectedIndex,
     onAddClick,
     onDeleteClick,
