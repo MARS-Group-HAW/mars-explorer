@@ -76,6 +76,7 @@ function QuickStartBar() {
           Stop
         </ActionButton>
         <Grid
+          container
           style={{
             cursor: errorMsg ? "pointer" : "initial",
           }}
