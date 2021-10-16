@@ -95,6 +95,7 @@ function QuickStartBar() {
         open={showErrorDialog}
         onKeyPressed={closeErrorDialog}
         scroll="paper"
+        maxWidth="lg"
       >
         <DialogTitle id="scroll-dialog-title">Last Error Message</DialogTitle>
         <DialogContent dividers>
