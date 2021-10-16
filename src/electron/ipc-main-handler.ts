@@ -9,7 +9,6 @@ import SimObjects from "@shared/types/sim-objects";
 import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
 import { AgentClassCreationMessage } from "@shared/types/class-creation-message";
-import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
 import launchLanguageServer from "./omnisharp/server-launcher";
@@ -18,7 +17,7 @@ import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import log from "./main-logger";
 import main from "./main";
 import SafeIpcMain from "./safe-ipc-main";
-import {is} from "electron-util";
+import fs = require("fs-extra");
 
 enum FileExtensions {
   CSHARP = ".cs",
@@ -449,29 +448,16 @@ enum ProcessExitCode {
 
 function runSimulation(projectPath: string) {
   log.info(`Starting simulation in ${projectPath} ...`);
-  const runProcess = child_process.spawn(
-    "dotnet run",
-      ["--no-build"],
-    {
-      shell: is.windows,
-      cwd: projectPath,
-    },
-  );
+  const runProcess = child_process.spawn("dotnet run", ["--no-build"], {
+    shell: true,
+    cwd: projectPath,
+  });
 
-  runProcess.on("error",(error) => {
-    console.log(error);
+  runProcess.on("error", (error) => {
     if (!error) return;
 
     log.error("Error while simulating: ", error.name, error.message);
     SafeIpcMain.send(Channel.SIMULATION_FAILED, error);
-  })
-
-  runProcess.stdout.on('data', (data) => {
-    console.log(`stdout: ${data}`);
-  });
-
-  runProcess.stderr.on('data', (data) => {
-    console.error(`stderr: ${data}`);
   });
 
   return runProcess;
