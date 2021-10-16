@@ -5,6 +5,7 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
+  Tab,
 } from "@material-ui/core";
 import DeleteIcon from "@material-ui/icons/Delete";
 import ContextMenu from "../../../shared/context-menu";
@@ -16,14 +17,18 @@ type Props = {
   onDelete: () => void;
 };
 
-function TypeListItem({ name, selected, onClick, onDelete }: Props) {
+function TypeListTab({ name, selected, onClick, onDelete }: Props) {
   const ref = useRef();
 
   return (
     <>
-      <ListItem ref={ref} button selected={selected} onClick={onClick}>
-        <ListItemText primary={name} />
-      </ListItem>
+      <Tab
+        ref={ref}
+        label={name}
+        selected={selected}
+        onClick={onClick}
+        style={{ textTransform: "none" }}
+      />
       <ContextMenu anchorRef={ref}>
         <MenuItem dense disabled>
           {name}
@@ -39,4 +44,4 @@ function TypeListItem({ name, selected, onClick, onDelete }: Props) {
   );
 }
 
-export default TypeListItem;
+export default TypeListTab;

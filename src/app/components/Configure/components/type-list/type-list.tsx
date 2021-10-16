@@ -1,9 +1,9 @@
 import * as React from "react";
-import { Fab, List, makeStyles } from "@material-ui/core";
+import { Fab, makeStyles, Tabs } from "@material-ui/core";
 import AddIcon from "@material-ui/icons/Add";
 import useTypeList from "./type-list.hook";
 import NoDataMessage from "../../../shared/no-data-message/no-data-message";
-import TypeListItem from "../type-list-item";
+import TypeListTab from "../type-list-tab";
 
 const useStyles = makeStyles(() => ({
   container: {
@@ -45,9 +45,14 @@ const TypeList = () => {
         />
       )}
       {!emptyTypes && (
-        <List className={classes.list}>
+        <Tabs
+          orientation="vertical"
+          variant="scrollable"
+          value={selectedIndex}
+          className={classes.list}
+        >
           {typeNames.map((name, index) => (
-            <TypeListItem
+            <TypeListTab
               key={agentKey++}
               name={name}
               selected={selectedIndex === index}
@@ -55,7 +60,7 @@ const TypeList = () => {
               onDelete={() => onDeleteClick(index)}
             />
           ))}
-        </List>
+        </Tabs>
       )}
       <Fab
         color="primary"
