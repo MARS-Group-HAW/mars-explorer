@@ -12,7 +12,7 @@ import { AgentClassCreationMessage } from "@shared/types/class-creation-message"
 import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
-import { launchLanguageServer } from "./omnisharp/server-launcher";
+import launchLanguageServer from "./omnisharp/server-launcher";
 import appPaths from "./app-paths";
 import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import log from "./main-logger";
