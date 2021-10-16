@@ -11,8 +11,8 @@ const useStyles = makeStyles(() => ({
     height: "100%",
   },
   list: {
-    overflowY: "scroll",
-    maxHeight: "100%",
+    overflowY: "auto",
+    height: "100%",
   },
   fab: {
     position: "absolute",

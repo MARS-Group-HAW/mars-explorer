@@ -78,6 +78,7 @@ function QuickStartBar() {
         <Grid
           container
           style={{
+            width: 40,
             cursor: errorMsg ? "pointer" : "initial",
           }}
           justifyContent="center"
