@@ -18,6 +18,7 @@ import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import log from "./main-logger";
 import main from "./main";
 import SafeIpcMain from "./safe-ipc-main";
+import {is} from "electron-util";
 
 enum FileExtensions {
   CSHARP = ".cs",
@@ -448,18 +449,32 @@ enum ProcessExitCode {
 
 function runSimulation(projectPath: string) {
   log.info(`Starting simulation in ${projectPath} ...`);
-  return child_process.exec(
-    "dotnet run --no-build",
+  const runProcess = child_process.spawn(
+    "dotnet run",
+      ["--no-build"],
     {
+      shell: is.windows,
       cwd: projectPath,
     },
-    (error) => {
-      if (!error || error.code === ProcessExitCode.TERMINATED) return;
-
-      log.error("Error while simulating: ", error.name, error.message);
-      SafeIpcMain.send(Channel.SIMULATION_FAILED, error);
-    }
   );
+
+  runProcess.on("error",(error) => {
+    console.log(error);
+    if (!error) return;
+
+    log.error("Error while simulating: ", error.name, error.message);
+    SafeIpcMain.send(Channel.SIMULATION_FAILED, error);
+  })
+
+  runProcess.stdout.on('data', (data) => {
+    console.log(`stdout: ${data}`);
+  });
+
+  runProcess.stderr.on('data', (data) => {
+    console.error(`stderr: ${data}`);
+  });
+
+  return runProcess;
 }
 
 SafeIpcMain.on(
