@@ -30,6 +30,7 @@ export const resetStore = createAction<void, "resetStore">("resetStore");
 const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
   if (action.type === resetStore.type) {
     return {
+      project: state.project,
       model: {
         ...initialState,
         exampleProjects: state.model.exampleProjects,
