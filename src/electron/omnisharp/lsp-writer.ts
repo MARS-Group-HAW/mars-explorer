@@ -30,11 +30,9 @@ const lspClientLogger = new Logger("lsp-client", {
   labels: Object.values(Labels),
 });
 
-class LspWriter {
-  private writer: StreamMessageWriter;
-
+class LspWriter extends StreamMessageWriter {
   constructor(writable: Writable, private channel: string) {
-    this.writer = new StreamMessageWriter(writable);
+    super(writable);
     ipcMain.on(channel, this.handleClientMessage);
   }
 
@@ -103,11 +101,11 @@ class LspWriter {
 
     lspClientLogger[logMethod](printMsg);
 
-    this.writer.write(clientMsg);
+    super.write(clientMsg);
   };
 
   dispose = () => {
-    this.writer.dispose();
+    super.dispose();
     ipcMain.removeAllListeners(this.channel);
   };
 }

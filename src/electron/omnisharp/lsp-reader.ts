@@ -34,14 +34,12 @@ const lspServerLogger = new Logger("lsp-server", {
   labels: Object.values(Labels),
 });
 
-class LspReader {
-  private reader: StreamMessageReader;
-
+class LspReader extends StreamMessageReader {
   private lastMessage: Message;
 
   constructor(readable: Readable, private channel: string) {
-    this.reader = new StreamMessageReader(readable);
-    this.reader.listen(this.handleServerMessage);
+    super(readable);
+    this.listen(this.handleServerMessage);
   }
 
   private handleServerMessage = (lspMessage: Message) => {
@@ -127,7 +125,7 @@ class LspReader {
   };
 
   dispose = () => {
-    this.reader.dispose();
+    super.dispose();
   };
 }
 
