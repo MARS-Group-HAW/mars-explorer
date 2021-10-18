@@ -1,8 +1,18 @@
-import { Message, NotificationMessage } from "vscode-jsonrpc";
+import { Message } from "vscode-jsonrpc";
 import * as rpc from "@codingame/monaco-jsonrpc";
 import { StreamMessageReader } from "vscode-jsonrpc/lib/node/main";
 import { Readable } from "stream";
 import { Channel } from "@shared/types/Channel";
+import {
+  InitializeRequest,
+  LogMessageNotification,
+  PublishDiagnosticsNotification,
+  RegistrationRequest,
+  ShowMessageNotification,
+  ShowMessageParams,
+} from "vscode-languageserver";
+import { ILogger } from "@shared/types/Logger";
+import { LogMessageParams } from "@codingame/monaco-languageclient";
 import { Logger } from "../logger";
 import {
   OmnisharpErrorMessage,
@@ -34,25 +44,73 @@ class LspReader {
     this.reader.listen(this.handleServerMessage);
   }
 
-  private handleServerMessage = (msg: Message) => {
+  private handleServerMessage = (lspMessage: Message) => {
+    let logMethod: keyof ILogger = "log";
     let msgType: string = "/";
     let method: string = "/";
+    let printMsg: string = "";
 
     // FIXME Prevent duplication
-    if (JSON.stringify(this.lastMessage) === JSON.stringify(msg)) {
-      lspServerLogger.log("DUPLICATION OF ABOVE");
+    if (JSON.stringify(this.lastMessage) === JSON.stringify(lspMessage)) {
       return;
     }
 
-    if (rpc.isNotificationMessage(msg)) {
+    if (rpc.isNotificationMessage(lspMessage)) {
       msgType = "notification";
-      method = this.handleNotificationMessage(msg);
-    } else {
-      msgType = "/";
-      method = "/";
+      method = lspMessage.method;
+
+      switch (lspMessage.method) {
+        case PublishDiagnosticsNotification.type.method:
+          printMsg = "<too long>";
+          break;
+        case LogMessageNotification.type.method:
+        case ShowMessageNotification.type.method: {
+          const params = lspMessage.params as
+            | ShowMessageParams
+            | LogMessageParams;
+          printMsg = `${params.message} (T${params.type})`;
+          break;
+        }
+        case OmnisharpNotification.ERROR:
+          if (
+            (
+              lspMessage.params as OmnisharpErrorNotificationParams
+            ).Text.startsWith(OmnisharpErrorMessage.DOTNET_NOT_FOUND)
+          ) {
+            mainLogger.error("Dotnet not found.");
+            SafeIpcMain.send(Channel.DOTNET_NOT_FOUND);
+          }
+          logMethod = "error";
+          break;
+        case OmnisharpNotification.PROJECT_ADDED:
+        case OmnisharpNotification.PROJECT_CHANGED:
+        case OmnisharpNotification.PROJECT_CONFIGURATION:
+        case OmnisharpNotification.PROJECT_DIAGNOSTIC_STATUS:
+        case OmnisharpNotification.MS_BUILD_PROJECT_DIAGNOSTICS:
+          break;
+        default: {
+          printMsg = "Unknown Notification Type";
+          logMethod = "warn";
+        }
+      }
+    } else if (rpc.isResponseMessage(lspMessage)) {
+      msgType = "response";
+    } else if (rpc.isRequestMessage(lspMessage)) {
+      msgType = "request";
+      method = lspMessage.method;
+
+      switch (lspMessage.method) {
+        case InitializeRequest.type.method:
+        case RegistrationRequest.type.method:
+          break;
+        default: {
+          printMsg = "Unknown Request Method";
+          logMethod = "warn";
+        }
+      }
     }
 
-    this.lastMessage = msg;
+    this.lastMessage = lspMessage;
     lspServerLogger.labels = [
       {
         key: Labels.MSG_TYPE,
@@ -64,31 +122,8 @@ class LspReader {
       },
     ];
 
-    lspServerLogger.log(msg);
-    main.window.webContents.send(this.channel, msg);
-  };
-
-  private handleNotificationMessage = (msg: NotificationMessage): string => {
-    // eslint-disable-next-line default-case
-    switch (msg.method) {
-      case OmnisharpNotification.PROJECT_ADDED: {
-        mainLogger.info("Project initialized.");
-        SafeIpcMain.send(Channel.PROJECT_INITIALIZED);
-        break;
-      }
-      case OmnisharpNotification.ERROR:
-        if (
-          (msg.params as OmnisharpErrorNotificationParams).Text.startsWith(
-            OmnisharpErrorMessage.DOTNET_NOT_FOUND
-          )
-        ) {
-          mainLogger.error("Dotnet not found.");
-          SafeIpcMain.send(Channel.DOTNET_NOT_FOUND);
-        }
-        break;
-    }
-
-    return msg.method;
+    lspServerLogger[logMethod](printMsg);
+    main.window.webContents.send(this.channel, lspMessage);
   };
 
   dispose = () => {

@@ -1,7 +1,7 @@
 import { spawn } from "child_process";
 import { BrowserWindow } from "electron";
 import kill from "tree-kill";
-import { getServer } from "./server-config";
+import getOmnisharpRunOptions from "./server-config";
 import mainLogger from "../main-logger";
 import LspWriter from "./lsp-writer";
 import LspReader from "./lsp-reader";
@@ -10,7 +10,7 @@ function launchLanguageServer(
   mainWindow: BrowserWindow,
   projectPath: string
 ): { lspChannel: string; killServer: () => void } {
-  const connectTo = getServer(projectPath);
+  const connectTo = getOmnisharpRunOptions(projectPath);
   mainLogger.info("Spawning Server");
   mainLogger.info("Project Path: ", projectPath);
 
