@@ -36,6 +36,7 @@ const OMNISHARP_CONFIG: OmnisharpConfiguration = {
   },
   msbuild: {
     enabled: true,
+    useBundledOnly: true,
     EnablePackageAutoRestore: false,
   },
 };
