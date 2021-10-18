@@ -2,7 +2,6 @@ import * as path from "path";
 import { is } from "electron-util";
 import os = require("os");
 import { OmnisharpConfiguration } from "../types/OmnisharpConfiguration";
-import { Server } from "../types/OmnisharpServerConfiguration";
 import appPaths from "../app-paths";
 
 let currentOS: "linux" | "osx" | "win";
@@ -41,40 +40,18 @@ const OMNISHARP_CONFIG: OmnisharpConfiguration = {
   },
 };
 
-function configToArg(): string[] {
-  const args: string[] = [];
+const configAsArgs = (): string[] =>
+  Object.entries(OMNISHARP_CONFIG)
+    .map(([k, v]) => Object.entries(v).map(([k2, v2]) => `${k}:${k2}=${v2}`))
+    .flat();
 
-  // eslint-disable-next-line no-restricted-syntax
-  for (const [k, v] of Object.entries(OMNISHARP_CONFIG)) {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const [k2, v2] of Object.entries(v)) {
-      // eslint-disable-next-line @typescript-eslint/restrict-template-expressions
-      args.push(`${k}:${k2}=${v2}`);
-    }
-  }
+const getOmnisharpRunOptions = (projectPath: string) => ({
+  command: is.windows ? "Omnisharp.exe" : "sh run",
+  args: [`-s ${projectPath}`, "-lsp", ...configAsArgs()],
+  options: {
+    cwd: path.join(appPaths.omnisharpDir, currentOS),
+    shell: true,
+  },
+});
 
-  return args;
-}
-
-const OMNISHARP_BASE: Omit<Server, "command" | "options"> = {
-  args: ["-lsp", "-v", ...configToArg()],
-  language: "csharp",
-  documentSelector: [
-    {
-      pattern: "**/*.cs",
-    },
-  ],
-};
-
-// eslint-disable-next-line import/prefer-default-export
-export function getServer(projectPath: string): Server {
-  return {
-    command: is.windows ? "Omnisharp.exe" : "sh run",
-    ...OMNISHARP_BASE,
-    args: [...OMNISHARP_BASE.args, `-s ${projectPath}`],
-    options: {
-      cwd: path.join(appPaths.omnisharpDir, currentOS),
-      shell: true,
-    },
-  };
-}
+export default getOmnisharpRunOptions;

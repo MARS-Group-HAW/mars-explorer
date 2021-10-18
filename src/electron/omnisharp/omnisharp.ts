@@ -1,5 +1,9 @@
 export enum OmnisharpNotification {
   PROJECT_ADDED = "o#/projectadded",
+  PROJECT_CHANGED = "o#/projectchanged",
+  PROJECT_CONFIGURATION = "o#/projectconfiguration",
+  PROJECT_DIAGNOSTIC_STATUS = "o#/projectdiagnosticstatus",
+  MS_BUILD_PROJECT_DIAGNOSTICS = "o#/msbuildprojectdiagnostics",
   ERROR = "o#/error",
 }
 
