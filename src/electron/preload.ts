@@ -8,12 +8,6 @@ const PreloadLogger = new Logger("ipc", {
   labels: ["method", "channel"],
 });
 
-const LspClientLogger = new Logger("lsp-client", {
-  newFile: true,
-  printToConsole: false,
-  labels: ["method"],
-});
-
 type Methods = "invoke" | "send" | "on";
 
 type UnknownListener = (...param: unknown[]) => unknown;
@@ -50,14 +44,6 @@ function callIpcRenderer(
       },
     ];
     PreloadLogger.info(args);
-  } else {
-    LspClientLogger.labels = [
-      {
-        key: "method",
-        value: method,
-      },
-    ];
-    LspClientLogger.info(args);
   }
 
   if (method === "invoke" || method === "send") {

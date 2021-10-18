@@ -1,9 +1,22 @@
 import { Message } from "vscode-jsonrpc";
 import * as rpc from "@codingame/monaco-jsonrpc";
-import { InitializeParams, InitializeRequest } from "vscode-languageserver";
+import {
+  CodeActionParams,
+  CodeActionRequest,
+  CodeLensParams,
+  CodeLensRequest,
+  CodeLensResolveRequest,
+  DidOpenTextDocumentNotification,
+  DidOpenTextDocumentParams,
+  HoverRequest,
+  InitializedNotification,
+  InitializeParams,
+  InitializeRequest,
+} from "vscode-languageserver";
 import { StreamMessageWriter } from "vscode-jsonrpc/lib/node/main";
 import { Writable } from "stream";
 import { ipcMain } from "electron";
+import { ILogger } from "@shared/types/Logger";
 import { Logger } from "../logger";
 
 enum Labels {
@@ -25,25 +38,56 @@ class LspWriter {
     ipcMain.on(channel, this.handleClientMessage);
   }
 
-  private handleClientMessage = (event: unknown, message: Message) => {
+  private handleClientMessage = (event: unknown, clientMsg: Message) => {
+    let logMethod: keyof ILogger = "log";
     let msgType: string = "/";
     let method: string = "/";
+    let printMsg: string = "";
 
-    if (rpc.isNotificationMessage(message)) {
+    if (rpc.isNotificationMessage(clientMsg)) {
       msgType = "notification";
-      method = message.method;
-    } else if (rpc.isRequestMessage(message)) {
-      msgType = "request";
-      method = message.method;
+      method = clientMsg.method;
 
-      if (message.method === InitializeRequest.type.method) {
-        const initializeParams = message.params as InitializeParams;
-        initializeParams.processId = process.pid;
+      switch (clientMsg.method) {
+        case DidOpenTextDocumentNotification.method: {
+          printMsg = (clientMsg.params as DidOpenTextDocumentParams)
+            .textDocument.uri;
+          break;
+        }
+        case InitializedNotification.type.method:
+          break;
+        default: {
+          printMsg = "Unknown Notification Message";
+          logMethod = "warn";
+        }
       }
-    } else if (rpc.isResponseMessage(message)) {
+    } else if (rpc.isRequestMessage(clientMsg)) {
+      msgType = `request|${clientMsg.id}`;
+      method = clientMsg.method;
+
+      switch (clientMsg.method) {
+        case InitializeRequest.type.method: {
+          const initializeParams = clientMsg.params as InitializeParams;
+          initializeParams.processId = process.pid;
+          break;
+        }
+        case HoverRequest.method:
+        case CodeLensRequest.method:
+        case CodeActionRequest.method: {
+          printMsg = (clientMsg.params as CodeActionParams | CodeLensParams)
+            .textDocument.uri;
+          break;
+        }
+        case CodeLensResolveRequest.method:
+        case "$/cancelRequest":
+          break;
+        default: {
+          printMsg = "Unknown Request Message";
+          logMethod = "warn";
+        }
+      }
+    } else if (rpc.isResponseMessage(clientMsg)) {
       msgType = "response";
-    } else {
-      msgType = "?";
     }
 
     lspClientLogger.labels = [
@@ -57,9 +101,9 @@ class LspWriter {
       },
     ];
 
-    lspClientLogger.log(message);
+    lspClientLogger[logMethod](printMsg);
 
-    this.writer.write(message);
+    this.writer.write(clientMsg);
   };
 
   dispose = () => {
