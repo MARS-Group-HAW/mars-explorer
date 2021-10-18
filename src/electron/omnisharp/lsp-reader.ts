@@ -94,9 +94,9 @@ class LspReader {
         }
       }
     } else if (rpc.isResponseMessage(lspMessage)) {
-      msgType = "response";
+      msgType = `response|${lspMessage.id}`;
     } else if (rpc.isRequestMessage(lspMessage)) {
-      msgType = "request";
+      msgType = `request|${lspMessage.id}`;
       method = lspMessage.method;
 
       switch (lspMessage.method) {

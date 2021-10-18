@@ -87,7 +87,7 @@ class LspWriter {
         }
       }
     } else if (rpc.isResponseMessage(clientMsg)) {
-      msgType = "response";
+      msgType = `response|${clientMsg.id}`;
     }
 
     lspClientLogger.labels = [
