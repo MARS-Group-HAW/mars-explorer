@@ -464,19 +464,20 @@ enum ProcessExitCode {
 
 function runSimulation(projectPath: string) {
   log.info(`Starting simulation in ${projectPath} ...`);
-  const runProcess = child_process.spawn("dotnet run", ["--no-build"], {
-    shell: true,
-    cwd: projectPath,
-  });
+  return child_process.execFile(
+    "dotnet",
+    ["run", "--no-build"],
+    {
+      cwd: projectPath,
+      shell: true,
+    },
+    (error) => {
+      if (!error || error.code === ProcessExitCode.TERMINATED) return;
 
-  runProcess.on("error", (error) => {
-    if (!error) return;
-
-    log.error("Error while simulating: ", error.name, error.message);
-    SafeIpcMain.send(Channel.SIMULATION_FAILED, error);
-  });
-
-  return runProcess;
+      log.error("Error while simulating: ", error.name, error.message);
+      SafeIpcMain.send(Channel.SIMULATION_FAILED, error);
+    }
+  );
 }
 
 SafeIpcMain.on(
