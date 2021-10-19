@@ -4,20 +4,19 @@ import useMarsFramework from "./use-mars-framework";
 import useMonacoServices from "./use-monaco-services";
 import useLanguageClient from "./use-language-client";
 import useModels from "./use-models";
-import useExampleProjects from "./use-example-projects";
-import useProjectInitialization from "./use-project-initialization";
+import useProjectRestore from "./use-project-restore";
 
 type State = void;
 
 function useModelBootstrap(): State {
   const path = useAppSelector(selectProjectPath);
 
+  console.log("test");
   useMarsFramework(path);
-  useProjectInitialization(path);
+  useProjectRestore(path);
   useMonacoServices();
   useLanguageClient(path);
   useModels();
-  useExampleProjects();
 }
 
 export default useModelBootstrap;
