@@ -11,6 +11,7 @@
     "start": "cross-env ELECTRON_ENV=development electron-forge start",
     "package": "electron-forge package",
     "make": "electron-forge make",
+    "make:win": "electron-forge make --platform win32",
     "publish": "electron-forge publish",
     "lint": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier src --write",
@@ -115,6 +116,7 @@
   "config": {
     "forge": {
       "packagerConfig": {
+        "icon": "./assets/icon",
         "extraResource": [
           "./resources/examples",
           "./resources/omnisharp",
@@ -133,7 +135,9 @@
         },
         {
           "name": "@electron-forge/maker-deb",
-          "config": {}
+          "config": {
+            "icon": "./resources/assets/icon.png"
+          }
         },
         {
           "name": "@electron-forge/maker-rpm",
