@@ -15,4 +15,9 @@ export interface SafeIpcRenderer {
     channel: Ch | string,
     listener: (arg: ChannelOutputMap[Ch]) => void
   ): () => void;
+
+  once<Ch extends Channel>(
+    channel: Ch | string,
+    listener: (arg: ChannelOutputMap[Ch]) => void
+  ): void;
 }

@@ -8,7 +8,7 @@ const PreloadLogger = new Logger("ipc", {
   labels: ["method", "channel"],
 });
 
-type Methods = "invoke" | "send" | "on";
+type Methods = "invoke" | "send" | "on" | "once";
 
 type UnknownListener = (...param: unknown[]) => unknown;
 
@@ -49,7 +49,8 @@ function callIpcRenderer(
   if (method === "invoke" || method === "send") {
     return ipcRenderer[method](channel, ...args);
   }
-  if (method === "on") {
+
+  if (method === "on" || method === "once") {
     if (!args[0]) throw new Error("Listener must be provided");
 
     const listener = args[0] as UnknownListener;
@@ -58,6 +59,12 @@ function callIpcRenderer(
     // the `event` arg to our renderer.
     const wrappedListener = (_event: IpcRendererEvent, ...a: unknown[]) =>
       listener(...a);
+
+    if (method === "once") {
+      ipcRenderer.once(channel, wrappedListener);
+      // eslint-disable-next-line consistent-return
+      return;
+    }
 
     ipcRenderer.on(channel, wrappedListener);
 
@@ -76,5 +83,7 @@ contextBridge.exposeInMainWorld("api", {
     callIpcRenderer("send", channel, ...args),
   on: (channel: Channel | string, ...args: unknown[]) =>
     callIpcRenderer("on", channel, ...args),
+  once: (channel: Channel | string, ...args: unknown[]) =>
+    callIpcRenderer("once", channel, ...args),
   logger: new Logger("app"),
 });
