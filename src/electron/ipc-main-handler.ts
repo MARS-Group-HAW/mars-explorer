@@ -9,6 +9,7 @@ import SimObjects from "@shared/types/sim-objects";
 import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
 import { AgentClassCreationMessage } from "@shared/types/class-creation-message";
+import fs = require("fs-extra");
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
 import launchLanguageServer from "./omnisharp/server-launcher";
@@ -17,14 +18,13 @@ import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import log from "./main-logger";
 import main from "./main";
 import SafeIpcMain from "./safe-ipc-main";
-import fs = require("fs-extra");
 
 enum FileExtensions {
   CSHARP = ".cs",
   CSV = ".csv",
 }
 
-const MARS_LIFE_VERSION = " --version 4.3.0-beta";
+const MARS_LIFE_VERSION = " --version 4.3.0-beta-2";
 
 SafeIpcMain.on(Channel.RESTART_APP, () => {
   log.warn("Restart requested by user.");

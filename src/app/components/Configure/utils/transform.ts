@@ -8,7 +8,8 @@ import { LayersMapping } from "../components/mappings-form/utils/types";
 
 type SimFlags = {
   pythonVisualization: boolean;
-  console: boolean;
+  reportProgress: boolean;
+  console?: boolean;
 };
 
 export type FormSchema = TypeOf<typeof validationSchema>;
@@ -54,7 +55,7 @@ class FormTransformer {
     globals.output = OutputSpecification.CSV;
     delete globals.options;
     globals.pythonVisualization = true;
-    globals.console = true;
+    globals.reportProgress = true;
 
     if (globals.timeSpecification) {
       if (globals.timeSpecification === TimeSpecification.STEP) {
