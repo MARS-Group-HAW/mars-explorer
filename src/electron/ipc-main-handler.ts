@@ -204,19 +204,35 @@ SafeIpcMain.on(Channel.CREATE_PROJECT, (_, projectName: string) => {
 
     if (code === 0) {
       const projectDir = path.join(appPaths.workspaceDir, projectName);
-      const filePath = path.resolve(projectDir, "Program.cs");
+      const templateConfigJsonPath = path.resolve(
+        appPaths.templatesDir,
+        "config.json"
+      );
+      const projectConfigJsonPath = path.resolve(projectDir, "config.json");
+      const programCsPath = path.resolve(projectDir, "Program.cs");
 
-      copyAndReplaceTemplate(Templates.PROGRAMM_CS, filePath, [
-        {
-          placeholder: PROJECT_NAME_PLACEHOLDER,
-          value: projectName,
-        },
-      ])
+      const copyProcess = fs.copyFile(
+        templateConfigJsonPath,
+        projectConfigJsonPath
+      );
+
+      const copyAndReplaceProgramCs = copyAndReplaceTemplate(
+        Templates.PROGRAMM_CS,
+        programCsPath,
+        [
+          {
+            placeholder: PROJECT_NAME_PLACEHOLDER,
+            value: projectName,
+          },
+        ]
+      );
+
+      Promise.all([copyProcess, copyAndReplaceProgramCs])
         .then(sendSuccessMsg)
-        .catch((replaceErr: unknown) => {
+        .catch((err: unknown) => {
           log.error(
-            "Error while replacing contents in new project: ",
-            replaceErr
+            "Error while replacing contents in new project or while creating a config.json: ",
+            err
           );
           remove(projectDir)
             .then(sendErrorMsg)

@@ -9,7 +9,6 @@ import { selectProject } from "../../../../Home/utils/project-slice";
 import FormTransformer, {
   FormSchema,
 } from "../../../../Configure/utils/transform";
-import defaultValues from "../../../../Configure/utils/defaultValues";
 import {
   resetConfig,
   setConfig,
@@ -31,15 +30,6 @@ function useConfigBootstrap() {
   const checkExistance = (projectRoot: string) =>
     window.api.invoke(Channel.DOES_CONFIG_EXIST, projectRoot);
 
-  const createDefaultConfig = (projectRoot: string) => {
-    // @ts-ignore
-    const defaultConfig = FormTransformer.formToConfig(defaultValues);
-    return window.api.invoke(Channel.WRITE_CONFIG_TO_FILE, {
-      path: projectRoot,
-      content: JSON.stringify(defaultConfig, null, "\t"),
-    });
-  };
-
   const getConfigContents = (projectPath: string) =>
     window.api.invoke(Channel.GET_CONFIG_IN_PROJECT, projectPath);
 
@@ -58,10 +48,10 @@ function useConfigBootstrap() {
     const doesExist = await checkExistance(path);
 
     if (!doesExist) {
-      await createDefaultConfig(path);
       window.api.logger.info(
-        "Config does not exists. A new one will be created."
+        "A config file does not exist. Did you delete it by accident?"
       );
+      return;
     }
 
     const configContents = await getConfigContents(path);
