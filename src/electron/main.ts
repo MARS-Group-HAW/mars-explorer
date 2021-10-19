@@ -57,6 +57,7 @@ class Main {
       height: 900,
       minWidth: 1000,
       minHeight: 700,
+      icon: appPaths.iconFile,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,

@@ -12,6 +12,10 @@ class AppPaths {
 
   readonly logsDir = path.dirname(ElectronLog.transports.file.getFile().path);
 
+  readonly assetsDir = path.join(this.resourcesDir, "assets");
+
+  readonly iconFile = path.resolve(this.assetsDir, "icon.png");
+
   readonly omnisharpDir = path.join(this.resourcesDir, "omnisharp");
 
   readonly resourcesExamplesDir = path.resolve(this.resourcesDir, "examples");
