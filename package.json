@@ -3,7 +3,7 @@
   "name": "mars-explorer",
   "productName": "mars-explorer",
   "version": "0.0.1",
-  "description": "My Electron application description",
+  "description": "An application to play around with MAS",
   "license": "MIT",
   "main": ".webpack/main",
   "scripts": {
