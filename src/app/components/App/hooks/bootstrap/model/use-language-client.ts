@@ -1,7 +1,8 @@
-import { useBoolean, useCustomCompareEffect, useLatest } from "react-use";
+import { useBoolean, useLatest, usePrevious } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { createMessageConnection } from "vscode-jsonrpc";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
+import _ from "lodash";
 import useRootUri from "./use-root-uri";
 import RendererIpcMessageReader from "../../../../../standalone/monaco-editor/client/RendererIpcMessageReader";
 import RendererIpcMessageWriter from "../../../../../standalone/monaco-editor/client/RendererIpcMessageWriter";
@@ -12,13 +13,14 @@ import LoadingSteps from "../../../../Model/utils/LoadingSteps";
 import {
   finishLoadingStep,
   resetLoadingStep,
-  selectModels,
+  selectModelsWithoutMeta,
   selectMonacoServicesInstalled,
 } from "../../../../Model/utils/model-slice";
 import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../../utils/hooks/use-store";
+import monaco from "../../../../../standalone/monaco-editor/monaco";
 
 function useLanguageClient(path: string) {
   const dispatch = useAppDispatch();
@@ -26,9 +28,10 @@ function useLanguageClient(path: string) {
   const latestRootUri = useLatest(rootUri);
   const { handleMessage } = useDiagnosticsMessages();
   const areServicesInstalled = useAppSelector(selectMonacoServicesInstalled);
-  const models = useAppSelector(selectModels);
+  const models = useAppSelector(selectModelsWithoutMeta);
   const [isLoading, setIsLoading] = useBoolean(true);
   const [isInitializing, setIsInitializing] = useBoolean(true);
+  const [client, setClient] = useState<CSharpLanguageClient>();
 
   const startLanguageServer = async () => {
     window.api.send(Channel.STOP_LANGUAGE_SERVER);
@@ -46,31 +49,53 @@ function useLanguageClient(path: string) {
 
     // FIXME doppelte writings zum lsp
     // create and start the language client
-    const client = new CSharpLanguageClient(connection);
-    client.start();
+    const newClient = new CSharpLanguageClient(connection);
+    newClient.start();
 
     setIsLoading(false);
 
-    client.onReady().then(() => {
+    newClient.onReady().then(() => {
       setIsInitializing(false);
+      setClient(newClient);
     });
   };
+
+  const previousModels = usePrevious(models);
+
+  useEffect(() => {
+    // model deleted?
+    if (
+      !client ||
+      !previousModels ||
+      Math.abs(models.length - previousModels.length) !== 1
+    ) {
+      return;
+    }
+
+    const modelAdded = models.length > previousModels.length;
+
+    const diffModel = _.xor(models, previousModels)[0];
+    const diffModelUri = monaco.Uri.file(diffModel.path).toString();
+
+    if (modelAdded) {
+      window.api.logger.info(
+        "Notifying about model creation: ",
+        diffModel.name
+      );
+      client.notifyFileCreate(diffModelUri);
+    } else {
+      window.api.logger.info(
+        "Notifying about model deletion: ",
+        diffModel.name
+      );
+      client.notifyFileDelete(diffModelUri);
+    }
+  }, [client, models, previousModels]);
 
   useEffect(() => {
     if (!rootUri || !areServicesInstalled) return;
     startLanguageServer();
   }, [areServicesInstalled, rootUri]);
-
-  useCustomCompareEffect(
-    () => {
-      if (isLoading) return;
-
-      // restart language server if model added
-      startLanguageServer();
-    },
-    [models],
-    (prevDeps, nextDeps) => prevDeps[0].length === nextDeps[0].length
-  );
 
   useLoadingStep<LoadingSteps>({
     step: LoadingSteps.LANGUAGE_CLIENT_STARTED,
