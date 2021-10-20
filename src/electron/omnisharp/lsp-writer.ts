@@ -8,10 +8,13 @@ import {
   CodeLensResolveRequest,
   DidOpenTextDocumentNotification,
   DidOpenTextDocumentParams,
+  FileChangeType,
   HoverRequest,
   InitializedNotification,
   InitializeParams,
   InitializeRequest,
+  DidChangeWatchedFilesNotification,
+  DidChangeWatchedFilesParams,
 } from "vscode-languageserver";
 import { StreamMessageWriter } from "vscode-jsonrpc/lib/node/main";
 import { Writable } from "stream";
@@ -50,6 +53,15 @@ class LspWriter extends StreamMessageWriter {
         case DidOpenTextDocumentNotification.method: {
           printMsg = (clientMsg.params as DidOpenTextDocumentParams)
             .textDocument.uri;
+          break;
+        }
+        case DidChangeWatchedFilesNotification.type.method: {
+          printMsg = (clientMsg.params as DidChangeWatchedFilesParams).changes
+            .map(
+              ({ uri, type }) =>
+                `${type === FileChangeType.Created ? "Add" : "Delete"}: ${uri}`
+            )
+            .join(" | ");
           break;
         }
         case InitializedNotification.type.method:
