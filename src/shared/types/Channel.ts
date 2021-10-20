@@ -51,6 +51,8 @@ export enum Channel {
   WRITE_CONTENT_TO_FILE = "WRITE_CONTENT_TO_FILE",
   RESTORE_PROJECT = "RESTORE_PROJECT",
   GET_README_IN_DIR = "GET_README_IN_DIR",
+  SHOW_UNSAVED_CHANGES_DIALOG = "SHOW_UNSAVED_CHANGES_DIALOG",
+  SHOW_UNSAVEABLE_CHANGES_DIALOG = "SHOW_UNSAVEABLE_CHANGES_DIALOG",
 }
 
 export interface ChannelInputMap {
@@ -81,6 +83,8 @@ export interface ChannelInputMap {
   [Channel.RESTART_APP]: void;
   [Channel.RESTORE_PROJECT]: string;
   [Channel.RUN_SIMULATION]: string;
+  [Channel.SHOW_UNSAVED_CHANGES_DIALOG]: void;
+  [Channel.SHOW_UNSAVEABLE_CHANGES_DIALOG]: void;
   [Channel.SIMULATION_COORDS_PROGRESS]: void;
   [Channel.SIMULATION_COUNT_PROGRESS]: void;
   [Channel.SIMULATION_EXITED]: void;
@@ -122,6 +126,8 @@ export interface ChannelOutputMap {
   [Channel.RESTART_APP]: void;
   [Channel.RESTORE_PROJECT]: void;
   [Channel.RUN_SIMULATION]: void;
+  [Channel.SHOW_UNSAVED_CHANGES_DIALOG]: boolean | null;
+  [Channel.SHOW_UNSAVEABLE_CHANGES_DIALOG]: boolean;
   [Channel.SIMULATION_COORDS_PROGRESS]: SimulationVisMessage;
   [Channel.SIMULATION_COUNT_PROGRESS]: SimulationCountMessage;
   [Channel.SIMULATION_EXITED]: SimulationStates;
