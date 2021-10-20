@@ -10,7 +10,6 @@ import FormTransformer, { FormSchema } from "../utils/transform";
 import {
   selectConfig,
   selectConfigHasBeenChecked,
-  selectConfigIsDirty,
   selectConfigLoading,
   setConfig,
   setErrorState,
@@ -22,7 +21,6 @@ type State = {
   showNoPathMsg: boolean;
   showForm: boolean;
   showLoading: boolean;
-  hasUnsavedChanges: boolean;
   handleSubmit: (values: FormikValues) => void;
 };
 
@@ -30,7 +28,6 @@ function useConfigure(): State {
   const dispatch = useAppDispatch();
   const hasBeenChecked = useAppSelector(selectConfigHasBeenChecked);
   const isLoading = useAppSelector(selectConfigLoading);
-  const configIsDirty = useAppSelector(selectConfigIsDirty);
   const config = useAppSelector(selectConfig);
   const { path } = useAppSelector(selectProject);
   const latestPath = useLatest(path);
@@ -76,7 +73,6 @@ function useConfigure(): State {
     showNoPathMsg: !path,
     showForm: hasBeenChecked && Boolean(config),
     showLoading: isLoading,
-    hasUnsavedChanges: configIsDirty,
     handleSubmit,
   };
 }

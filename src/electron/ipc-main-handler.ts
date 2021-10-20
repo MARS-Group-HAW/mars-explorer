@@ -1,5 +1,5 @@
 import * as path from "path";
-import { app } from "electron";
+import { app, dialog } from "electron";
 import { Channel } from "@shared/types/Channel";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import * as child_process from "child_process";
@@ -432,6 +432,55 @@ SafeIpcMain.handle(Channel.OPEN_PROJECT, (_, modelRef: ModelRef): Model => {
 SafeIpcMain.handle(Channel.READ_FILE, (ev, projectPath: string): string =>
   fs.readFileSync(projectPath, "utf-8")
 );
+
+enum UnsavedChangesDialogButtons {
+  SAVE,
+  CANCEL,
+  DONT_SAVE,
+}
+
+SafeIpcMain.handle(Channel.SHOW_UNSAVEABLE_CHANGES_DIALOG, async () => {
+  const { response } = await dialog.showMessageBox(main.window, {
+    message:
+      "Your config has errors and therefore cannot be saved. Do you still want to leave this form?",
+    detail: "Your changes will be lost if you leave now.",
+    type: "warning",
+    buttons: ["Leave", "Cancel"],
+  });
+
+  if (response === 0) return true;
+
+  if (response === 1) return false;
+
+  log.warn(
+    `Unknown Button pressed in unsaveable changes dialog (${response}).`
+  );
+  return true;
+});
+
+SafeIpcMain.handle(Channel.SHOW_UNSAVED_CHANGES_DIALOG, async () => {
+  const { response } = await dialog.showMessageBox(main.window, {
+    message: "Do you want to save the changes you made to your config?",
+    detail: "Your changes will be lost if you don't save them.",
+    type: "warning",
+    buttons: ["Save", "Cancel", "Don't save"],
+  });
+
+  switch (response) {
+    case UnsavedChangesDialogButtons.DONT_SAVE:
+      return false;
+    case UnsavedChangesDialogButtons.SAVE:
+      return true;
+    case UnsavedChangesDialogButtons.CANCEL:
+      return null;
+    default: {
+      log.warn(
+        `Unknown Button pressed in unsaved changes dialog (${response}).`
+      );
+      return null;
+    }
+  }
+});
 
 SafeIpcMain.handle(
   Channel.START_LANGUAGE_SERVER,
