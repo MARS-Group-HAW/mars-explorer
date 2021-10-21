@@ -15,12 +15,14 @@ import {
   InitializeRequest,
   DidChangeWatchedFilesNotification,
   DidChangeWatchedFilesParams,
+  ExitNotification,
 } from "vscode-languageserver";
 import { StreamMessageWriter } from "vscode-jsonrpc/lib/node/main";
 import { Writable } from "stream";
 import { ipcMain } from "electron";
 import { ILogger } from "@shared/types/Logger";
 import { Logger } from "../logger";
+import mainLogger from "../main-logger";
 
 enum Labels {
   MSG_TYPE = "MSG_TYPE",
@@ -62,6 +64,12 @@ class LspWriter extends StreamMessageWriter {
                 `${type === FileChangeType.Created ? "Add" : "Delete"}: ${uri}`
             )
             .join(" | ");
+          break;
+        }
+        case ExitNotification.type.method: {
+          mainLogger.info(`Exiting ${this.channel} by client notification.`);
+          // eslint-disable-next-line no-param-reassign
+          delete clientMsg.params;
           break;
         }
         case InitializedNotification.type.method:

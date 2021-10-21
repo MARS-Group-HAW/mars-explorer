@@ -1,6 +1,5 @@
 import { spawn } from "child_process";
 import { BrowserWindow } from "electron";
-import kill from "tree-kill";
 import getOmnisharpRunOptions from "./server-config";
 import mainLogger from "../main-logger";
 import LspWriter from "./lsp-writer";
@@ -9,7 +8,7 @@ import LspReader from "./lsp-reader";
 function launchLanguageServer(
   mainWindow: BrowserWindow,
   projectPath: string
-): { lspChannel: string; killServer: () => void } {
+): string {
   const connectTo = getOmnisharpRunOptions(projectPath);
   mainLogger.info("Spawning Server");
   mainLogger.info("Project Path: ", projectPath);
@@ -25,18 +24,15 @@ function launchLanguageServer(
   const reader = new LspReader(lsProcess.stdout, ipcChannel);
   const writer = new LspWriter(lsProcess.stdin, ipcChannel);
 
-  const killServer = () => {
+  lsProcess.on("exit", (code) => {
+    mainLogger.info(`LSP Process (${ipcChannel}) has exited (${code})`);
     reader.dispose();
     writer.dispose();
-    kill(lsProcess.pid);
-  };
+  });
 
   mainLogger.info("Server spawned successfully!");
 
-  return {
-    lspChannel: ipcChannel,
-    killServer,
-  };
+  return ipcChannel;
 }
 
 export default launchLanguageServer;

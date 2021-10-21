@@ -10,6 +10,7 @@ import {
   RegistrationRequest,
   ShowMessageNotification,
   ShowMessageParams,
+  ShutdownRequest,
 } from "vscode-languageserver";
 import { ILogger } from "@shared/types/Logger";
 import { LogMessageParams } from "@codingame/monaco-languageclient";
@@ -93,6 +94,7 @@ class LspReader extends StreamMessageReader {
       }
     } else if (rpc.isResponseMessage(lspMessage)) {
       msgType = `response|${lspMessage.id}`;
+      console.log(JSON.stringify(lspMessage.result));
     } else if (rpc.isRequestMessage(lspMessage)) {
       msgType = `request|${lspMessage.id}`;
       method = lspMessage.method;
@@ -100,7 +102,12 @@ class LspReader extends StreamMessageReader {
       switch (lspMessage.method) {
         case InitializeRequest.type.method:
         case RegistrationRequest.type.method:
+          console.log(JSON.stringify(lspMessage.params));
           break;
+        case ShutdownRequest.type.method: {
+          printMsg = "Asking server to prepare exit.";
+          break;
+        }
         default: {
           printMsg = "Unknown Request Method";
           logMethod = "warn";
