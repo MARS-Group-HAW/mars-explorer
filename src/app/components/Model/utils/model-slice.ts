@@ -172,6 +172,8 @@ export const selectLoadingSteps = (state: RootState) =>
   state.model.finishedSteps;
 export const selectFrameworkAdded = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MARS_FRAMEWORK_ADDED);
+export const selectProjectRestored = (state: RootState) =>
+  state.model.finishedSteps.includes(LoadingSteps.PROJECT_RESTORED);
 export const selectMonacoServicesInstallStatus = (state: RootState) =>
   state.model.finishedSteps.includes(LoadingSteps.MONACO_SERVICES_INSTALLED);
 export const selectLanguageServerStartStatus = (state: RootState) =>

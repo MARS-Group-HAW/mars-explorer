@@ -1,9 +1,9 @@
 import { useBoolean, useLatest, useMount, usePrevious } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { createMessageConnection } from "vscode-jsonrpc";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import _ from "lodash";
-import { ExitNotification, ShutdownRequest } from "vscode-languageserver";
+import { Disposable } from "@codingame/monaco-languageclient";
 import useRootUri from "./use-root-uri";
 import RendererIpcMessageReader from "../../../../../standalone/monaco-editor/client/RendererIpcMessageReader";
 import RendererIpcMessageWriter from "../../../../../standalone/monaco-editor/client/RendererIpcMessageWriter";
@@ -14,8 +14,10 @@ import LoadingSteps from "../../../../Model/utils/LoadingSteps";
 import {
   finishLoadingStep,
   resetLoadingStep,
+  selectFrameworkAdded,
   selectModelsWithoutMeta,
   selectMonacoServicesInstalled,
+  selectProjectRestored,
 } from "../../../../Model/utils/model-slice";
 import {
   useAppDispatch,
@@ -29,17 +31,19 @@ function useLanguageClient(path: string) {
   const latestRootUri = useLatest(rootUri);
   const { handleMessage } = useDiagnosticsMessages();
   const areServicesInstalled = useAppSelector(selectMonacoServicesInstalled);
+  const isFrameworkAdded = useAppSelector(selectFrameworkAdded);
+  const isProjectRestored = useAppSelector(selectProjectRestored);
   const models = useAppSelector(selectModelsWithoutMeta);
   const [isLoading, setIsLoading] = useBoolean(true);
   const [isInitializing, setIsInitializing] = useBoolean(true);
   const [client, setClient] = useState<CSharpLanguageClient>();
 
-  const shutdownServer = useCallback(async () => {
-    if (client) {
-      await client.sendRequest(ShutdownRequest.type);
-      client.sendNotification(ExitNotification.type);
-    }
-  }, [client]);
+  const ref = useRef<Disposable>();
+
+  const shutdownServer = useCallback(
+    async () => (client ? client.stop() : Promise.resolve()),
+    [client]
+  );
 
   useMount(() =>
     window.api.on(Channel.SHUTDOWN, () =>
@@ -48,15 +52,13 @@ function useLanguageClient(path: string) {
   );
 
   const startLanguageServer = async () => {
-    if (client) {
-      // window.api.send(Channel.STOP_LANGUAGE_SERVER);
-      await client.sendRequest(ShutdownRequest.type);
-      client.sendNotification(ExitNotification.type);
-      return;
+    setClient(undefined);
+    setIsLoading(true);
+
+    if (ref.current) {
+      ref.current.dispose();
     }
 
-    setIsLoading(true);
-    console.warn("start server");
     const ipcChannel = await window.api.invoke(
       Channel.START_LANGUAGE_SERVER,
       latestRootUri.current
@@ -68,10 +70,9 @@ function useLanguageClient(path: string) {
     const writer = new RendererIpcMessageWriter(ipcChannel);
     const connection = createMessageConnection(reader, writer);
 
-    // FIXME doppelte writings zum lsp
     // create and start the language client
     const newClient = new CSharpLanguageClient(connection);
-    newClient.start();
+    ref.current = newClient.start();
 
     setIsLoading(false);
     setIsInitializing(true);
@@ -115,9 +116,15 @@ function useLanguageClient(path: string) {
   }, [client, models, previousModels]);
 
   useEffect(() => {
-    if (!rootUri || !areServicesInstalled) return;
+    if (
+      !rootUri ||
+      !areServicesInstalled ||
+      !isFrameworkAdded ||
+      !isProjectRestored
+    )
+      return;
     startLanguageServer();
-  }, [areServicesInstalled, rootUri]);
+  }, [rootUri, areServicesInstalled, isFrameworkAdded, isProjectRestored]);
 
   useLoadingStep<LoadingSteps>({
     step: LoadingSteps.LANGUAGE_CLIENT_STARTED,
