@@ -11,6 +11,7 @@ import Configure from "../Configure";
 import Analyze from "../Analyze";
 import useApp from "./hooks";
 import ErrorPage from "./components/ErrorPage";
+import ShutdownScreen from "./components/ShutdownScreen";
 
 function App() {
   useApp();
@@ -18,6 +19,7 @@ function App() {
   return (
     <ErrorBoundary fallbackRender={(props) => <ErrorPage {...props} />}>
       <CssBaseline>
+        <ShutdownScreen />
         <Drawer>
           <Route path={Path.HOME} exact>
             <Home />

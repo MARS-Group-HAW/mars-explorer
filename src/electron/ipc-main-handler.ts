@@ -484,25 +484,8 @@ SafeIpcMain.handle(Channel.SHOW_UNSAVED_CHANGES_DIALOG, async () => {
 
 SafeIpcMain.handle(
   Channel.START_LANGUAGE_SERVER,
-  (_, projectPath: string): string => {
-    const { lspChannel, killServer } = launchLanguageServer(
-      main.window,
-      projectPath
-    );
-
-    const kill = (reason: string) => {
-      if (!killServer) return;
-      log.info(`Stopping Language Server (${lspChannel}) because of ${reason}`);
-      killServer();
-    };
-
-    main.window.once("close", () => kill("Close-Event"));
-    SafeIpcMain.once(Channel.STOP_LANGUAGE_SERVER, () =>
-      kill("Channel.STOP_LANGUAGE_SERVER")
-    );
-
-    return lspChannel;
-  }
+  (_, projectPath: string): string =>
+    launchLanguageServer(main.window, projectPath)
 );
 
 enum ProcessExitCode {

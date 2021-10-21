@@ -1,8 +1,9 @@
-import { useBoolean, useLatest, usePrevious } from "react-use";
+import { useBoolean, useLatest, useMount, usePrevious } from "react-use";
 import { Channel } from "@shared/types/Channel";
 import { createMessageConnection } from "vscode-jsonrpc";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import _ from "lodash";
+import { ExitNotification, ShutdownRequest } from "vscode-languageserver";
 import useRootUri from "./use-root-uri";
 import RendererIpcMessageReader from "../../../../../standalone/monaco-editor/client/RendererIpcMessageReader";
 import RendererIpcMessageWriter from "../../../../../standalone/monaco-editor/client/RendererIpcMessageWriter";
@@ -33,9 +34,29 @@ function useLanguageClient(path: string) {
   const [isInitializing, setIsInitializing] = useBoolean(true);
   const [client, setClient] = useState<CSharpLanguageClient>();
 
+  const shutdownServer = useCallback(async () => {
+    if (client) {
+      await client.sendRequest(ShutdownRequest.type);
+      client.sendNotification(ExitNotification.type);
+    }
+  }, [client]);
+
+  useMount(() =>
+    window.api.on(Channel.SHUTDOWN, () =>
+      shutdownServer().then(() => window.api.send(Channel.SERVER_SHUTDOWN))
+    )
+  );
+
   const startLanguageServer = async () => {
-    window.api.send(Channel.STOP_LANGUAGE_SERVER);
+    if (client) {
+      // window.api.send(Channel.STOP_LANGUAGE_SERVER);
+      await client.sendRequest(ShutdownRequest.type);
+      client.sendNotification(ExitNotification.type);
+      return;
+    }
+
     setIsLoading(true);
+    console.warn("start server");
     const ipcChannel = await window.api.invoke(
       Channel.START_LANGUAGE_SERVER,
       latestRootUri.current
@@ -53,6 +74,7 @@ function useLanguageClient(path: string) {
     newClient.start();
 
     setIsLoading(false);
+    setIsInitializing(true);
 
     newClient.onReady().then(() => {
       setIsInitializing(false);

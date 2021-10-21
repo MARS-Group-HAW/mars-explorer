@@ -38,6 +38,7 @@ export enum Channel {
   READ_FILE = "READ_FILE",
   RESTART_APP = "RESTART_APP",
   RUN_SIMULATION = "RUN_SIMULATION",
+  SHUTDOWN = "SHUTDOWN",
   SIMULATION_COORDS_PROGRESS = "SIMULATION_COORDS_PROGRESS",
   SIMULATION_COUNT_PROGRESS = "SIMULATION_COUNT_PROGRESS",
   SIMULATION_EXITED = "SIMULATION_EXITED",
@@ -53,6 +54,7 @@ export enum Channel {
   GET_README_IN_DIR = "GET_README_IN_DIR",
   SHOW_UNSAVED_CHANGES_DIALOG = "SHOW_UNSAVED_CHANGES_DIALOG",
   SHOW_UNSAVEABLE_CHANGES_DIALOG = "SHOW_UNSAVEABLE_CHANGES_DIALOG",
+  SERVER_SHUTDOWN = "SERVER_SHUTDOWN",
 }
 
 export interface ChannelInputMap {
@@ -83,6 +85,8 @@ export interface ChannelInputMap {
   [Channel.RESTART_APP]: void;
   [Channel.RESTORE_PROJECT]: string;
   [Channel.RUN_SIMULATION]: string;
+  [Channel.SHUTDOWN]: void;
+  [Channel.SERVER_SHUTDOWN]: void;
   [Channel.SHOW_UNSAVED_CHANGES_DIALOG]: void;
   [Channel.SHOW_UNSAVEABLE_CHANGES_DIALOG]: void;
   [Channel.SIMULATION_COORDS_PROGRESS]: void;
@@ -126,6 +130,8 @@ export interface ChannelOutputMap {
   [Channel.RESTART_APP]: void;
   [Channel.RESTORE_PROJECT]: void;
   [Channel.RUN_SIMULATION]: void;
+  [Channel.SHUTDOWN]: void;
+  [Channel.SERVER_SHUTDOWN]: void;
   [Channel.SHOW_UNSAVED_CHANGES_DIALOG]: boolean | null;
   [Channel.SHOW_UNSAVEABLE_CHANGES_DIALOG]: boolean;
   [Channel.SIMULATION_COORDS_PROGRESS]: SimulationVisMessage;

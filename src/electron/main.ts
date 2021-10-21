@@ -1,11 +1,13 @@
-import { app, BrowserWindow, Menu } from "electron";
+import { app, BrowserWindow, Event, Menu } from "electron";
 import { enforceMacOSAppLocation, is } from "electron-util";
 import fixPath from "fix-path";
-import fs = require("fs-extra");
-import squirrel = require("electron-squirrel-startup");
+import { Channel } from "@shared/types/Channel";
 import appPaths from "./app-paths";
 import log from "./main-logger";
 import menuItems from "./menu";
+import SafeIpcMain from "./safe-ipc-main";
+import fs = require("fs-extra");
+import squirrel = require("electron-squirrel-startup");
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -90,8 +92,15 @@ class Main {
     }
   };
 
-  onBeforeQuit = () => {
-    log.info("Quitting app");
+  onBeforeQuit = (e: Event) => {
+    e.preventDefault();
+    this.window.webContents.send(Channel.SHUTDOWN);
+
+    SafeIpcMain.on(Channel.SERVER_SHUTDOWN, () => app.exit());
+    setTimeout(() => {
+      log.warn("Server Shutdown did not respond in time. Exiting.");
+      app.exit();
+    }, 5000);
   };
 
   onWindowAllClosed = () => {
