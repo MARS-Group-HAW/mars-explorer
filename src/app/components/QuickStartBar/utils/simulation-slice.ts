@@ -20,7 +20,7 @@ const initialResultDataWithMeta: Omit<ResultDataWithMeta, "name"> = {
 };
 
 // Define the initial state using that type
-const initialState: SimulationState = {
+export const initialState: SimulationState = {
   simulationState: SimulationStates.NONE,
   resultData: [],
 };

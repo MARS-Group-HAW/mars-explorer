@@ -7,7 +7,11 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../utils/hooks/use-store";
-import { selectProjectPath } from "../../utils/project-slice";
+import {
+  resetProject,
+  selectProjectPath,
+  setProject,
+} from "../../utils/project-slice";
 import { resetStore } from "../../../../utils/store";
 
 type State = {
@@ -43,6 +47,7 @@ function useDeleteProjectDialogHook(onClose: () => void): State {
     }
 
     if (ref.path === latestPath.current) {
+      dispatch(resetProject());
       dispatch(resetStore());
     }
 
