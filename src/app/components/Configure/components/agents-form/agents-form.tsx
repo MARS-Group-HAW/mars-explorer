@@ -24,6 +24,7 @@ const AgentsForm = () => {
       <Grid
         container
         justifyContent="space-between"
+        alignItems="center"
         className={classes.nameCountContainer}
       >
         <Grid item xs={4}>

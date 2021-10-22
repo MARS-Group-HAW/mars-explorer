@@ -82,7 +82,7 @@ function BubbleChart() {
         alignItems="center"
         direction="row"
       >
-        <Typography color="secondary">Tick</Typography>
+        <Typography color="secondary">Progress</Typography>
         <IconButton aria-label="decrement" onClick={decrementTick}>
           <RemoveCircleOutlineIcon />
         </IconButton>

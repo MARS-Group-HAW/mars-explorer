@@ -32,7 +32,7 @@ const FormFileInput = ({ namespace, label }: Props) => {
   return (
     <Grid
       container
-      justifyContent="space-between"
+      justifyContent="space-around"
       alignItems="center"
       wrap="nowrap"
     >
