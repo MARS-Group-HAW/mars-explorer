@@ -13,17 +13,14 @@ import { Link as RouterLink } from "react-router-dom";
 import FormBox from "../form-box";
 import useOutputsForm from "./outputs-form.hook";
 import { OutputSpecification } from "./utils/types";
-import OutputsCsvForm from "../output-csv-form";
-import OutputsSqliteForm from "../output-sqlite-form";
 import Path from "../../../App/utils/app-paths";
-import OutputsNoneForm from "../output-none-form";
 
 type Props = {
   namespace: string;
 };
 
 function OutputsForm({ namespace }: Props) {
-  const { value, handleChange, choices, outputNamespace, optionsNamespace } =
+  const { value, handleChange, choices, outputNamespace } =
     useOutputsForm(namespace);
 
   return (
@@ -72,7 +69,8 @@ function OutputsForm({ namespace }: Props) {
             )}
           </Grid>
         </Grid>
-        <Grid item xs={12}>
+        {/* TODO low priority
+          <Grid item xs={12}>
           {value === OutputSpecification.NONE && <OutputsNoneForm />}
           {value === OutputSpecification.CSV && (
             <OutputsCsvForm namespace={optionsNamespace} />
@@ -81,6 +79,7 @@ function OutputsForm({ namespace }: Props) {
             <OutputsSqliteForm namespace={optionsNamespace} />
           )}
         </Grid>
+        */}
       </Grid>
     </FormBox>
   );
