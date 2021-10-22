@@ -20,15 +20,15 @@ import DialogWithKeyListener from "../../../shared/dialog-with-key-listener";
 
 const description: { [key in SimObjects]: string } = {
   [SimObjects.AGENT]:
-    "Agents are the main part of every model (besides layers). Once the layers have been created, we can start specifying the the agents. For this step you, as a modeler, need to know what your agents are going to be, what attributes define them and what their actions will look like. Once this has been established, we can start with the agent creation.",
+    "Agents are independent and active components that can sense surroundings and act upon these findings and their internal state (memory, goals, desires, ..).",
   [SimObjects.BASIC_LAYER]:
-    "Layers in MARS are instruments to fulfill the tasks of agent management or data management. Depending on your model, you will be using one or several different layer types. Baseline are the layers to manage agents. They are called that because they will contain the respective agents and manage their movements.",
+    "Layers represent the environment in which agents live and offer possibilities for input of various data formats. Basic Layer is the most simple layer without any predefined reference system.",
   [SimObjects.RASTER_LAYER]:
     "Raster layer and grid layer are able to process grid and raster data and can be viewed similar to a 2D matrix. Real numerical values are stored in a n x m matrix and have a certain semantic nominal value.",
   [SimObjects.VECTOR_LAYER]:
     "Vector layers are used to map vector objects that can be represented by points, lines or areas. Vector objects are the most commonly used types for modeling the simulated environment.r",
   [SimObjects.ENTITY]:
-    "In contrast to agents, entities are pure objects without a Tick() method. However, entities are also identified by a UUID (Guid) ID and can be included in the model to enter other data that is not directly part of the agent parameterization. Entity are versioned and snapshots are persisted just the same as with agents.",
+    "Entities are like agents components with a life-cycle (they are created initially, initialized with data and eventually removed from the simulation later). Unlike agents, they cannot act. They, therefore, represent model objects that exist in the model and can be used by the agent.",
 };
 
 const useStyles = makeStyles((theme) => ({
