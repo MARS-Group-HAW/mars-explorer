@@ -25,14 +25,13 @@ class Main {
   constructor() {
     this.ensureDirs();
     app.on("ready", this.onReady);
-    app.on("before-quit", this.onBeforeQuit);
     app.on("window-all-closed", this.onWindowAllClosed);
     app.on("activate", this.onActivate);
   }
 
   onReady = () => {
     enforceMacOSAppLocation();
-    if (app.isInApplicationsFolder()) {
+    if (app.isInApplicationsFolder() || is.development) {
       this.createMenu();
       this.window = this.createWindow();
       this.registerWebContentsListener();
@@ -44,6 +43,7 @@ class Main {
       "did-frame-finish-load",
       this.onDidFrameFinishLoad
     );
+    this.window.on("close", this.onWindowClose);
   }
 
   onActivate = () => {
@@ -93,7 +93,7 @@ class Main {
     }
   };
 
-  onBeforeQuit = (e: Event) => {
+  onWindowClose = (e: Event) => {
     e.preventDefault();
 
     try {
@@ -102,10 +102,17 @@ class Main {
       log.warn("Could not send shutdown request: ", err);
     }
 
-    ipcMain.on(Channel.SERVER_SHUTDOWN, () => app.exit());
+    ipcMain.on(Channel.SERVER_SHUTDOWN, () => {
+      log.info("Server was shutdown.");
+      this.window.destroy();
+      app.quit();
+    });
     setTimeout(() => {
-      log.warn("Server Shutdown did not respond in time. Exiting.");
-      app.exit();
+      log.warn(
+        "Server did not respond to the Shutdown-Request in time. Exiting."
+      );
+      this.window.destroy();
+      app.quit();
     }, 5000);
   };
 
