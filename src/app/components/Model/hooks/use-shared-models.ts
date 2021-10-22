@@ -7,6 +7,9 @@ export const selectModel = createAction<
   { model: IModelFile; isExample?: boolean },
   "selectModel"
 >("selectModel");
+export const resetSelectedModel = createAction<void, "resetSelectedModel">(
+  "resetSelectedModel"
+);
 export const selectExampleProject = createAction<
   { project: ExampleProject },
   "selectExampleProject"
@@ -49,6 +52,9 @@ const reducer = createReducer(initialState, (builder) =>
       const { model, isExample } = payload;
       state.selectedModel = model;
       state.isExampleProject = isExample;
+    })
+    .addCase(resetSelectedModel, (state) => {
+      state.selectedModel = undefined;
     })
     .addCase(selectExampleProject, (state, { payload }) => {
       const { project } = payload;

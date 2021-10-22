@@ -62,7 +62,10 @@ function useEditor(): State {
   }
 
   useEffect(() => {
-    if (!selectedModel) return;
+    if (!selectedModel) {
+      monacoEditor?.setModel(null);
+      return;
+    }
 
     const { path, content } = selectedModel;
 

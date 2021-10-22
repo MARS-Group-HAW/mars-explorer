@@ -6,6 +6,7 @@ import { useAppDispatch } from "../../../../utils/hooks/use-store";
 import { removeModel } from "../../utils/model-slice";
 import {
   closeModelDeletion,
+  resetSelectedModel,
   useSharedModels,
 } from "../../hooks/use-shared-models";
 
@@ -19,8 +20,10 @@ type State = {
 
 function useDeleteClassDialog(): State {
   const dispatch = useAppDispatch();
-  const [{ isDeleteDialogOpen, processedModel }, sharedModelDispatch] =
-    useSharedModels();
+  const [
+    { isDeleteDialogOpen, processedModel, selectedModel },
+    sharedModelDispatch,
+  ] = useSharedModels();
 
   const { addSuccessAlert, addErrorAlert } = useContext(SnackBarContext);
   const [isLoading, setIsLoading] = useBoolean(false);
@@ -44,6 +47,11 @@ function useDeleteClassDialog(): State {
 
     if (deleted) {
       addSuccessAlert({ msg: `"${name}" has been deleted.` });
+
+      if (processedModel?.path === selectedModel?.path) {
+        sharedModelDispatch(resetSelectedModel);
+      }
+
       dispatch(removeModel(processedModel));
     } else {
       addErrorAlert({
