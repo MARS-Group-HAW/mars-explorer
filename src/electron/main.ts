@@ -2,12 +2,12 @@ import { app, BrowserWindow, Event, Menu } from "electron";
 import { enforceMacOSAppLocation, is } from "electron-util";
 import fixPath from "fix-path";
 import { Channel } from "@shared/types/Channel";
+import fs = require("fs-extra");
+import squirrel = require("electron-squirrel-startup");
 import appPaths from "./app-paths";
 import log from "./main-logger";
 import menuItems from "./menu";
 import SafeIpcMain from "./safe-ipc-main";
-import fs = require("fs-extra");
-import squirrel = require("electron-squirrel-startup");
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -43,6 +43,10 @@ class Main {
       "did-frame-finish-load",
       this.onDidFrameFinishLoad
     );
+    this.window.on("close", (e) => {
+      e.preventDefault();
+      app.quit();
+    });
   }
 
   onActivate = () => {
@@ -94,6 +98,10 @@ class Main {
 
   onBeforeQuit = (e: Event) => {
     e.preventDefault();
+    this.shutdownApp();
+  };
+
+  private shutdownApp = () => {
     this.window.webContents.send(Channel.SHUTDOWN);
 
     SafeIpcMain.on(Channel.SERVER_SHUTDOWN, () => app.exit());
