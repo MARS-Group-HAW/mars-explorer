@@ -11,7 +11,6 @@ type State = void;
 function useModelBootstrap(): State {
   const path = useAppSelector(selectProjectPath);
 
-  console.log("test");
   useMarsFramework(path);
   useProjectRestore(path);
   useMonacoServices();
