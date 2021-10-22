@@ -21,8 +21,9 @@ const LayersForm = () => {
   return (
     <MappingsForm>
       <Grid
+        spacing={2}
         container
-        justifyContent="space-between"
+        alignItems="center"
         className={classes.nameCountContainer}
       >
         <Grid item>
