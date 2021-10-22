@@ -99,7 +99,6 @@ class Main {
   };
 
   onBeforeQuit = (e: Event) => {
-    console.log("on before quit");
     e.preventDefault();
     this.shutdownApp();
   };
