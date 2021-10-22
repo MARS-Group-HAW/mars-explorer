@@ -12,7 +12,6 @@ function useClassNameInput(init: string = ""): State {
     }
 
     if (!newValue.match(/^[a-z0-9]+$/i)) {
-      console.log("no match for", newValue);
       return;
     }
 
