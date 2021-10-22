@@ -31,7 +31,7 @@ class Main {
 
   onReady = () => {
     enforceMacOSAppLocation();
-    if (!is.macos || app.isInApplicationsFolder() || is.development) {
+    if (!is.macos || app.isInApplicationsFolder()) {
       this.createMenu();
       this.window = this.createWindow();
       this.registerWebContentsListener();
