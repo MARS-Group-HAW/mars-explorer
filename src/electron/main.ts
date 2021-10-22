@@ -44,8 +44,10 @@ class Main {
       this.onDidFrameFinishLoad
     );
     this.window.on("close", (e) => {
-      e.preventDefault();
-      app.quit();
+      if (!is.macos) {
+        e.preventDefault();
+        app.quit();
+      }
     });
   }
 
@@ -97,6 +99,7 @@ class Main {
   };
 
   onBeforeQuit = (e: Event) => {
+    console.log("on before quit");
     e.preventDefault();
     this.shutdownApp();
   };
@@ -104,7 +107,10 @@ class Main {
   private shutdownApp = () => {
     this.window.webContents.send(Channel.SHUTDOWN);
 
-    SafeIpcMain.on(Channel.SERVER_SHUTDOWN, () => app.exit());
+    SafeIpcMain.on(Channel.SERVER_SHUTDOWN, () => {
+      log.warn("Server shutdown successfully.");
+      app.exit();
+    });
     setTimeout(() => {
       log.warn("Server Shutdown did not respond in time. Exiting.");
       app.exit();
