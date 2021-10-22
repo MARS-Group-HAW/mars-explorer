@@ -103,7 +103,7 @@ class SimulationHandler {
   private calcProgress = (currentTick: number) => {
     const progress = Math.floor((currentTick / this.maxTicks) * 100);
 
-    return Number.isNaN(progress) ? 0 : progress;
+    return Number.isNaN(progress) || !Number.isFinite(progress) ? 0 : progress;
   };
 
   private isNewProgress = (progress: number, lastProgress?: number) =>
@@ -157,13 +157,16 @@ class SimulationHandler {
     const { currentTick, typeName, entities, worldSize } =
       SimulationHandler.parseMsg<VisWebsocketMessage>(msg);
 
-    const progress = this.calcProgress(currentTick);
-
-    const progressOfType = this.visProgress.get(typeName);
-
     if (worldSize) {
       handleWorldSizeMsg({ worldSizes: worldSize });
     }
+
+    if (!currentTick || !typeName || !entities || entities?.length === 0)
+      return null;
+
+    const progress = this.calcProgress(currentTick);
+
+    const progressOfType = this.visProgress.get(typeName);
 
     if (
       this.isNewProgress(progress, progressOfType) &&
