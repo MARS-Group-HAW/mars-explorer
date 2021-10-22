@@ -32,9 +32,11 @@ class Main {
 
   onReady = () => {
     enforceMacOSAppLocation();
-    this.createMenu();
-    this.window = this.createWindow();
-    this.registerWebContentsListener();
+    if (app.isInApplicationsFolder()) {
+      this.createMenu();
+      this.window = this.createWindow();
+      this.registerWebContentsListener();
+    }
   };
 
   registerWebContentsListener() {
@@ -42,12 +44,6 @@ class Main {
       "did-frame-finish-load",
       this.onDidFrameFinishLoad
     );
-    this.window.on("close", (e) => {
-      if (!is.macos) {
-        e.preventDefault();
-        app.quit();
-      }
-    });
   }
 
   onActivate = () => {
@@ -99,16 +95,14 @@ class Main {
 
   onBeforeQuit = (e: Event) => {
     e.preventDefault();
-    this.shutdownApp();
-  };
 
-  private shutdownApp = () => {
-    this.window.webContents.send(Channel.SHUTDOWN);
+    try {
+      this.window.webContents.send(Channel.SHUTDOWN);
+    } catch (err: any) {
+      log.warn("Could not send shutdown request: ", err);
+    }
 
-    ipcMain.on(Channel.SERVER_SHUTDOWN, () => {
-      log.warn("Server shutdown successfully.");
-      app.exit();
-    });
+    ipcMain.on(Channel.SERVER_SHUTDOWN, () => app.exit());
     setTimeout(() => {
       log.warn("Server Shutdown did not respond in time. Exiting.");
       app.exit();
