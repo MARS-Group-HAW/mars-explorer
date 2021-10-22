@@ -2,6 +2,8 @@
   "globals": {
     "steps": 100,
     "output": "csv",
+    "pythonVisualization": true,
+    "reportProgress": true,
     "options": {
       "delimiter": ";",
       "format": "en-EN"

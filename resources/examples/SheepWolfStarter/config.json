@@ -3,7 +3,7 @@
     "steps": 250,
     "output": "csv",
     "pythonVisualization": true,
-    "console": true
+    "reportProgress": true
   },
   "layers": [
     {
