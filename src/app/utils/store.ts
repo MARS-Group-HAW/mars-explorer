@@ -10,8 +10,12 @@ import projectReducer from "../components/Home/utils/project-slice";
 import modelReducer, {
   initialState,
 } from "../components/Model/utils/model-slice";
-import configReducer from "../components/Configure/utils/config-slice";
-import simulationReducer from "../components/QuickStartBar/utils/simulation-slice";
+import configReducer, {
+  initialState as initConfigState,
+} from "../components/Configure/utils/config-slice";
+import simulationReducer, {
+  initialState as initSimState,
+} from "../components/QuickStartBar/utils/simulation-slice";
 
 const logger = createLogger({
   collapsed: true,
@@ -35,6 +39,8 @@ const rootReducer: Reducer = (state: RootState, action: AnyAction) => {
         ...initialState,
         exampleProjects: state.model.exampleProjects,
       },
+      simulation: initSimState,
+      config: initConfigState,
     } as RootState;
   }
   return combinedReducer(state, action);

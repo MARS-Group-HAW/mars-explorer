@@ -9,7 +9,7 @@ type State = {
   errors: string[];
 };
 // Define the initial state using that type
-const initialState: State = {
+export const initialState: State = {
   status: ValidationState.UNKNOWN,
   errors: [],
 };
