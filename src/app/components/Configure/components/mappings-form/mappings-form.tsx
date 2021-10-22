@@ -25,7 +25,6 @@ const useStyles = makeStyles(() => ({
   },
   mappingContainer: {
     height: "80%",
-    padding: 5,
   },
   mappingInputsContainer: {
     padding: 10,
