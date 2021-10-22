@@ -5,6 +5,7 @@ import {
   setDirtyStateInModel,
 } from "../utils/model-slice";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
+import uriToFsPath from "@app/utils/uri-to-fs-path";
 
 function useDirtyFileHandler() {
   const dispatch = useAppDispatch();
@@ -13,7 +14,7 @@ function useDirtyFileHandler() {
 
   useMount(() => {
     const didCreateDisposable = editor.onDidCreateModel((model) => {
-      const modelPath = model.uri.path;
+      const modelPath = uriToFsPath(model.uri);
       const didContentChangeDisposable = model.onDidChangeContent(() => {
         const latestVersion = latestModelPathsWithVersion.current[modelPath];
         const currentVersion = model.getAlternativeVersionId();
