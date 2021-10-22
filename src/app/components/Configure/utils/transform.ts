@@ -54,6 +54,7 @@ class FormTransformer {
     // FIXME: output options currently not in use
     globals.output = OutputSpecification.CSV;
     delete globals.options;
+    delete globals.console;
     globals.pythonVisualization = true;
     globals.reportProgress = true;
 
