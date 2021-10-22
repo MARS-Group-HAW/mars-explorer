@@ -19,6 +19,7 @@ import {
   selectModelsPathWithError,
   setErrorStateInModel,
 } from "../../../../Model/utils/model-slice";
+import uriToFsPath from "@app/utils/uri-to-fs-path";
 
 type State = {
   handleMessage: (msg: Message) => void;
@@ -62,7 +63,7 @@ function useDiagnosticsMessages(): State {
         diagnosticParams.diagnostics.filter(diagnosticIsError);
 
       const { uri } = diagnosticParams;
-      const { path } = Uri.parse(uri);
+      const path = uriToFsPath(Uri.parse(uri));
 
       const isInErrors = latestErrors.current.includes(path);
 
