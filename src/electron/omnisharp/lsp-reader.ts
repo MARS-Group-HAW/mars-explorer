@@ -7,6 +7,7 @@ import {
   InitializeRequest,
   LogMessageNotification,
   PublishDiagnosticsNotification,
+  RegistrationParams,
   RegistrationRequest,
   ShowMessageNotification,
   ShowMessageParams,
@@ -37,6 +38,8 @@ const lspServerLogger = new Logger("lsp-server", {
 
 class LspReader extends StreamMessageReader {
   private lastMessage: Message;
+
+  private registerSet: Set<string> = new Set<string>();
 
   constructor(readable: Readable, private channel: string) {
     super(readable);
@@ -94,16 +97,26 @@ class LspReader extends StreamMessageReader {
       }
     } else if (rpc.isResponseMessage(lspMessage)) {
       msgType = `response|${lspMessage.id}`;
-      console.log(JSON.stringify(lspMessage.result));
     } else if (rpc.isRequestMessage(lspMessage)) {
       msgType = `request|${lspMessage.id}`;
       method = lspMessage.method;
 
       switch (lspMessage.method) {
         case InitializeRequest.type.method:
-        case RegistrationRequest.type.method:
-          console.log(JSON.stringify(lspMessage.params));
+        case RegistrationRequest.type.method: {
+          // workaround for https://github.com/OmniSharp/omnisharp-roslyn/issues/2119
+          const params = lspMessage.params as RegistrationParams;
+          const uniqueRegistrations = params.registrations.filter(
+            (regist) => !this.registerSet.has(regist.id)
+          );
+          uniqueRegistrations.forEach((register) =>
+            this.registerSet.add(register.id)
+          );
+          // eslint-disable-next-line no-param-reassign
+          (lspMessage.params as RegistrationParams).registrations =
+            uniqueRegistrations;
           break;
+        }
         case ShutdownRequest.type.method: {
           printMsg = "Asking server to prepare exit.";
           break;
