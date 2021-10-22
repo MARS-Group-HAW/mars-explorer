@@ -1,6 +1,6 @@
 import * as React from "react";
 import AgentsForm from "@app/components/Configure/components/agents-form";
-import { AppBar, Divider, Grid, Tab, Tabs } from "@material-ui/core";
+import { AppBar, Grid, Tab, Tabs } from "@material-ui/core";
 import FormPaper from "../form-paper";
 import useTypeForm, { TabIndizes } from "./use-type-form.hook";
 import useStyles from "./type-form-styles";

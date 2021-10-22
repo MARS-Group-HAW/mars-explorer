@@ -1,4 +1,4 @@
-import { app, BrowserWindow, Event, Menu } from "electron";
+import { app, BrowserWindow, Event, ipcMain, Menu } from "electron";
 import { enforceMacOSAppLocation, is } from "electron-util";
 import fixPath from "fix-path";
 import { Channel } from "@shared/types/Channel";
@@ -7,7 +7,6 @@ import squirrel = require("electron-squirrel-startup");
 import appPaths from "./app-paths";
 import log from "./main-logger";
 import menuItems from "./menu";
-import SafeIpcMain from "./safe-ipc-main";
 
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
@@ -106,7 +105,7 @@ class Main {
   private shutdownApp = () => {
     this.window.webContents.send(Channel.SHUTDOWN);
 
-    SafeIpcMain.on(Channel.SERVER_SHUTDOWN, () => {
+    ipcMain.on(Channel.SERVER_SHUTDOWN, () => {
       log.warn("Server shutdown successfully.");
       app.exit();
     });

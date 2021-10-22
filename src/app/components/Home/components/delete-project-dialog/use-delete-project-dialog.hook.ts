@@ -7,11 +7,7 @@ import {
   useAppDispatch,
   useAppSelector,
 } from "../../../../utils/hooks/use-store";
-import {
-  resetProject,
-  selectProjectPath,
-  setProject,
-} from "../../utils/project-slice";
+import { resetProject, selectProjectPath } from "../../utils/project-slice";
 import { resetStore } from "../../../../utils/store";
 
 type State = {

@@ -1,7 +1,6 @@
 import * as React from "react";
 import { useRef } from "react";
 import {
-  ListItem,
   ListItemIcon,
   ListItemText,
   MenuItem,
