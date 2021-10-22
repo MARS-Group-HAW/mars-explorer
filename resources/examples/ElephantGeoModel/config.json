@@ -8,7 +8,9 @@
 		"options": {
 			"delimiter": ";",
 			"format": "en-EN"
-		}
+		},
+		"pythonVisualization": true,
+		"reportProgress": true
 	},
 	"layers": [
 		{

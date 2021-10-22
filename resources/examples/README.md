@@ -11,6 +11,8 @@ Since these projects often represent a starting point for students, they should 
   -> `const MARS_LIFE_VERSION = "..."`)
 - The project should preferably build with `netcoreapp3.1`
 - Your directory must contain a `config.json` file at the same level as the models
+- This config.json should:
+  - not use `globals.console: true` because it's currently bugged, use `globals.reportProgress: true` instead
 - Your main file (usually `Program.cs`) must read the contents of the `config.json` and pass it to the `Start(...)`
   method
 - Your project should contain a `README.md` to explain the use case of that project
