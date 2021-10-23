@@ -37,6 +37,10 @@ function getLabelBySimState(simState: SimulationStates) {
   switch (simState) {
     case SimulationStates.SUCCESS:
       return "Simulation has finished.";
+    case SimulationStates.STARTED:
+      return "Building ...";
+    case SimulationStates.RUNNING:
+      return "Running ...";
     case SimulationStates.FAILED:
       return "Simulation has failed. Click to show the error message.";
     case SimulationStates.PAUSED:
@@ -52,18 +56,18 @@ function getLabelBySimState(simState: SimulationStates) {
 }
 
 function StatusIndicator({ showProgress, progress, simState }: Props) {
-  if (showProgress) {
-    return (
-      <CircularProgressWithLabel
-        hasStarted={simState === SimulationStates.RUNNING}
-        value={progress}
-      />
-    );
-  }
-
   return (
     <Tooltip arrow title={getLabelBySimState(simState)}>
-      {getIconBySimState(simState)}
+      {showProgress ? (
+        <span>
+          <CircularProgressWithLabel
+            hasStarted={simState === SimulationStates.RUNNING}
+            value={progress}
+          />
+        </span>
+      ) : (
+        getIconBySimState(simState)
+      )}
     </Tooltip>
   );
 }
