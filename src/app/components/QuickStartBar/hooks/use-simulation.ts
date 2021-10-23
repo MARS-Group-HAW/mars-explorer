@@ -6,6 +6,7 @@ import {
   SimulationVisMessage,
   SimulationWorldSizeMessage,
 } from "@shared/types/SimulationMessages";
+import { useLatest } from "react-use";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
 import {
   addCountData,
@@ -32,6 +33,7 @@ function useSimulation(): State {
     dispatch(setSimulationState(newState));
 
   const [progress, setProgress] = useState(0);
+  const latestProgress = useLatest(progress);
   const [error, setError] = useState<string>();
 
   function runSimulation(path: string) {
@@ -43,10 +45,10 @@ function useSimulation(): State {
     window.api.send(Channel.TERMINATE_SIMULATION);
   }
 
-  function handleSimulationProgress(newProgress: number) {
+  const handleSimulationProgress = (newProgress: number) => {
     dispatchSimState(SimulationStates.RUNNING);
-    setProgress(Math.max(progress, newProgress));
-  }
+    setProgress(Math.max(latestProgress.current, newProgress));
+  };
 
   function handleSimulationCountMsg(msg: SimulationCountMessage) {
     handleSimulationProgress(msg.progress);

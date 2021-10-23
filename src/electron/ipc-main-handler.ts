@@ -531,10 +531,24 @@ SafeIpcMain.on(
       },
       (error, stdout) => {
         if (error) {
-          log.error("Error while building: ", stdout);
-          SafeIpcMain.send(Channel.SIMULATION_FAILED, stdout);
-          SafeIpcMain.send(Channel.SIMULATION_EXITED, SimulationStates.FAILED);
-          return;
+          switch (error.code) {
+            case ProcessExitCode.TERMINATED: {
+              SafeIpcMain.send(
+                Channel.SIMULATION_EXITED,
+                SimulationStates.TERMINATED
+              );
+              return;
+            }
+            default: {
+              log.error(`Error while running ${error.cmd}: ${stdout}`);
+              SafeIpcMain.send(Channel.SIMULATION_FAILED, stdout);
+              SafeIpcMain.send(
+                Channel.SIMULATION_EXITED,
+                SimulationStates.FAILED
+              );
+              return;
+            }
+          }
         }
 
         runProcess = runSimulation(projectPath);
