@@ -21,6 +21,7 @@ import useChannelSubscription from "../../../utils/hooks/use-channel-subscriptio
 type State = {
   simState: SimulationStates;
   progress: number;
+  outputMsg: string;
   errorMsg: string;
   runSimulation: (path: string) => void;
   cancelSimulation: () => void;
@@ -34,6 +35,7 @@ function useSimulation(): State {
 
   const [progress, setProgress] = useState(0);
   const latestProgress = useLatest(progress);
+  const [output, setOutput] = useState<string>();
   const [error, setError] = useState<string>();
 
   function runSimulation(path: string) {
@@ -73,6 +75,10 @@ function useSimulation(): State {
     }
   }
 
+  function handleSimulationOutput(simOutput: string) {
+    setOutput(simOutput);
+  }
+
   useChannelSubscription(
     Channel.SIMULATION_COORDS_PROGRESS,
     handleSimulationCoordsMsg
@@ -90,6 +96,8 @@ function useSimulation(): State {
     window.api.logger.error("Simulation Error: ", errMsg);
     setError(errMsg);
   });
+
+  useChannelSubscription(Channel.SIMULATION_OUTPUT, handleSimulationOutput);
 
   useChannelSubscription(Channel.SIMULATION_EXITED, handleSimulationEnd);
 
@@ -130,6 +138,7 @@ function useSimulation(): State {
   return {
     simState,
     progress,
+    outputMsg: output,
     errorMsg: error,
     runSimulation,
     cancelSimulation,

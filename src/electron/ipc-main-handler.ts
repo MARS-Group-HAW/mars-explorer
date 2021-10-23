@@ -503,7 +503,9 @@ function runSimulation(projectPath: string) {
       cwd: projectPath,
       shell: true,
     },
-    (error) => {
+    (error, stdout) => {
+      SafeIpcMain.send(Channel.SIMULATION_OUTPUT, stdout);
+
       if (!error || error.code === ProcessExitCode.TERMINATED) return;
 
       log.error("Error while simulating: ", error.name, error.message);

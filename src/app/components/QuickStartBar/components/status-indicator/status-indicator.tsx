@@ -1,4 +1,5 @@
 import * as React from "react";
+import { useEffect } from "react";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import CheckCircleOutlineIcon from "@material-ui/icons/CheckCircleOutline";
 import ErrorIcon from "@material-ui/icons/Error";
@@ -7,6 +8,7 @@ import PanToolIcon from "@material-ui/icons/PanTool";
 import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
 import { Tooltip } from "@material-ui/core";
+import { useBoolean, useTimeoutFn } from "react-use";
 import CircularProgressWithLabel from "../CircularProgressWithLabel";
 
 type Props = {
@@ -36,17 +38,17 @@ function getIconBySimState(simState: SimulationStates) {
 function getLabelBySimState(simState: SimulationStates) {
   switch (simState) {
     case SimulationStates.SUCCESS:
-      return "Simulation has finished.";
+      return "Simulation has finished. Click here to show the output.";
     case SimulationStates.STARTED:
       return "Building ...";
     case SimulationStates.RUNNING:
       return "Running ...";
     case SimulationStates.FAILED:
-      return "Simulation has failed. Click to show the error message.";
+      return "Simulation has failed. Click here to show the error message.";
     case SimulationStates.PAUSED:
       return "Simulation has been paused.";
     case SimulationStates.TERMINATED:
-      return "You've terminated the simulation.";
+      return "You've terminated the simulation. Click here to show the output.";
     case SimulationStates.NONE:
       return "Waiting for action.";
     case SimulationStates.UNKNOWN:
@@ -55,19 +57,44 @@ function getLabelBySimState(simState: SimulationStates) {
   }
 }
 
+const isFinishedState = (state: SimulationStates) =>
+  [SimulationStates.SUCCESS, SimulationStates.TERMINATED].includes(state);
+
 function StatusIndicator({ showProgress, progress, simState }: Props) {
+  const [openTooltip, setTooltipShow] = useBoolean(false);
+
+  const [, , reset] = useTimeoutFn(() => setTooltipShow(false), 5000);
+
+  useEffect(() => {
+    if (isFinishedState(simState)) {
+      setTooltipShow(true);
+      reset();
+    }
+  }, [simState]);
+
+  const icon = getIconBySimState(simState);
+  const title = getLabelBySimState(simState);
+
+  if (!isFinishedState(simState) || !openTooltip) {
+    return (
+      <Tooltip key="hover-tooltip" arrow title={title}>
+        {showProgress ? (
+          <span>
+            <CircularProgressWithLabel
+              hasStarted={simState === SimulationStates.RUNNING}
+              value={progress}
+            />
+          </span>
+        ) : (
+          icon
+        )}
+      </Tooltip>
+    );
+  }
+
   return (
-    <Tooltip arrow title={getLabelBySimState(simState)}>
-      {showProgress ? (
-        <span>
-          <CircularProgressWithLabel
-            hasStarted={simState === SimulationStates.RUNNING}
-            value={progress}
-          />
-        </span>
-      ) : (
-        getIconBySimState(simState)
-      )}
+    <Tooltip key="timeout-tooltip" arrow title={title} open>
+      {icon}
     </Tooltip>
   );
 }

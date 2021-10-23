@@ -21,10 +21,11 @@ type State = {
   simState: SimulationStates;
   progress: number;
   showProgress: boolean;
-  showErrorDialog: boolean;
-  openErrorDialog: () => void;
-  closeErrorDialog: () => void;
+  showOutputDialog: boolean;
+  openOutputDialog: () => void;
+  closeOutputDialog: () => void;
   errorMsg: string;
+  outputMsg: string;
   modelState: ValidationState;
   modelErrorFiles?: string[];
   dirtyModelNames: string[];
@@ -40,8 +41,14 @@ function useQuickStartBar(): State {
   const isProjectFullyInitialized = useAppSelector(selectModelFullyInitialized);
   const { path, name } = useAppSelector(selectProject);
   useResultsInLocalStorage();
-  const { simState, progress, errorMsg, runSimulation, cancelSimulation } =
-    useSimulation();
+  const {
+    simState,
+    progress,
+    errorMsg,
+    outputMsg,
+    runSimulation,
+    cancelSimulation,
+  } = useSimulation();
 
   const isProjectDefined = Boolean(path);
 
@@ -51,7 +58,7 @@ function useQuickStartBar(): State {
   const configErrors = useAppSelector(selectConfigErrors);
   const configStatus = useAppSelector(selectConfigStatus);
 
-  const [showErrorDialog, setShowErrorDialog] = useBoolean(false);
+  const [showOutputDialog, setOutputDialogOpen] = useBoolean(false);
 
   const [modelValidationState, setModelValidationState] = useState(
     ValidationState.UNKNOWN
@@ -84,7 +91,7 @@ function useQuickStartBar(): State {
   }, [path, modelErrors, modelDirtyFiles, isProjectFullyInitialized]);
 
   useEffect(() => {
-    setShowErrorDialog(Boolean(errorMsg));
+    setOutputDialogOpen(Boolean(errorMsg));
   }, [errorMsg]);
 
   const handleStart = () => runSimulation(path);
@@ -108,9 +115,10 @@ function useQuickStartBar(): State {
     progress,
     showProgress: isRunning,
     errorMsg,
-    showErrorDialog,
-    openErrorDialog: () => setShowErrorDialog(true),
-    closeErrorDialog: () => setShowErrorDialog(false),
+    outputMsg,
+    showOutputDialog,
+    openOutputDialog: () => setOutputDialogOpen(true),
+    closeOutputDialog: () => setOutputDialogOpen(false),
     modelErrorFiles: modelErrors || [],
     dirtyModelNames: modelDirtyFiles,
     configErrors,
