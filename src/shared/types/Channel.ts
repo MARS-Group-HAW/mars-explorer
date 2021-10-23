@@ -55,6 +55,7 @@ export enum Channel {
   SHOW_UNSAVED_CHANGES_DIALOG = "SHOW_UNSAVED_CHANGES_DIALOG",
   SHOW_UNSAVEABLE_CHANGES_DIALOG = "SHOW_UNSAVEABLE_CHANGES_DIALOG",
   SERVER_SHUTDOWN = "SERVER_SHUTDOWN",
+  SIMULATION_OUTPUT = "SIMULATION_OUTPUT",
 }
 
 export interface ChannelInputMap {
@@ -93,6 +94,7 @@ export interface ChannelInputMap {
   [Channel.SIMULATION_COUNT_PROGRESS]: void;
   [Channel.SIMULATION_EXITED]: void;
   [Channel.SIMULATION_FAILED]: void;
+  [Channel.SIMULATION_OUTPUT]: void;
   [Channel.SIMULATION_WORLD_SIZES]: void;
   [Channel.START_LANGUAGE_SERVER]: string;
   [Channel.STOP_LANGUAGE_SERVER]: void;
@@ -138,6 +140,7 @@ export interface ChannelOutputMap {
   [Channel.SIMULATION_COUNT_PROGRESS]: SimulationCountMessage;
   [Channel.SIMULATION_EXITED]: SimulationStates;
   [Channel.SIMULATION_FAILED]: ExecException | string;
+  [Channel.SIMULATION_OUTPUT]: string;
   [Channel.SIMULATION_WORLD_SIZES]: SimulationWorldSizeMessage;
   [Channel.START_LANGUAGE_SERVER]: string;
   [Channel.STOP_LANGUAGE_SERVER]: void;

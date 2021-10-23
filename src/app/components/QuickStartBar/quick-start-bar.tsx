@@ -1,22 +1,14 @@
 import * as React from "react";
-import {
-  Button,
-  DialogActions,
-  DialogContent,
-  DialogContentText,
-  DialogTitle,
-  Grid,
-  Toolbar,
-  Typography,
-} from "@material-ui/core";
+import { Grid, Toolbar, Typography } from "@material-ui/core";
 import useQuickStartBar from "@app/components/QuickStartBar/hooks";
 import StatusChip from "@app/components/QuickStartBar/components/status-chip";
 import ActionButton from "@app/components/QuickStartBar/components/action-button";
 import PlayCircleOutlineIcon from "@material-ui/icons/PlayCircleOutline";
 import StopIcon from "@material-ui/icons/Stop";
-import DialogWithKeyListener from "../shared/dialog-with-key-listener";
+import { SimulationStates } from "@shared/types/SimulationStates";
 import ValidationState from "../../utils/types/validation-state";
 import StatusIndicator from "./components/status-indicator";
+import OutputDialog from "./components/output-dialog";
 
 function QuickStartBar() {
   const {
@@ -32,12 +24,19 @@ function QuickStartBar() {
     progress,
     showProgress,
     errorMsg,
-    showErrorDialog,
-    openErrorDialog,
-    closeErrorDialog,
+    outputMsg,
+    showOutputDialog,
+    openOutputDialog,
+    closeOutputDialog,
     handleStart,
     handleStop,
   } = useQuickStartBar();
+
+  const hasFinishedState = [
+    SimulationStates.SUCCESS,
+    SimulationStates.FAILED,
+    SimulationStates.TERMINATED,
+  ].includes(simState);
 
   return (
     <>
@@ -79,11 +78,11 @@ function QuickStartBar() {
           container
           style={{
             width: 40,
-            cursor: errorMsg ? "pointer" : "initial",
+            cursor: hasFinishedState ? "pointer" : "initial",
           }}
           justifyContent="center"
           alignItems="center"
-          onClick={() => errorMsg && openErrorDialog()}
+          onClick={() => hasFinishedState && openOutputDialog()}
         >
           <StatusIndicator
             showProgress={showProgress}
@@ -92,27 +91,12 @@ function QuickStartBar() {
           />
         </Grid>
       </Grid>
-      <DialogWithKeyListener
-        open={showErrorDialog}
-        onKeyPressed={closeErrorDialog}
-        scroll="paper"
-        maxWidth="lg"
-      >
-        <DialogTitle id="scroll-dialog-title">Last Error Message</DialogTitle>
-        <DialogContent dividers>
-          {errorMsg?.split("\n").map((msg) => (
-            <DialogContentText
-              tabIndex={-1}
-              style={{ fontFamily: "monospace", color: "red" }}
-            >
-              {msg}
-            </DialogContentText>
-          ))}
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={closeErrorDialog}>Close</Button>
-        </DialogActions>
-      </DialogWithKeyListener>
+      <OutputDialog
+        open={showOutputDialog}
+        onClose={closeOutputDialog}
+        errorMsg={errorMsg}
+        outputMsg={outputMsg}
+      />
     </>
   );
 }
