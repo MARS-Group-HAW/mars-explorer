@@ -15,7 +15,9 @@ import {
   InitializeRequest,
   DidChangeWatchedFilesNotification,
   DidChangeWatchedFilesParams,
+  DidCloseTextDocumentNotification,
   ExitNotification,
+  DidCloseTextDocumentParams,
 } from "vscode-languageserver";
 import { StreamMessageWriter } from "vscode-jsonrpc/lib/node/main";
 import { Writable } from "stream";
@@ -52,9 +54,13 @@ class LspWriter extends StreamMessageWriter {
       method = clientMsg.method;
 
       switch (clientMsg.method) {
-        case DidOpenTextDocumentNotification.method: {
-          printMsg = (clientMsg.params as DidOpenTextDocumentParams)
-            .textDocument.uri;
+        case DidOpenTextDocumentNotification.method:
+        case DidCloseTextDocumentNotification.method: {
+          printMsg = (
+            clientMsg.params as
+              | DidOpenTextDocumentParams
+              | DidCloseTextDocumentParams
+          ).textDocument.uri;
           break;
         }
         case DidChangeWatchedFilesNotification.type.method: {
