@@ -1,5 +1,6 @@
 import { Channel } from "@shared/types/Channel";
 import { useCallback } from "react";
+import { editor } from "monaco-editor";
 import {
   useAppDispatch,
   useAppSelector,
@@ -17,7 +18,12 @@ function useModels(): State {
   const { path, name } = useAppSelector(selectProject);
 
   const loadingAction: LoadingAction = useCallback(async () => {
-    if (!path) return Promise.reject();
+    if (!path) {
+      editor?.getModels().forEach((model) => model.dispose());
+      return Promise.reject();
+    }
+
+    editor?.getModels().forEach((model) => model.dispose());
 
     window.api.logger.info("Fetching Models");
     const workingModel = await window.api.invoke(Channel.GET_USER_PROJECT, {

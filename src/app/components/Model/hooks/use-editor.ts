@@ -1,13 +1,15 @@
 import { MutableRefObject, useEffect, useRef, useState } from "react";
 import { editor } from "monaco-editor";
 import monaco from "@app/standalone/monaco-editor/monaco";
-import { useUnmount } from "react-use";
+import { useCustomCompareEffect, useUnmount } from "react-use";
 import _ from "lodash";
 import { CSHARP, MARKDOWN } from "../../../standalone/monaco-editor/types";
 import { useSharedModels } from "./use-shared-models";
 import useEditorDecorations from "./use-editor-decorations";
 import useEditorSaveKey from "./use-editor-save-key";
 import useDirtyFileHandler from "./use-dirty-file-handler";
+import { useAppSelector } from "../../../utils/hooks/use-store";
+import { selectModelsWithoutMeta } from "../utils/model-slice";
 import IStandaloneCodeEditor = editor.IStandaloneCodeEditor;
 import ITextModel = editor.ITextModel;
 import IStandaloneEditorConstructionOptions = editor.IStandaloneEditorConstructionOptions;
@@ -33,6 +35,8 @@ type State = {
 
 function useEditor(): State {
   const ref = useRef();
+  const models = useAppSelector(selectModelsWithoutMeta);
+
   const [{ selectedModel, isExampleProject }] = useSharedModels();
   const [monacoEditor, setMonacoEditor] = useState<IStandaloneCodeEditor>();
   useEditorDecorations();
@@ -60,6 +64,17 @@ function useEditor(): State {
 
     return textModel;
   }
+
+  useCustomCompareEffect(
+    () => {
+      if (!models) return;
+      // add models to monaco, trigger textDocument/didOpen notification
+      models.forEach(({ path, content }) => createOrGetModel(path, content));
+    },
+    [models],
+    ([prevModels], [nextModels]) =>
+      _.xorBy(prevModels, nextModels, (model) => model.path)?.length === 0
+  );
 
   useEffect(() => {
     if (!selectedModel) {
