@@ -1,5 +1,5 @@
 import * as React from "react";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 import {
   AppBar,
   Button,
@@ -41,39 +41,45 @@ function OutputDialog({ open, errorMsg, outputMsg, onClose }: Props) {
     }
   }, [errorMsg, outputMsg]);
 
-  const errorContent = () =>
-    errorMsg ? (
-      <>
-        {errorMsg.split("\n").map((msg) => (
-          <DialogContentText
-            key={msgKeys++}
-            tabIndex={-1}
-            style={{ fontFamily: "monospace", color: "red" }}
-          >
-            {msg}
-          </DialogContentText>
-        ))}
-      </>
-    ) : (
-      <NoDataMessage msg="No error output found." />
-    );
+  const errorContent = useMemo(
+    () =>
+      errorMsg ? (
+        <>
+          {errorMsg.split("\n").map((msg) => (
+            <DialogContentText
+              key={msgKeys++}
+              tabIndex={-1}
+              style={{ fontFamily: "monospace", color: "red" }}
+            >
+              {msg}
+            </DialogContentText>
+          ))}
+        </>
+      ) : (
+        <NoDataMessage msg="No error output found." />
+      ),
+    [errorMsg]
+  );
 
-  const outputContent = () =>
-    outputMsg ? (
-      <>
-        {outputMsg.split("\n").map((msg) => (
-          <DialogContentText
-            key={msgKeys++}
-            tabIndex={-1}
-            style={{ fontFamily: "monospace" }}
-          >
-            {msg}
-          </DialogContentText>
-        ))}
-      </>
-    ) : (
-      <NoDataMessage msg="No console output found." />
-    );
+  const outputContent = useMemo(
+    () =>
+      outputMsg ? (
+        <>
+          {outputMsg.split("\n").map((msg) => (
+            <DialogContentText
+              key={msgKeys++}
+              tabIndex={-1}
+              style={{ fontFamily: "monospace" }}
+            >
+              {msg}
+            </DialogContentText>
+          ))}
+        </>
+      ) : (
+        <NoDataMessage msg="No console output found." />
+      ),
+    [outputMsg]
+  );
 
   return (
     <DialogWithKeyListener
@@ -95,7 +101,7 @@ function OutputDialog({ open, errorMsg, outputMsg, onClose }: Props) {
         </Tabs>
       </AppBar>
       <DialogContent dividers>
-        {tab === TabOptions.ERROR ? errorContent() : outputContent()}
+        {tab === TabOptions.ERROR ? errorContent : outputContent}
       </DialogContent>
       <DialogActions>
         <Button onClick={onClose}>Close</Button>

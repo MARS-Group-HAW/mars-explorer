@@ -494,42 +494,16 @@ enum ProcessExitCode {
   TERMINATED = 143,
 }
 
+enum ProcessSignals {
+  TERMINATED = "SIGTERM",
+}
+
 function runSimulation(projectPath: string): ChildProcess {
   log.info(`Starting simulation in ${projectPath} ...`);
-
-  let consoleOutput: string;
-  let errorOutput: string;
-
-  const runProc = child_process.spawn("dotnet", ["run", "--no-build"], {
+  return child_process.spawn("dotnet", ["run", "--no-build"], {
     cwd: projectPath,
     shell: true,
   });
-
-  runProc.stdout.setEncoding("utf8");
-  runProc.stdout.on("data", (data) => {
-    consoleOutput += data.toString();
-  });
-
-  runProc.stderr.setEncoding("utf8");
-  runProc.stderr.on("data", (data) => {
-    errorOutput += data.toString();
-  });
-
-  runProc.on("close", (code) => {
-    SafeIpcMain.send(Channel.SIMULATION_OUTPUT, consoleOutput);
-
-    switch (code) {
-      case ProcessExitCode.SUCCESS:
-      case ProcessExitCode.TERMINATED:
-        return;
-      default: {
-        log.error("Error while simulating: ", errorOutput);
-        SafeIpcMain.send(Channel.SIMULATION_FAILED, errorOutput);
-      }
-    }
-  });
-
-  return runProc;
 }
 
 SafeIpcMain.on(
@@ -571,7 +545,26 @@ SafeIpcMain.on(
           }
         }
 
+        let consoleOutput: string;
+        let errorOutput: string;
+
         runProcess = runSimulation(projectPath);
+
+        runProcess.stdout.setEncoding("utf8");
+        runProcess.stdout.on("data", (data) => {
+          consoleOutput += data.toString();
+        });
+
+        runProcess.stderr.setEncoding("utf8");
+        runProcess.stderr.on("data", (data) => {
+          if (!data) return;
+
+          const dataStr = data.toString();
+
+          if (!dataStr) return;
+
+          errorOutput += data.toString();
+        });
 
         const wsHandler = new SimulationHandler({
           handleCountMsg: (msg) =>
@@ -591,31 +584,45 @@ SafeIpcMain.on(
           wsHandler.closeSockets(wsCode);
         };
 
-        runProcess.on("exit", (code) => {
+        runProcess.on("exit", (code, signal) => {
           let exitState: SimulationStates;
+          let cleanupCode: number;
 
-          switch (code) {
-            case ProcessExitCode.SUCCESS:
-              log.info(`Simulation exited successfully (${code}).`);
-              exitState = SimulationStates.SUCCESS;
-              cleanupHandler(WebSocketCloseCodes.EXITING);
-              break;
-            case ProcessExitCode.TERMINATED:
-              log.info(`Simulation was terminated (${code}).`);
-              exitState = SimulationStates.TERMINATED;
-              cleanupHandler(WebSocketCloseCodes.TERMINATED);
-              break;
-            case ProcessExitCode.ERROR:
-              log.error(`Simulation errored (${code}).`);
-              exitState = SimulationStates.FAILED;
-              cleanupHandler();
-              break;
-            default:
-              exitState = SimulationStates.UNKNOWN;
-              cleanupHandler();
+          if (Number.isInteger(code)) {
+            switch (code) {
+              case ProcessExitCode.SUCCESS:
+                log.info(`Simulation exited successfully (${code}).`);
+                exitState = SimulationStates.SUCCESS;
+                cleanupCode = WebSocketCloseCodes.EXITING;
+                break;
+              case ProcessExitCode.TERMINATED:
+                log.info(`Simulation was terminated (${code}).`);
+                exitState = SimulationStates.TERMINATED;
+                cleanupCode = WebSocketCloseCodes.TERMINATED;
+                break;
+              case ProcessExitCode.ERROR:
+                log.error(`Simulation errored (${code}).`);
+                exitState = SimulationStates.FAILED;
+                SafeIpcMain.send(Channel.SIMULATION_FAILED, errorOutput);
+                break;
+              default:
+                exitState = SimulationStates.UNKNOWN;
+            }
+          } else if (signal) {
+            // in windows, there is no exit code if terminating
+            switch (signal) {
+              case ProcessSignals.TERMINATED:
+                log.info(`Simulation was terminated (${signal}).`);
+                exitState = SimulationStates.TERMINATED;
+                cleanupCode = WebSocketCloseCodes.TERMINATED;
+                break;
+              default:
+                exitState = SimulationStates.UNKNOWN;
+            }
           }
-
+          cleanupHandler(cleanupCode);
           SafeIpcMain.send(Channel.SIMULATION_EXITED, exitState);
+          SafeIpcMain.send(Channel.SIMULATION_OUTPUT, consoleOutput);
         });
       }
     );
