@@ -10,6 +10,7 @@ import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
 import { AgentClassCreationMessage } from "@shared/types/class-creation-message";
 import fs = require("fs-extra");
+import kill = require("tree-kill");
 import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
 import launchLanguageServer from "./omnisharp/server-launcher";
@@ -18,8 +19,6 @@ import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import log from "./main-logger";
 import main from "./main";
 import SafeIpcMain from "./safe-ipc-main";
-import kill = require('tree-kill');
-
 
 enum FileExtensions {
   CSHARP = ".cs",
@@ -589,8 +588,6 @@ SafeIpcMain.on(
           let exitState: SimulationStates;
           let cleanupCode: number;
 
-          console.log('received', code, signal)
-
           if (Number.isInteger(code)) {
             switch (code) {
               case ProcessExitCode.SUCCESS:
@@ -607,7 +604,6 @@ SafeIpcMain.on(
               case ProcessExitCode.ERROR:
                 log.error(`Simulation errored (${code}).`);
                 exitState = SimulationStates.FAILED;
-                console.log("ERROR", errorOutput);
                 SafeIpcMain.send(Channel.SIMULATION_FAILED, errorOutput);
                 break;
               default:
@@ -635,7 +631,10 @@ SafeIpcMain.on(
     SafeIpcMain.once(Channel.TERMINATE_SIMULATION, () => {
       log.info(`Canceling simulation of ${projectPath}`);
       buildProcess?.kill();
-      kill(runProcess?.pid);
+
+      if (runProcess?.pid) {
+        kill(runProcess.pid);
+      }
     });
   }
 );
