@@ -545,8 +545,8 @@ SafeIpcMain.on(
           }
         }
 
-        let consoleOutput: string;
-        let errorOutput: string;
+        let consoleOutput: string = "";
+        let errorOutput: string = "";
 
         runProcess = runSimulation(projectPath);
 
@@ -562,8 +562,7 @@ SafeIpcMain.on(
           const dataStr = data.toString();
 
           if (!dataStr) return;
-
-          errorOutput += data.toString();
+          errorOutput += dataStr;
         });
 
         const wsHandler = new SimulationHandler({
@@ -603,6 +602,7 @@ SafeIpcMain.on(
               case ProcessExitCode.ERROR:
                 log.error(`Simulation errored (${code}).`);
                 exitState = SimulationStates.FAILED;
+                console.log("ERROR", errorOutput);
                 SafeIpcMain.send(Channel.SIMULATION_FAILED, errorOutput);
                 break;
               default:
