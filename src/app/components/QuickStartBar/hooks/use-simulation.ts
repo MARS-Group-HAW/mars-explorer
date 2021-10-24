@@ -30,6 +30,7 @@ type State = {
 function useSimulation(): State {
   const dispatch = useAppDispatch();
   const simState = useAppSelector(selectSimulationState);
+  const latestSimState = useLatest(simState);
   const dispatchSimState = (newState: SimulationStates) =>
     dispatch(setSimulationState(newState));
 
@@ -46,6 +47,7 @@ function useSimulation(): State {
 
   function cancelSimulation() {
     window.api.send(Channel.TERMINATE_SIMULATION);
+    dispatchSimState(SimulationStates.TERMINATING);
   }
 
   const handleSimulationProgress = (newProgress: number) => {
@@ -54,11 +56,15 @@ function useSimulation(): State {
   };
 
   function handleSimulationCountMsg(msg: SimulationCountMessage) {
+    if (latestSimState.current === SimulationStates.TERMINATING) return;
+
     handleSimulationProgress(msg.progress);
     dispatch(addCountData(msg));
   }
 
   function handleSimulationCoordsMsg(msg: SimulationVisMessage) {
+    if (latestSimState.current === SimulationStates.TERMINATING) return;
+
     handleSimulationProgress(msg.progress);
     dispatch(addPosData(msg));
   }
@@ -68,6 +74,12 @@ function useSimulation(): State {
   }
 
   function handleSimulationEnd(endState: SimulationStates) {
+    // handle case that sim got terminated but had already finished
+    if (latestSimState.current === SimulationStates.TERMINATING) {
+      dispatchSimState(SimulationStates.TERMINATED);
+      return;
+    }
+
     dispatchSimState(endState);
     window.api.logger.info(`Finishing results (Code: ${endState}).`);
 
@@ -115,6 +127,9 @@ function useSimulation(): State {
         break;
       case SimulationStates.SUCCESS:
         window.api.logger.info(`Simulation finished successfully.`);
+        break;
+      case SimulationStates.TERMINATING:
+        window.api.logger.info(`Termination requested.`);
         break;
       case SimulationStates.TERMINATED:
         window.api.logger.info(`Simulation canceled by user.`);

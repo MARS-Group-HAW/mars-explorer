@@ -7,7 +7,7 @@ import PauseCircleOutlineIcon from "@material-ui/icons/PauseCircleOutline";
 import PanToolIcon from "@material-ui/icons/PanTool";
 import HourglassEmptyIcon from "@material-ui/icons/HourglassEmpty";
 import HelpOutlineIcon from "@material-ui/icons/HelpOutline";
-import { Tooltip } from "@material-ui/core";
+import { CircularProgress, Tooltip } from "@material-ui/core";
 import { useBoolean, useTimeoutFn } from "react-use";
 import CircularProgressWithLabel from "../CircularProgressWithLabel";
 
@@ -47,6 +47,8 @@ function getLabelBySimState(simState: SimulationStates) {
       return "Simulation has failed. Click here to show the error message.";
     case SimulationStates.PAUSED:
       return "Simulation has been paused.";
+    case SimulationStates.TERMINATING:
+      return "Simulation is terminating.";
     case SimulationStates.TERMINATED:
       return "You've terminated the simulation. Click here to show the output.";
     case SimulationStates.NONE:
@@ -74,6 +76,14 @@ function StatusIndicator({ showProgress, progress, simState }: Props) {
 
   const icon = getIconBySimState(simState);
   const title = getLabelBySimState(simState);
+
+  if (simState === SimulationStates.TERMINATING) {
+    return (
+      <Tooltip key="terminating-tooltip" arrow title={title}>
+        <CircularProgress color="secondary" variant="indeterminate" />
+      </Tooltip>
+    );
+  }
 
   if (!isFinishedState(simState) || !openTooltip) {
     return (
