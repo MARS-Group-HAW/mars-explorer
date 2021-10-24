@@ -40,6 +40,7 @@ function useSimulation(): State {
 
   function runSimulation(path: string) {
     dispatchSimState(SimulationStates.STARTED);
+    setProgress(0);
     window.api.send(Channel.RUN_SIMULATION, path);
   }
 
