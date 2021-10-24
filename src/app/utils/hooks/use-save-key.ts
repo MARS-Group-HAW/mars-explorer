@@ -4,7 +4,7 @@ import { useCallback } from "react";
 function useSaveKey(predicate: () => boolean, onSaveCb: () => void): void {
   const isSaveKey = useCallback(
     (event: KeyboardEvent) =>
-      event.metaKey && event.key.toLowerCase() === "s" && predicate(),
+      (event.metaKey || event.ctrlKey) && event.key.toLowerCase() === "s" && predicate(),
     [predicate, onSaveCb]
   );
 
