@@ -8,4 +8,5 @@ export enum SimulationStates {
   NONE,
   UNKNOWN,
   STARTED,
+  TERMINATING,
 }
