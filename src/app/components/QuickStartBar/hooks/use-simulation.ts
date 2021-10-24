@@ -92,8 +92,7 @@ function useSimulation(): State {
 
   useChannelSubscription(Channel.SIMULATION_WORLD_SIZES, handleWorldSizeMsg);
 
-  useChannelSubscription(Channel.SIMULATION_FAILED, (e: Error | string) => {
-    const errMsg = e instanceof String ? (e as string) : e.toString();
+  useChannelSubscription(Channel.SIMULATION_FAILED, (errMsg: string) => {
     window.api.logger.error("Simulation Error: ", errMsg);
     setError(errMsg);
   });
