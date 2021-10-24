@@ -18,6 +18,8 @@ import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
 import log from "./main-logger";
 import main from "./main";
 import SafeIpcMain from "./safe-ipc-main";
+import kill = require('tree-kill');
+
 
 enum FileExtensions {
   CSHARP = ".cs",
@@ -588,6 +590,8 @@ SafeIpcMain.on(
           let exitState: SimulationStates;
           let cleanupCode: number;
 
+          console.log('received', code, signal)
+
           if (Number.isInteger(code)) {
             switch (code) {
               case ProcessExitCode.SUCCESS:
@@ -595,6 +599,7 @@ SafeIpcMain.on(
                 exitState = SimulationStates.SUCCESS;
                 cleanupCode = WebSocketCloseCodes.EXITING;
                 break;
+              case 1: // tree-kill termination code on windows
               case ProcessExitCode.TERMINATED:
                 log.info(`Simulation was terminated (${code}).`);
                 exitState = SimulationStates.TERMINATED;
@@ -630,7 +635,7 @@ SafeIpcMain.on(
     SafeIpcMain.once(Channel.TERMINATE_SIMULATION, () => {
       log.info(`Canceling simulation of ${projectPath}`);
       buildProcess?.kill();
-      runProcess?.kill();
+      kill(runProcess?.pid);
     });
   }
 );
