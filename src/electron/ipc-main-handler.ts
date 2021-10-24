@@ -494,24 +494,42 @@ enum ProcessExitCode {
   TERMINATED = 143,
 }
 
-function runSimulation(projectPath: string) {
+function runSimulation(projectPath: string): ChildProcess {
   log.info(`Starting simulation in ${projectPath} ...`);
-  return child_process.execFile(
-    "dotnet",
-    ["run", "--no-build"],
-    {
-      cwd: projectPath,
-      shell: true,
-    },
-    (error, stdout) => {
-      SafeIpcMain.send(Channel.SIMULATION_OUTPUT, stdout);
 
-      if (!error || error.code === ProcessExitCode.TERMINATED) return;
+  let consoleOutput: string;
+  let errorOutput: string;
 
-      log.error("Error while simulating: ", error.name, error.message);
-      SafeIpcMain.send(Channel.SIMULATION_FAILED, error);
+  const runProc = child_process.spawn("dotnet", ["run", "--no-build"], {
+    cwd: projectPath,
+    shell: true,
+  });
+
+  runProc.stdout.setEncoding("utf8");
+  runProc.stdout.on("data", (data) => {
+    consoleOutput += data.toString();
+  });
+
+  runProc.stderr.setEncoding("utf8");
+  runProc.stderr.on("data", (data) => {
+    errorOutput += data.toString();
+  });
+
+  runProc.on("close", (code) => {
+    SafeIpcMain.send(Channel.SIMULATION_OUTPUT, consoleOutput);
+
+    switch (code) {
+      case ProcessExitCode.SUCCESS:
+      case ProcessExitCode.TERMINATED:
+        return;
+      default: {
+        log.error("Error while simulating: ", errorOutput);
+        SafeIpcMain.send(Channel.SIMULATION_FAILED, errorOutput);
+      }
     }
-  );
+  });
+
+  return runProc;
 }
 
 SafeIpcMain.on(
