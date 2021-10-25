@@ -15,10 +15,12 @@ import ModelFile from "./types/ModelFile";
 import FileRef from "./types/FileRef";
 import launchLanguageServer from "./omnisharp/server-launcher";
 import appPaths from "./app-paths";
-import SimulationHandler, { WebSocketCloseCodes } from "./handle-simulation";
+import { WebSocketCloseCodes } from "./handle-simulation";
 import log from "./main-logger";
 import main from "./main";
 import SafeIpcMain from "./safe-ipc-main";
+import SimulationCountHandler from "./handle-simulation-count";
+import SimulationVisHandler from "./handle-simulation-vis";
 
 enum FileExtensions {
   CSHARP = ".cs",
@@ -566,27 +568,40 @@ SafeIpcMain.on(
           errorOutput += dataStr;
         });
 
-        const wsHandler = new SimulationHandler({
+        const handleMaxRetries = () => runProcess.kill();
+
+        const countWebsocket = new SimulationCountHandler({
           handleCountMsg: (msg) =>
             msg !== null &&
             SafeIpcMain.send(Channel.SIMULATION_COUNT_PROGRESS, msg),
+          handleMaxRetries,
+        });
+
+        const visWebsocket = new SimulationVisHandler({
           handleVisMsg: (msg) =>
             msg !== null &&
             SafeIpcMain.send(Channel.SIMULATION_COORDS_PROGRESS, msg),
           handleWorldSizeMsg: (msg) =>
             msg !== null &&
             SafeIpcMain.send(Channel.SIMULATION_WORLD_SIZES, msg),
-          handleMaxRetries: () => runProcess.kill(),
+          handleMaxRetries,
         });
 
         const cleanupHandler = (wsCode?: WebSocketCloseCodes) => {
           SafeIpcMain.removeHandler(Channel.TERMINATE_SIMULATION);
-          wsHandler.closeSockets(wsCode);
+          countWebsocket.close(wsCode);
+          visWebsocket.close(wsCode);
         };
 
         runProcess.on("exit", (code, signal) => {
           let exitState: SimulationStates;
-          let cleanupCode: number;
+          let cleanupCode: WebSocketCloseCodes;
+
+          log.debug(
+            `Run Process exited (Code = ${
+              Number.isInteger(code) ? code : "NONE"
+            }, Signal = ${signal || "NONE"})`
+          );
 
           if (Number.isInteger(code)) {
             switch (code) {
