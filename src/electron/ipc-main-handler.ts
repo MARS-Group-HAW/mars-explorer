@@ -555,8 +555,28 @@ SafeIpcMain.on(
 
         let consoleOutput: string = "";
         let errorOutput: string = "";
+        let countWebsocket: SimulationCountHandler;
+        let visWebsocket: SimulationVisHandler;
 
-        runProcess = runSimulation(projectPath);
+        function cleanupHandler(wsCode?: WebSocketCloseCodes) {
+          SafeIpcMain.removeHandler(Channel.TERMINATE_SIMULATION);
+          countWebsocket.close(wsCode);
+          visWebsocket.close(wsCode);
+        }
+
+        function handleRunStartError(err: any) {
+          log.error("An error occurred while starting the simulation: ", err);
+          SafeIpcMain.send(Channel.SIMULATION_FAILED, err.toString());
+          SafeIpcMain.send(Channel.SIMULATION_EXITED, SimulationStates.FAILED);
+          cleanupHandler();
+        }
+
+        try {
+          runProcess = runSimulation(projectPath);
+          runProcess.on("error", handleRunStartError);
+        } catch (e: any) {
+          handleRunStartError(e);
+        }
 
         runProcess.stdout.setEncoding("utf8");
         runProcess.stdout.on("data", (data) => {
@@ -575,14 +595,14 @@ SafeIpcMain.on(
 
         const handleMaxRetries = () => runProcess.kill();
 
-        const countWebsocket = new SimulationCountHandler({
+        countWebsocket = new SimulationCountHandler({
           handleCountMsg: (msg) =>
             msg !== null &&
             SafeIpcMain.send(Channel.SIMULATION_COUNT_PROGRESS, msg),
           handleMaxRetries,
         });
 
-        const visWebsocket = new SimulationVisHandler({
+        visWebsocket = new SimulationVisHandler({
           handleVisMsg: (msg) =>
             msg !== null &&
             SafeIpcMain.send(Channel.SIMULATION_COORDS_PROGRESS, msg),
@@ -591,12 +611,6 @@ SafeIpcMain.on(
             SafeIpcMain.send(Channel.SIMULATION_WORLD_SIZES, msg),
           handleMaxRetries,
         });
-
-        const cleanupHandler = (wsCode?: WebSocketCloseCodes) => {
-          SafeIpcMain.removeHandler(Channel.TERMINATE_SIMULATION);
-          countWebsocket.close(wsCode);
-          visWebsocket.close(wsCode);
-        };
 
         runProcess.on("exit", (code, signal) => {
           let exitState: SimulationStates;
