@@ -3,234 +3,115 @@ import ReconnectingWebSocket, {
   Options,
 } from "reconnecting-websocket";
 import WS from "ws";
-import { ObjectCounts } from "@shared/types/ObjectData";
-import {
-  SimulationCountMessage,
-  SimulationVisMessage,
-  SimulationWorldSizeMessage,
-} from "@shared/types/SimulationMessages";
 import log from "./main-logger";
 
 export enum WebSocketCloseCodes {
   RETRYING = 1000,
+  TERMINATED = 1006,
   EXITING = 4000,
-  TERMINATED,
 }
-
-type CountWebsocketMessage = {
-  maxTicks: number;
-  currentTick: number;
-  typeMetadata?: ObjectCounts;
-};
-
-type VisWebsocketMessage = {
-  currentTick: number;
-  typeName: string;
-  entities: {
-    x: number;
-    y: number;
-  }[];
-  worldSize?: { minX: number; minY: number; maxX: number; maxY: number };
-};
 
 const options: Options = {
   WebSocket: WS, // custom WebSocket constructor
-  maxRetries: 4000,
-  maxReconnectionDelay: 100,
+  maxRetries: 6000,
+  maxReconnectionDelay: 10,
 };
 
+export enum MarsFrameworkSockets {
+  COUNT = "progress",
+  VIS = "vis",
+}
+
 type Props = {
-  handleCountMsg: (countMsg: SimulationCountMessage | null) => void;
-  handleVisMsg: (visMsg: SimulationVisMessage | null) => void;
-  handleWorldSizeMsg: (msg: SimulationWorldSizeMessage | null) => void;
+  marsSocket: MarsFrameworkSockets;
   handleMaxRetries: () => void;
 };
 
-class SimulationHandler {
+abstract class SimulationHandler<OutputMessage> {
   private static readonly SOCKET_ADDRESS = "ws://127.0.0.1:4567";
 
-  private countSocket: ReconnectingWebSocket;
+  protected readonly socket: ReconnectingWebSocket;
 
-  private visSocket: ReconnectingWebSocket;
+  private readonly marsSocket: MarsFrameworkSockets;
 
-  private countProgress: number;
+  protected static maxTicks?: number;
 
-  private visProgress = new Map<string, number>();
-
-  private maxTicks: number;
-
-  constructor({
-    handleCountMsg,
-    handleVisMsg,
-    handleMaxRetries,
-    handleWorldSizeMsg,
-  }: Props) {
-    this.countSocket = new ReconnectingWebSocket(
-      `${SimulationHandler.SOCKET_ADDRESS}/progress`,
-      [],
-      options
-    );
-    this.visSocket = new ReconnectingWebSocket(
-      `${SimulationHandler.SOCKET_ADDRESS}/vis`,
+  protected constructor({ marsSocket, handleMaxRetries }: Props) {
+    SimulationHandler.maxTicks = undefined;
+    this.marsSocket = marsSocket;
+    this.socket = new ReconnectingWebSocket(
+      `${SimulationHandler.SOCKET_ADDRESS}/${marsSocket}`,
       [],
       options
     );
 
-    this.countSocket.onopen = () => log.info("WebSocket (Count) opened.");
-    this.visSocket.onopen = () => log.info("WebSocket (Vis) opened.");
-
-    this.countSocket.onmessage = (msg) =>
-      handleCountMsg(this.handleCountMsg(msg));
-    this.visSocket.onmessage = (msg) =>
-      handleVisMsg(this.handleVisMsg(msg, handleWorldSizeMsg));
+    this.socket.onopen = this.handleOpen;
+    this.socket.onmessage = this.handleMessage;
 
     try {
-      this.countSocket.onclose = this.handleCountClose;
-      this.visSocket.onclose = this.handleVisClose;
+      this.socket.onclose = this.handleClose;
     } catch (e: any) {
+      log.error(
+        `An error occurred while closing the websocket (${marsSocket}):`,
+        e
+      );
       handleMaxRetries();
     }
   }
 
-  public closeSockets = (code?: WebSocketCloseCodes) => {
-    this.countSocket.close(code);
-    this.visSocket.close(code);
-  };
+  protected abstract handleMessage(message: MessageEvent): OutputMessage;
 
-  private static parseMsg = <T>(msg: MessageEvent<string>): T =>
+  private handleOpen = () => log.info(`WebSocket (${this.marsSocket}) opened.`);
+
+  public close = (code?: WebSocketCloseCodes) => this.socket.close(code);
+
+  protected static parseMsg = <T>(msg: MessageEvent<string>): T =>
     JSON.parse(msg.data) as T;
 
-  private calcProgress = (currentTick: number) => {
-    const progress = Math.floor((currentTick / this.maxTicks) * 100);
+  protected calcProgress = (currentTick: number) => {
+    const progress = Math.floor(
+      (currentTick / SimulationHandler.maxTicks) * 100
+    );
 
     return Number.isNaN(progress) || !Number.isFinite(progress) ? 0 : progress;
   };
 
-  private isNewProgress = (progress: number, lastProgress?: number) =>
+  protected isNewProgress = (progress: number, lastProgress?: number) =>
     lastProgress === undefined ||
     lastProgress === null ||
     lastProgress < progress;
 
-  private handleCountMsg = (
-    msg: MessageEvent<string>
-  ): SimulationCountMessage | null => {
-    const { currentTick, maxTicks, typeMetadata } =
-      SimulationHandler.parseMsg<CountWebsocketMessage>(msg);
+  private handleClose = (evt: CloseEvent) => {
+    const { retryCount } = this.socket;
 
-    if (!this.maxTicks) {
-      this.maxTicks = maxTicks;
-    }
-
-    const progress = this.calcProgress(currentTick);
-
-    if (this.isNewProgress(progress, this.countProgress)) {
-      log.debug(
-        `Simulation-Progress: ${currentTick} von ${this.maxTicks} (${progress}%)`
-      );
-
-      const results: SimulationCountMessage["objectCounts"] = [];
-
-      if (typeMetadata) {
-        typeMetadata.forEach(({ name, count }) => {
-          results.push({
-            name,
-            count,
-          });
-        });
-      }
-
-      this.countProgress = progress;
-
-      return {
-        progress,
-        objectCounts: results,
-      };
-    }
-
-    return null;
-  };
-
-  private handleVisMsg = (
-    msg: MessageEvent<string>,
-    handleWorldSizeMsg: Props["handleWorldSizeMsg"]
-  ): SimulationVisMessage | null => {
-    const { currentTick, typeName, entities, worldSize } =
-      SimulationHandler.parseMsg<VisWebsocketMessage>(msg);
-
-    if (worldSize) {
-      handleWorldSizeMsg({ worldSizes: worldSize });
-    }
-
-    if (!currentTick || !typeName || !entities || entities?.length === 0)
-      return null;
-
-    const progress = this.calcProgress(currentTick);
-
-    const progressOfType = this.visProgress.get(typeName);
-
-    if (
-      this.isNewProgress(progress, progressOfType) &&
-      entities &&
-      entities.length > 0
-    ) {
-      const coords: SimulationVisMessage["objectCoords"]["coords"] = [];
-      entities.forEach(({ x, y }) => {
-        const found = coords.find((coord) => coord.x === x && coord.y === y);
-
-        if (found) {
-          found.count += 1;
-        } else {
-          coords.push({
-            x,
-            y,
-            count: 1,
-          });
-        }
-      });
-
-      this.visProgress.set(typeName, progress);
-
-      return {
-        progress,
-        objectCoords: {
-          name: typeName,
-          coords,
-        },
-      };
-    }
-
-    return null;
-  };
-
-  private handleCountClose = (msg: CloseEvent) =>
-    this.handleClose(msg, this.countSocket.retryCount);
-
-  private handleVisClose = (msg: CloseEvent) =>
-    this.handleClose(msg, this.visSocket.retryCount);
-
-  private handleClose = (evt: CloseEvent, retryCount: number) => {
     if (retryCount === options.maxRetries) {
       log.warn(
-        "Could not connect to the simulation process. Exiting the simulation. Is the 'console' flag set in the config.json?"
+        `Could not connect to the websocket (${this.marsSocket}) of the simulation process. Exiting the simulation. Is the 'console' flag set in the config.json?`
       );
-      throw new Error("Max retries for reconnecting websocket reached.");
+      throw new Error(
+        `Max retries for reconnecting websocket (${this.marsSocket}) reached.`
+      );
     }
 
     // see codes at https://developer.mozilla.org/en-US/docs/Web/API/CloseEvent/code
     switch (evt.code) {
       case WebSocketCloseCodes.RETRYING:
-        if (retryCount <= 1) {
-          log.info("Could not connect to WebSocket. Retrying ...");
+        if (retryCount === 1 || retryCount % 10 === 0) {
+          log.info(
+            `Trying to connect to WebSocket (${this.marsSocket}) ... (count: ${retryCount})`
+          );
         }
         break;
       case WebSocketCloseCodes.EXITING:
-        log.info("WebSocket closed by simulation end.");
+        log.info(`WebSocket (${this.marsSocket}) closed by simulation end.`);
         break;
       case WebSocketCloseCodes.TERMINATED:
-        log.info("WebSocket closed because of termination.");
+        log.info(
+          `WebSocket (${this.marsSocket}) closed because of termination.`
+        );
         break;
       default:
-        log.info("WebSocket closed for unknown reason.");
+        log.info(`WebSocket (${this.marsSocket}) closed for unknown reason.`);
     }
   };
 }
