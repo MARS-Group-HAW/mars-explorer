@@ -64,10 +64,10 @@ abstract class SimulationHandler<OutputMessage> {
   private handleOpen = () => log.info(`WebSocket (${this.marsSocket}) opened.`);
 
   public close = (code?: WebSocketCloseCodes) => {
-    if (Number.isInteger(code)) {
-      this.socket.close(code);
-    } else {
-      this.socket.close();
+    try {
+      this.socket.close(code || WebSocketCloseCodes.EXITING);
+    } catch(e: any) {
+      window.api.logger.error("Error while closing websocket: ", e);
     }
   };
 
