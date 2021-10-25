@@ -29,6 +29,11 @@ enum FileExtensions {
 
 const MARS_LIFE_VERSION = " --version 4.3.0-beta-2";
 
+SafeIpcMain.on(Channel.EXIT_APP, () => {
+  log.warn("Exit requested by window.");
+  app.exit();
+});
+
 SafeIpcMain.on(Channel.RESTART_APP, () => {
   log.warn("Restart requested by user.");
   app.relaunch();
