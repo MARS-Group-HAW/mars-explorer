@@ -56,6 +56,7 @@ export enum Channel {
   SHOW_UNSAVEABLE_CHANGES_DIALOG = "SHOW_UNSAVEABLE_CHANGES_DIALOG",
   SERVER_SHUTDOWN = "SERVER_SHUTDOWN",
   SIMULATION_OUTPUT = "SIMULATION_OUTPUT",
+  EXIT_APP = "EXIT_APP",
 }
 
 export interface ChannelInputMap {
@@ -67,6 +68,7 @@ export interface ChannelInputMap {
   [Channel.DELETE_FILE_OR_DIR]: string;
   [Channel.DOES_CONFIG_EXIST]: string;
   [Channel.DOTNET_NOT_FOUND]: void;
+  [Channel.EXIT_APP]: void;
   [Channel.FILE_EXISTS]: string;
   [Channel.GET_ALL_EXAMPLE_PROJECTS]: void;
   [Channel.GET_CONFIG_IN_PROJECT]: string;
@@ -113,6 +115,7 @@ export interface ChannelOutputMap {
   [Channel.DELETE_FILE_OR_DIR]: boolean;
   [Channel.DOES_CONFIG_EXIST]: boolean;
   [Channel.DOTNET_NOT_FOUND]: void;
+  [Channel.EXIT_APP]: void;
   [Channel.FILE_EXISTS]: boolean;
   [Channel.GET_ALL_EXAMPLE_PROJECTS]: ExampleProject[];
   [Channel.GET_CONFIG_IN_PROJECT]: string | null;
