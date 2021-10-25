@@ -63,7 +63,13 @@ abstract class SimulationHandler<OutputMessage> {
 
   private handleOpen = () => log.info(`WebSocket (${this.marsSocket}) opened.`);
 
-  public close = (code?: WebSocketCloseCodes) => this.socket.close(code);
+  public close = (code?: WebSocketCloseCodes) => {
+    if (Number.isInteger(code)) {
+      this.socket.close(code);
+    } else {
+      this.socket.close();
+    }
+  };
 
   protected static parseMsg = <T>(msg: MessageEvent<string>): T =>
     JSON.parse(msg.data) as T;
