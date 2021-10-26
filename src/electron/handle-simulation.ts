@@ -13,8 +13,8 @@ export enum WebSocketCloseCodes {
 
 const options: Options = {
   WebSocket: WS, // custom WebSocket constructor
-  maxRetries: 6000,
-  maxReconnectionDelay: 10,
+  maxRetries: 1000,
+  maxReconnectionDelay: 100,
 };
 
 export enum MarsFrameworkSockets {
@@ -66,7 +66,7 @@ abstract class SimulationHandler<OutputMessage> {
   public close = (code?: WebSocketCloseCodes) => {
     try {
       this.socket.close(code || WebSocketCloseCodes.EXITING);
-    } catch(e: any) {
+    } catch (e: any) {
       window.api.logger.error("Error while closing websocket: ", e);
     }
   };
