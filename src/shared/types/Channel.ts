@@ -1,4 +1,3 @@
-import { ExecException } from "child_process";
 import { PathAbsToRelParams } from "./ChannelParams";
 import { IModelFile, ModelRef, WorkingModel } from "./Model";
 import ExampleProject from "./ExampleProject";
@@ -10,7 +9,6 @@ import {
   SimulationVisMessage,
   SimulationWorldSizeMessage,
 } from "./SimulationMessages";
-import ModelFile from "../../electron/types/ModelFile";
 
 export enum Channel {
   CHECK_LAST_PATH = "CHECK_LAST_PATH",
@@ -121,7 +119,7 @@ export interface ChannelOutputMap {
   [Channel.GET_CONFIG_IN_PROJECT]: string | null;
   [Channel.GET_DEFAULT_CONFIG_PATH]: string;
   [Channel.GET_EXAMPLES_PATH]: string;
-  [Channel.GET_README_IN_DIR]: ModelFile;
+  [Channel.GET_README_IN_DIR]: IModelFile;
   [Channel.GET_USER_PROJECT]: WorkingModel;
   [Channel.GET_USER_PROJECTS]: ModelRef[];
   [Channel.GET_WORKSPACE_PATH]: string;
