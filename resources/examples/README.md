@@ -7,7 +7,7 @@ Since these projects often represent a starting point for students, they should 
 - The models (`*.cs` files) should be located at the top level of the directory (other files can be nested)
 - The namespace of the model files must be the same as the project name, no additions
 - Your models framework version of `Mars.Life.Simulations` must match the version used in the *MARS-Explorer* (you can find the
-  version used by this app at the top of `Explorer/src/electron/ipc-main-handler.ts`
+  version used by this app at the top of `Explorer/src/main/ipc-main-handler.ts`
   -> `const MARS_LIFE_VERSION = "..."`)
 - The project should preferably build with `netcoreapp3.1`
 - Your directory must contain a `config.json` file at the same level as the models

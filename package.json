@@ -164,7 +164,7 @@
                   "js": "./src/app/index.tsx",
                   "name": "main_window",
                   "preload": {
-                    "js": "./src/electron/preload.ts"
+                    "js": "./src/main/preload.ts"
                   }
                 }
               ]
