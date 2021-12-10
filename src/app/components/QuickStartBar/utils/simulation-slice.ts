@@ -207,7 +207,7 @@ export const simulationSlice = createSlice({
         const { progress } = action.payload;
         state.simulationState = SimulationStates.RUNNING;
         state.maxProgress = Math.min(
-          Math.max(state.maxProgress, progress),
+          Math.max(state.maxProgress || 0, progress),
           100
         );
 

@@ -39,9 +39,17 @@ class FormTransformer {
       globals.timeSpecification = TimeSpecification.STEP;
     }
 
-    if (!globals.output) {
-      globals.output = OutputSpecification.NONE;
+    if (globals.steps) {
+      globals.deltaTUnit = globals.deltaTUnit || "seconds";
     }
+
+    if (!globals.options) {
+      globals.options = null;
+    }
+
+    if (!parsedConfig.agents) parsedConfig.agents = [];
+    if (!parsedConfig.layers) parsedConfig.layers = [];
+    if (!parsedConfig.entities) parsedConfig.entities = [];
 
     return parsedConfig;
   }
@@ -51,7 +59,6 @@ class FormTransformer {
       OutputsValidationSchema &
       SimFlags;
 
-    // FIXME: output options currently not in use
     globals.output = OutputSpecification.CSV;
     delete globals.options;
     delete globals.console;

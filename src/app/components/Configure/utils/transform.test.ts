@@ -129,12 +129,6 @@ describe("Transform", () => {
       expect(globals).not.toHaveProperty(GlobalsFieldNames.END_POINT);
     });
 
-    test("should not mutate the input object", () => {
-      const clone = JSON.parse(JSON.stringify(form));
-      transformer.formToConfig(form);
-      expect(clone).toMatchObject(form);
-    });
-
     test("should remove form-exclusive attributes", () => {
       const { globals } = transformer.formToConfig(form);
       expect(globals).not.toHaveProperty(GlobalsFieldNames.TIME_SPECIFICATION);
