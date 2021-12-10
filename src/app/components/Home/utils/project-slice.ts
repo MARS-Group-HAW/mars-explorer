@@ -6,7 +6,7 @@ import LocalStorageService, {
 } from "../../../utils/local-storage-service";
 
 // Define a type for the slice state
-type ProjectState = Partial<ModelRef>;
+export type ProjectState = Partial<ModelRef>;
 
 // Define the initial state using that type
 const initialState: ProjectState = {};

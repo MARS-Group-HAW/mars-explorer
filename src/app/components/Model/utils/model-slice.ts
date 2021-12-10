@@ -7,25 +7,19 @@ import {
   LoadingState,
 } from "../../../utils/slices/loading-slice";
 import LoadingSteps from "./LoadingSteps";
-
-type ModelWithMeta = {
-  model: IModelFile;
-  isDirty: boolean;
-  isErroneous: boolean;
-  lastSavedVersion: number;
-};
+import { ModelWithMetadata } from "./types";
 
 type ModelId = {
   path: string;
 };
 
-type ErrorPayload = ModelId & Pick<ModelWithMeta, "isErroneous">;
-type DirtyPayload = ModelId & Pick<ModelWithMeta, "isDirty">;
-type VersionPayload = ModelId & Pick<ModelWithMeta, "lastSavedVersion">;
+type ErrorPayload = ModelId & Pick<ModelWithMetadata, "isErroneous">;
+type DirtyPayload = ModelId & Pick<ModelWithMetadata, "isDirty">;
+type VersionPayload = ModelId & Pick<ModelWithMetadata, "lastSavedVersion">;
 
 // Define a type for the slice state
-type ModelState = LoadingState<LoadingSteps> & {
-  models: ModelWithMeta[];
+export type ModelState = LoadingState<LoadingSteps> & {
+  models: ModelWithMetadata[];
   exampleProjects: ExampleProject[];
 };
 
@@ -38,7 +32,7 @@ export const initialState: ModelState = {
 };
 
 const findIndexOfModelByPath = (
-  modelsWithMeta: ModelWithMeta[],
+  modelsWithMeta: ModelWithMetadata[],
   searchPath: string
 ) => modelsWithMeta.findIndex(({ model }) => model.path === searchPath);
 
@@ -78,7 +72,6 @@ export const modelSlice = createSlice({
       const indexOfModel = findIndexOfModelByPath(state.models, path);
 
       if (indexOfModel === -1) {
-        window.api.logger.warn(`Model ${path} was not found.`);
         return;
       }
 
@@ -89,7 +82,6 @@ export const modelSlice = createSlice({
       const indexOfModel = findIndexOfModelByPath(state.models, path);
 
       if (indexOfModel === -1) {
-        window.api.logger.warn(`Model ${path} was not found.`);
         return;
       }
 
@@ -112,7 +104,6 @@ export const modelSlice = createSlice({
       const indexOfModel = findIndexOfModelByPath(state.models, path);
 
       if (indexOfModel === -1) {
-        window.api.logger.warn(`Model ${path} was not found.`);
         return;
       }
 
