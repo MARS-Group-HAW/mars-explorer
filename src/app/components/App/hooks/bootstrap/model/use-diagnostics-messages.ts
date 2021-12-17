@@ -8,6 +8,7 @@ import {
 import { DiagnosticSeverity } from "vscode-languageserver";
 import { useLatest } from "react-use";
 import { Uri } from "monaco-editor";
+import uriToFsPath from "@app/utils/uri-to-fs-path";
 import {
   useAppDispatch,
   useAppSelector,
@@ -19,7 +20,6 @@ import {
   selectModelsPathWithError,
   setErrorStateInModel,
 } from "../../../../Model/utils/model-slice";
-import uriToFsPath from "@app/utils/uri-to-fs-path";
 
 type State = {
   handleMessage: (msg: Message) => void;

@@ -1,11 +1,11 @@
 import { editor } from "monaco-editor";
 import { useLatest, useMount } from "react-use";
+import uriToFsPath from "@app/utils/uri-to-fs-path";
 import {
   selectModelVersionByPath,
   setDirtyStateInModel,
 } from "../utils/model-slice";
 import { useAppDispatch, useAppSelector } from "../../../utils/hooks/use-store";
-import uriToFsPath from "@app/utils/uri-to-fs-path";
 
 function useDirtyFileHandler() {
   const dispatch = useAppDispatch();
