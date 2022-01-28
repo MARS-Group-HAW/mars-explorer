@@ -8,17 +8,22 @@ import appPaths from "./app-paths";
 import log from "./main-logger";
 import menuItems from "./menu";
 
+// will be assigned by electron-forge
 declare const MAIN_WINDOW_WEBPACK_ENTRY: string;
 declare const MAIN_WINDOW_PRELOAD_WEBPACK_ENTRY: string;
 
+// to fix MacOS Path, see https://www.npmjs.com/package/fix-path
 fixPath();
 
+// will be used when installing on windows for the first time
 if (squirrel) {
   log.info("Quitting because of squirrel");
-  // eslint-disable-line global-require
   app.quit();
 }
 
+/**
+ * Manages the browser windows (a.k.a. `/app`)
+ */
 class Main {
   window!: BrowserWindow;
 
@@ -62,6 +67,7 @@ class Main {
       minHeight: 700,
       icon: appPaths.iconFile,
       webPreferences: {
+        // security reasons
         nodeIntegration: false,
         contextIsolation: true,
         enableRemoteModule: false,
@@ -77,12 +83,17 @@ class Main {
     return window;
   };
 
+  // append custom menu entries to app menu
   createMenu = () => {
     const menu = Menu.getApplicationMenu();
     menuItems.forEach((menuItem) => menu.append(menuItem));
     Menu.setApplicationMenu(menu);
   };
 
+  /*
+   * Checks weather the necessary directories exists in the users document folder.
+   * If not, it will create them.
+   */
   ensureDirs = () => {
     fs.ensureDirSync(appPaths.workspaceDir);
   };
@@ -93,6 +104,13 @@ class Main {
     }
   };
 
+  /**
+   * Is called whenever the user closes the application window.
+   * A shutdown request (`Channel.SERVER_SHUTDOWN`) will be send to the app-process which should notify the language-server to shutdown.
+   * If the shutdown of the language-server was successful, the app sends a message to this process (`Channel.SERVER_SHUTDOWN`) and the app will quit.
+   * If the app does not response in time, the app will be forced to quit.
+   * @param e The close event which will be prevented in order to wait for the language-server shutdown.
+   */
   onWindowClose = (e: Event) => {
     e.preventDefault();
 
