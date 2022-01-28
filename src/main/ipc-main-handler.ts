@@ -1,12 +1,11 @@
 import * as path from "path";
-import { app, dialog } from "electron";
+import { dialog } from "electron";
 import { Channel } from "@shared/types/Channel";
 import { IModelFile, ModelRef, WorkingModel } from "@shared/types/Model";
 import * as child_process from "child_process";
 import { ChildProcess } from "child_process";
 import { SimulationStates } from "@shared/types/SimulationStates";
 import SimObjects from "@shared/types/sim-objects";
-import { fileURLToPath } from "url";
 import ExampleProject from "@shared/types/ExampleProject";
 import { AgentClassCreationMessage } from "@shared/types/class-creation-message";
 import fs = require("fs-extra");
@@ -21,39 +20,12 @@ import main from "./main";
 import SafeIpcMain from "./safe-ipc-main";
 import SimulationCountHandler from "./handle-simulation-count";
 import SimulationVisHandler from "./handle-simulation-vis";
+import "./handler";
 
 enum FileExtensions {
   CSHARP = ".cs",
   CSV = ".csv",
 }
-
-const MARS_LIFE_VERSION = " --version 4.3.0-beta-2";
-
-SafeIpcMain.on(Channel.EXIT_APP, () => {
-  log.warn("Exit requested by window.");
-  app.exit();
-});
-
-SafeIpcMain.on(Channel.RESTART_APP, () => {
-  log.warn("Restart requested by user.");
-  app.relaunch();
-  app.exit();
-});
-
-SafeIpcMain.handle(Channel.GET_WORKSPACE_PATH, () => appPaths.workspaceDir);
-
-SafeIpcMain.handle(
-  Channel.GET_EXAMPLES_PATH,
-  () => appPaths.resourcesExamplesDir
-);
-
-SafeIpcMain.handle(Channel.URI_TO_NAME, (_, uri) =>
-  path.basename(fileURLToPath(uri))
-);
-
-SafeIpcMain.handle(Channel.PATH_ABSOLUTE_TO_RELATIVE, (_, { from, to }) =>
-  path.relative(from, to)
-);
 
 function getProjectsInDir(dir: string): string[] {
   return fs
@@ -312,58 +284,6 @@ SafeIpcMain.handle(
     };
   }
 );
-
-SafeIpcMain.on(Channel.INSTALL_MARS, (_, projectPath: string) => {
-  if (!fs.pathExistsSync(projectPath)) {
-    throw new Error(
-      `Error while installing the MARS-Framework: Path (${projectPath}) does not exist.`
-    );
-  }
-
-  const installProcess = child_process.exec(
-    `dotnet add package Mars.Life.Simulations${MARS_LIFE_VERSION}`,
-    {
-      cwd: projectPath,
-    }
-  );
-
-  installProcess.on("message", (msg: MessageEvent) => log.info(msg.data));
-
-  installProcess.on("exit", (code) => {
-    log.info(`Installation exited with code ${code}.`);
-    SafeIpcMain.send(Channel.MARS_INSTALLED);
-  });
-});
-
-SafeIpcMain.on(Channel.RESTORE_PROJECT, (_, projectPath: string) => {
-  if (!fs.pathExistsSync(projectPath)) {
-    SafeIpcMain.send(Channel.PROJECT_RESTORED, false);
-    throw new Error(
-      `Error while restoring the project: Path (${projectPath}) does not exist.`
-    );
-  }
-
-  const installProcess = child_process.exec("dotnet restore", {
-    cwd: projectPath,
-  });
-
-  installProcess.on("message", (msg: MessageEvent) => log.info(msg.data));
-  installProcess.on("error", (msg: Error) => log.error(msg));
-
-  installProcess.on("exit", (code) => {
-    log.info(`[RESTORE_PROJECT] Exited with code ${code}.`);
-    SafeIpcMain.send(Channel.PROJECT_RESTORED, code === 0);
-  });
-});
-
-SafeIpcMain.handle(Channel.CLEAN_PROJECT, (_, projectPath: string) => {
-  log.warn("Starting to clean ", projectPath);
-
-  child_process.execSync(`dotnet clean`, {
-    cwd: projectPath,
-  });
-  log.warn("Cleaning successful.");
-});
 
 function getFilesInDirWithExtension(
   dir: string,
