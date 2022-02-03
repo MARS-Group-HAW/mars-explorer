@@ -3,7 +3,7 @@
   "name": "mars-explorer",
   "productName": "mars-explorer",
   "version": "0.0.1",
-  "description": "An application to play around with MAS",
+  "description": "An application to play around with MARS",
   "license": "MIT",
   "main": ".webpack/main",
   "scripts": {
@@ -13,7 +13,8 @@
     "make": "electron-forge make",
     "make:win": "electron-forge make --platform win32",
     "publish": "electron-forge publish",
-    "lint": "eslint src --ext .ts,.tsx --fix",
+    "lint": "eslint src --ext .ts,.tsx",
+    "lint-fix": "eslint src --ext .ts,.tsx --fix",
     "format": "prettier src --write",
     "test": "jest"
   },

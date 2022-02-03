@@ -61,7 +61,6 @@ fs.ensureDirSync(pathToOmnisharpOSPath);
 console.info(`Downloading Omnisharp for your OS: ${currentOS}${currentArch}`);
 
 (async () => {
-  // TODO: linux and windows x64 and x86
   try {
     await download(
       `https://github.com/OmniSharp/omnisharp-roslyn/releases/download/v${OMNISHARP_VERSION}/omnisharp-${currentOS}${currentArch}.zip`,
