@@ -27,7 +27,7 @@ enum FileExtensions {
   CSV = ".csv",
 }
 
-const MARS_LIFE_VERSION = " --version 4.3.0-beta-2";
+const MARS_LIFE_VERSION = " --version 4.3.0-beta-5";
 
 SafeIpcMain.on(Channel.EXIT_APP, () => {
   log.warn("Exit requested by window.");

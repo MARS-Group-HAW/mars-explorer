@@ -1,9 +1,9 @@
 {
-  "author": "Jan-Niklas Voß",
+  "author": "Jan-Niklas Voß@MARS GROUP",
   "name": "mars-explorer",
-  "productName": "mars-explorer",
+  "productName": "MARS Explorer",
   "version": "0.0.1",
-  "description": "An application to play around with MARS",
+  "description": "Simplified development of Multi-Agent simulations with MARS",
   "license": "MIT",
   "main": ".webpack/main",
   "scripts": {
