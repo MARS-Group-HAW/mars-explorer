@@ -186,7 +186,7 @@ async function copyAndReplaceTemplate(
 SafeIpcMain.on(Channel.CREATE_PROJECT, (_, projectName: string) => {
   const args = [];
   args.push('--language "C#"');
-  args.push("--framework netcoreapp3.1");
+  //args.push("--framework netcoreapp3.1");
   args.push(`--name ${projectName}`);
 
   log.info(

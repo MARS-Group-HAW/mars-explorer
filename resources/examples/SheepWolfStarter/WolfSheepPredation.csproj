@@ -1,7 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <OutputType>Exe</OutputType>
-    <TargetFramework>netcoreapp3.1;net5.0</TargetFramework>
+    <RollForward>LatestMajor</RollForward>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
     <AssemblyName>SheepWolfStarter</AssemblyName>
     <RootNamespace>SheepWolfStarter</RootNamespace>
   </PropertyGroup>

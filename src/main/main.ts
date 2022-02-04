@@ -49,8 +49,9 @@ class Main {
   onActivate = () => {
     // On macOS it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
-    if (BrowserWindow.getAllWindows().length === 0)
+    if (BrowserWindow.getAllWindows().length === 0){
       this.window = this.createWindow();
+    }
   };
 
   createWindow = () => {
@@ -61,6 +62,7 @@ class Main {
       minWidth: 1000,
       minHeight: 700,
       icon: appPaths.iconFile,
+      autoHideMenuBar: true,
       webPreferences: {
         nodeIntegration: false,
         contextIsolation: true,
@@ -73,6 +75,7 @@ class Main {
     window
       .loadURL(MAIN_WINDOW_WEBPACK_ENTRY)
       .catch((e: Error) => log.error("main window could not be loaded: ", e));
+
 
     return window;
   };
