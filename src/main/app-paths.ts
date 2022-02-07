@@ -3,6 +3,9 @@ import path from "path";
 import { is } from "electron-util";
 import ElectronLog from "electron-log";
 
+/*
+ * Collection of relevant paths.
+ */
 class AppPaths {
   private readonly userDocuments = app.getPath("documents");
 

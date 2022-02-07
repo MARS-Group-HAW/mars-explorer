@@ -2,7 +2,7 @@ import { PathAbsToRelParams } from "./ChannelParams";
 import { IModelFile, ModelRef, WorkingModel } from "./Model";
 import ExampleProject from "./ExampleProject";
 import { ClassCreationMessage } from "./class-creation-message";
-import PathWithContent from "./ipc-params/path-with-content";
+import PathWithContent from "./path-with-content";
 import { SimulationStates } from "./SimulationStates";
 import {
   SimulationCountMessage,
