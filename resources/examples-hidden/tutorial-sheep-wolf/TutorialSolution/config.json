@@ -1,0 +1,62 @@
+{
+	"entities": [],
+	"layers": [
+		{
+			"name": "GrasslandLayer",
+			"file": "Resources/simple_raster.csv"
+		}
+	],
+	"agents": [
+		{
+			"name": "Sheep",
+			"count": 10,
+			"mapping": [
+				{
+					"parameter": "SheepGainFromFood",
+					"value": 4
+				},
+				{
+					"parameter": "SheepReproduce",
+					"value": 2
+				},
+				{
+					"parameter": "EnergyLoss",
+					"value": 2
+				}
+			]
+		},
+		{
+			"name": "Wolf",
+			"count": 2,
+			"mapping": [
+				{
+					"parameter": "WolfGainFromFood",
+					"value": 80
+				},
+				{
+					"parameter": "WolfReproduce",
+					"value": 3
+				}
+			]
+		},
+		{
+			"name": "GrassGrowthAgent",
+			"count": 1,
+			"mapping": [
+				{
+					"parameter": "GrassRegrowthPerStep",
+					"value": 1
+				}
+			]
+		}
+	],
+	"globals": {
+		"endPoint": "2022-02-23T14:53:00",
+		"startPoint": "2022-02-23T14:49:00",
+		"deltaTUnit": "minutes",
+		"deltaT": 1,
+		"output": "csv",
+		"pythonVisualization": true,
+		"reportProgress": true
+	}
+}

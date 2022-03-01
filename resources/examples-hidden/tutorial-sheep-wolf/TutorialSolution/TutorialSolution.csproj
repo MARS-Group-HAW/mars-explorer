@@ -1,0 +1,20 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RollForward>LatestMajor</RollForward>
+    <TargetFramework>netcoreapp3.1</TargetFramework>
+    <AssemblyName>SheepWolfStarter</AssemblyName>
+    <RootNamespace>SheepWolfStarter</RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="config.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Resources\*.*">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Mars.Life.Simulations" Version="4.3.0-beta-2" />
+  </ItemGroup>
+</Project>
