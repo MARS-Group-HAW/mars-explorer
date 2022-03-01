@@ -61,7 +61,7 @@ This will make distributables for your application.
 It builds for the current OS by default.
 Afterwards, the distributable files can be found in `out/make`.
 
-If you want to build it for another OS, have a look at the documentation of [electron-forge](https://git.haw-hamburg.de/mars/life.git).
+If you want to build it for another OS, have a look at the documentation of [electron-forge](https://www.electronforge.io/config/makers).
 
 
 ## Tech Stack
@@ -116,6 +116,10 @@ In this case it is sufficient to introduce a local reducer.
 Since several processes interact within the application, debugging with common tools is difficult.
 To find out how the processes interact with each other, the logs have proven to be extremely helpful.
 ## FAQ
+
+#### Update MARS framework version
+The nuget package version is defined in 
+``src/main/handler/dotnetcli-handler.ts``
 
 #### Where are the logs located?
 

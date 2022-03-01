@@ -1,4 +1,4 @@
-# SheepWolfStarter
+# WolfSheepPredation
 A simple model based on a predator-prey system.
 
 ## Layer

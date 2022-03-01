@@ -2,11 +2,11 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <RollForward>LatestMajor</RollForward>
-        <TargetFrameworks>netcoreapp3.1</TargetFrameworks>
+        <TargetFramework>netcoreapp3.1</TargetFramework>
         <RootNamespace>RandomGridMoveModel</RootNamespace>
     </PropertyGroup>
     <ItemGroup>
-        <PackageReference Include="Mars.Life.Simulations" Version="4.3.0-beta-2" />
+        <PackageReference Include="Mars.Life.Simulations" Version="*" />
     </ItemGroup>
     <ItemGroup>
         <Content Include="config.json">
