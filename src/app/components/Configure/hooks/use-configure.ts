@@ -47,9 +47,7 @@ function useConfigure(): State {
           .then(() => {
             addSuccessAlert({ msg: "Your config was saved." });
             dispatch(setValidState());
-            dispatch(
-              setConfig(FormTransformer.configToForm(transformedConfig))
-            );
+            dispatch(setConfig(values));
           })
           .catch((err) => {
             addErrorAlert({
