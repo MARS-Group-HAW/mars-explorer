@@ -3,7 +3,7 @@ import { Channel } from "@shared/types/Channel";
 import child_process from "child_process";
 import IpcHandler from "./ipc-handler";
 
-const MARS_LIFE_VERSION = " --version 4.3.0-beta-2";
+const MARS_LIFE_VERSION = " --version 4.*";
 
 class DotnetCliHandler extends IpcHandler {
   protected registerHandler(): void {
