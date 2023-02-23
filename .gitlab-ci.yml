@@ -1,0 +1,65 @@
+image: mcr.microsoft.com/dotnet/sdk:6.0
+
+stages:
+  - build_test
+  - build_test_explorer
+
+install-deps:
+  stage: build_test
+  image: node:14-alpine
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules
+  script:
+    - mkdir -p resources/omnisharp/linux
+    - yarn install --frozen-lockfile
+
+
+build_explorer:
+  stage: build_test_explorer
+  image: node:14-alpine
+  needs: [install-deps]
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules
+  script:
+    - apk add --no-cache git
+    - mkdir -p resources/omnisharp/linux
+    - yarn install --prefer-offline --frozen-lockfile
+    - yarn package
+
+lint_explorer:
+  stage: build_test_explorer
+  image: node:14-alpine
+  needs: [install-deps]
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules
+  script:
+    - mkdir -p resources/omnisharp/linux
+    - yarn install --prefer-offline --frozen-lockfile
+    - yarn lint
+
+test_explorer:
+  stage: build_test_explorer
+  image: node:14-alpine
+  needs: [install-deps]
+  cache:
+    key:
+      files:
+        - yarn.lock
+    paths:
+      - node_modules
+  script:
+    - mkdir -p resources/omnisharp/linux
+    - yarn install --prefer-offline --frozen-lockfile
+    - yarn test
