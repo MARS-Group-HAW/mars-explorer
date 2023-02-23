@@ -59,3 +59,4 @@ spec/fixtures/logo.png
 out/
 resources/omnisharp/win/
 .webpack/
+resources/omnisharp
