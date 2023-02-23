@@ -30,7 +30,7 @@ Start the application:
   yarn start
 ```
 
-> **Warning**
+> **Warning**  
 > Only the files within `app/` will be live reloaded. 
 > Changes to other files (e.g. in `/main`, `/shared`, ...) won't have an effect until the application has been restarted.
 
