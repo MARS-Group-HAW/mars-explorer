@@ -2,7 +2,7 @@
     <PropertyGroup>
         <OutputType>Exe</OutputType>
         <RollForward>LatestMajor</RollForward>
-        <TargetFramework>netcoreapp3.1</TargetFramework>
+        <TargetFramework>net6.0</TargetFramework>
         <RootNamespace>RandomGridMoveModel</RootNamespace>
     </PropertyGroup>
     <ItemGroup>

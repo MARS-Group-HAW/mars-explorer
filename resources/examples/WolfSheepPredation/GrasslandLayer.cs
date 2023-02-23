@@ -1,4 +1,5 @@
 using System.Linq;
+using Mars.Common.Core.Random;
 using Mars.Components.Environments;
 using Mars.Components.Layers;
 using Mars.Core.Data;
@@ -7,7 +8,7 @@ using Mars.Interfaces.Environments;
 using Mars.Interfaces.Layers;
 using Mars.Numerics.Statistics;
 
-namespace SheepWolfStarter
+namespace WolfSheepPredation
 {
     public class GrasslandLayer : RasterLayer
     {

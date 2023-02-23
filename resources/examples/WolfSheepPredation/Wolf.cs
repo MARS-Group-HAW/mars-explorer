@@ -1,5 +1,6 @@
 using System;
 using System.Linq;
+using Mars.Common.Core.Random;
 using Mars.Common;
 using Mars.Interfaces.Agents;
 using Mars.Interfaces.Annotations;
@@ -8,7 +9,7 @@ using Mars.Interfaces.Layers;
 using Mars.Numerics;
 using Mars.Numerics.Statistics;
 
-namespace SheepWolfStarter
+namespace WolfSheepPredation
 {
     public class Wolf : IAgent<GrasslandLayer>, IPositionable
     {

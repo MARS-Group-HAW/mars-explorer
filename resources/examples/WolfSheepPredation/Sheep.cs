@@ -1,12 +1,13 @@
 using System;
 using System.Linq;
+using Mars.Common.Core.Random;
 using Mars.Interfaces.Agents;
 using Mars.Interfaces.Annotations;
 using Mars.Interfaces.Environments;
 using Mars.Interfaces.Layers;
 using Mars.Numerics.Statistics;
 
-namespace SheepWolfStarter
+namespace WolfSheepPredation
 {
     /// <summary>
     ///     Sheep walk around by chance.

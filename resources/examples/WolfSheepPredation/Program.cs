@@ -3,7 +3,7 @@ using System.IO;
 using Mars.Components.Starter;
 using Mars.Interfaces.Model;
 
-namespace SheepWolfStarter
+namespace WolfSheepPredation
 {
     internal static class Program
     {
