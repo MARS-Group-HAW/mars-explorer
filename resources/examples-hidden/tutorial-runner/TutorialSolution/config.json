@@ -53,7 +53,7 @@
 	"globals": {
 		"endPoint": "2022-02-23T14:53:00",
 		"startPoint": "2022-02-23T14:49:00",
-		"deltaTUnit": "minutes",
+		"deltaTUnit": "seconds",
 		"deltaT": 1,
 		"output": "csv",
 		"pythonVisualization": true,

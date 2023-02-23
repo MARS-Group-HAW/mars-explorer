@@ -51,9 +51,7 @@ namespace SheepWolfStarter
             }
             Spawn(WolfReproduce);
 
-            // var target = _grassland.SheepEnvironment.Explore(Position, -1D, 1).FirstOrDefault();
-            var target = _grassland.SheepEnvironment.Entities.OrderBy(sheep =>
-                Distance.Chebyshev(Position.PositionArray, sheep.Position.PositionArray)).FirstOrDefault();
+            var target = _grassland.SheepEnvironment.Explore(Position, -1D, 1).FirstOrDefault();
             if (target != null)
             {
                 var targetDistance = (int) Distance.Chebyshev(Position.PositionArray, target.Position.PositionArray);
