@@ -9,36 +9,31 @@ An application intended to simplify the first steps into the subject of multi-ag
 - [Node.js](https://nodejs.org/en/) (Version >= 14)
 - [Yarn](https://classic.yarnpkg.com/lang/en/docs/install/#mac-stable)
 - .NET SDK (for running simulations and validating code in the application)
+
 ## Run Locally
 
-Clone the project
+Clone the project:
 
 ```bash
-  git clone https://git.haw-hamburg.de/mars/life.git
+  git clone https://github.com/MARS-Group-HAW/mars-explorer.git
 ```
 
-Go to the project directory
-
-```bash
-  cd mars-life/Explorer
-```
-
-Install dependencies
+Install dependencies:
 
 ```bash
   yarn install
 ```
 
-Start the application
+Start the application:
 
 ```bash
   yarn start
 ```
 
-> **IMPORTANT**: 
-> Only the files within `app/` will be live reloaded.
+> **Warning**
+> Only the files within `app/` will be live reloaded. 
 > Changes to other files (e.g. in `/main`, `/shared`, ...) won't have an effect until the application has been restarted.
-> 
+
 
 ## Running Tests
 
@@ -47,7 +42,6 @@ To run tests, run the following command
 ```bash
   yarn test
 ```
-
 
 ## Build
 
@@ -66,14 +60,15 @@ If you want to build it for another OS, have a look at the documentation of [ele
 
 ## Tech Stack
 
-#### Main
+### Main
 
 - [Electron](https://www.electronjs.org/) (Fundamental Framework for X-Platform development, V13)
 - [Electron-Forge](https://www.electronforge.io/) (Tool for creating, publishing, and installing Electron applications)
 - [Electron-Log](https://www.npmjs.com/package/electron-log) (Simple Logging Library)
 - [Omnisharp-Roslyn](https://github.com/OmniSharp/omnisharp-roslyn) (C# Languageserver, will be downloaded for your current OS by script after running `yarn install`)
 
-#### Renderer
+### Renderer
+
 - [React](https://reactjs.org/) (Fundamental UI-Framework)
 - [React-use](https://github.com/streamich/react-use) (Collection of Hooks)
 - [Material UI](https://v4.mui.com/) (UI-Components, V4)
@@ -83,12 +78,13 @@ If you want to build it for another OS, have a look at the documentation of [ele
 - [Monaco Editor](https://microsoft.github.io/monaco-editor/) (Code Editor)
 - [Monaco-Languageclient](https://github.com/TypeFox/monaco-languageclient) (Languageclient to communicate with Languageserver, new version released as `@codingame/monaco-languageclient`, see [here](https://github.com/TypeFox/monaco-languageclient/issues/295#issuecomment-940756215))
 
-#### Others
+### Others
 - [Typescript](https://www.typescriptlang.org/) (JavaScript with Typings)
 - [Jest](https://jestjs.io/) (Testing Library)
+
 ## Lessons Learned
 
-#### Complex state should be simplified by using a reducer
+### Complex state should be simplified by using a reducer
 
 Any state that has multiple values should be moved to a reducer function.
 In simple terms, a reducer is a function that takes a state and an action as an argument and returns a new state.
@@ -103,7 +99,7 @@ However, experience has shown that these can become very confusing in combinatio
 Therefore, these hooks should be gradually migrated to Reducers in the future.
 
 
-#### Using a Reducer does not imply using the global store
+### Using a Reducer does not imply using the global store
 
 It is important to distinguish between a global state using Redux and a local reducer.
 In some cases, a certain state must be shared with other components that are not directly accessible.
@@ -112,18 +108,20 @@ In contrast, there are also cases where a complex state needs to be simplified a
 In this case it is sufficient to introduce a local reducer.
 
 
-#### Use Logs to debug multiple processes
+### Use Logs to debug multiple processes
 Since several processes interact within the application, debugging with common tools is difficult.
 To find out how the processes interact with each other, the logs have proven to be extremely helpful.
+
+
 ## FAQ
 
-#### Update MARS framework version
-The nuget package version is defined in 
-``src/main/handler/dotnetcli-handler.ts``
+### Update MARS framework version
 
-#### Where are the logs located?
+The NuGet package version is defined in `src/main/handler/dotnetcli-handler.ts`.
 
-- MacOS: `~/Library/Logs/MARS-Explorer/`
+### Where are the logs located?
+
+- macOS: `~/Library/Logs/MARS-Explorer/`
 - Linux: `~/.config/MARS-Explorer/logs/`
 - Windows: `%USERPROFILE%\AppData\Roaming\MARS-Explorer\logs\`
 
